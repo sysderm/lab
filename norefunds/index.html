@@ -23,6 +23,7 @@
     --ink-soft:#5C5A52;
     --ink-faint:#8B887C;
     --red:#C0392B;
+    --gold:#9A7B2F;
     --focus:#E8E4D4;
   }
   *{box-sizing:border-box}
@@ -72,12 +73,23 @@
     display:block;font-size:11.5px;letter-spacing:.14em;color:var(--ink-soft);
     text-transform:uppercase;margin:14px 0 2px;
   }
-  .stub .opt{color:var(--ink-faint)}
+  .stub .opt{color:var(--gold)}
   .stub input[type=number], .stub select{
     font-family:"Courier Prime","Courier New",monospace;font-size:17px;color:var(--ink);
-    background:transparent;border:none;border-bottom:1.5px dashed var(--ink-faint);
+    background:transparent;border:none;border-bottom:1.5px dashed var(--gold);
     padding:4px 2px;width:100%;border-radius:0;
   }
+  /* the one field the register cannot live without */
+  label[for="age"]{color:var(--red)}
+  .req-chip{
+    display:inline-block;font-size:9px;letter-spacing:.18em;font-weight:700;
+    color:var(--paper);background:var(--red);padding:2px 7px;border-radius:2px;
+    margin-left:8px;vertical-align:2px;
+  }
+  #age{border-bottom:2.5px solid var(--red);background:rgba(192,57,43,.07)}
+  #age.bad{animation:shake .3s}
+  @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  @media (prefers-reduced-motion: reduce){#age.bad{animation:none}}
   .stub select{width:auto}
   .stub .inline{display:flex;gap:10px;align-items:flex-end}
   .stub .inline input{flex:1}
@@ -178,8 +190,8 @@
   <hr class="rule">
 
   <form class="stub" id="stub" autocomplete="off">
-    <label for="age">Your age</label>
-    <input id="age" type="number" inputmode="numeric" min="1" max="119" placeholder="34">
+    <label for="age">Your age <span class="req-chip">required</span></label>
+    <input id="age" type="number" inputmode="numeric" min="1" max="119" aria-required="true">
 
     <fieldset class="warranty">
       <legend>Warranty plan <span class="opt">(life expectancy)</span></legend>
@@ -232,8 +244,10 @@
    Empty strings keep the support box hidden.
    ═══════════════════════════════════════════════════════════ */
 const MONETIZE = {
+  /* On Stripe activation: paste the LIVE buy.stripe.com links here.
+     (sandbox link that passed testing: https://buy.stripe.com/test_dRm14m2U96JU4lr0l87bW00) */
   tipUrl: "",
-  tipLabel: "Tip · $3 (refundable)",
+  tipLabel: "Tip the cashier · CHF 3 suggested",
   productUrl: "",
   productLabel: "",
   sponsorText: "",
@@ -255,10 +269,57 @@ function money(v,cur){
 
 let LAST = null;
 
+/* ── cashier sound: thermal ratchet while lines print, register bell at the end ── */
+function chaChing(lines){
+  try{
+    const AC = window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    const ctx = window.__tillAC || (window.__tillAC = new AC());
+    if(ctx.state==="suspended") ctx.resume();
+    const t0 = ctx.currentTime;
+    const dur = REDUCED ? 0.7 : Math.min(2.6, lines*0.055+0.35);
+    /* printer ratchet: gated noise through a bandpass */
+    const n = Math.floor(ctx.sampleRate*dur);
+    const buf = ctx.createBuffer(1,n,ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for(let i=0;i<n;i++){
+      const t = i/ctx.sampleRate;
+      const gate = Math.sin(2*Math.PI*36*t) > -0.1 ? 1 : 0.08;
+      const wobble = Math.sin(2*Math.PI*3.2*t) > 0 ? 1 : 0.85;
+      d[i] = (Math.random()*2-1)*gate*wobble;
+    }
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const hp = ctx.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=700;
+    const bp = ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=2400; bp.Q.value=0.9;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.001,t0);
+    g.gain.exponentialRampToValueAtTime(0.55,t0+0.05);
+    g.gain.setValueAtTime(0.55,t0+Math.max(0.06,dur-0.08));
+    g.gain.exponentialRampToValueAtTime(0.001,t0+dur);
+    src.connect(hp); hp.connect(bp); bp.connect(g); g.connect(ctx.destination);
+    src.start(t0);
+    /* the bell: two partials, quick strike, long-ish decay */
+    [[1568,0],[2093,0.004]].forEach(([f,off])=>{
+      const o = ctx.createOscillator(); o.type="sine"; o.frequency.value=f;
+      const og = ctx.createGain(); const tb = t0+dur+0.02+off;
+      og.gain.setValueAtTime(0.0001,tb);
+      og.gain.exponentialRampToValueAtTime(0.6,tb+0.012);
+      og.gain.exponentialRampToValueAtTime(0.0001,tb+0.9);
+      o.connect(og); og.connect(ctx.destination);
+      o.start(tb); o.stop(tb+1);
+    });
+  }catch(e){}
+}
+
 function build(){
   const age = parseFloat(document.getElementById("age").value);
   const err = document.getElementById("err");
-  if(!isFinite(age)||age<1||age>119){err.style.display="block";return;}
+  if(!isFinite(age)||age<1||age>119){
+    err.style.display="block";
+    const af=document.getElementById("age");
+    af.classList.remove("bad"); void af.offsetWidth; af.classList.add("bad");
+    af.focus();
+    return;
+  }
   err.style.display="none";
 
   let exp = parseFloat(document.querySelector('input[name="plan"]:checked').value);
@@ -349,6 +410,7 @@ function build(){
 }
 
 function render(L){
+  chaChing(L.length);
   const out=document.getElementById("out");
   out.innerHTML="";out.classList.add("on","printing");
   const els=[];
