@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>The Weather Lottery</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="You were entered into the weather lottery at birth. Check your country's ticket: sunshine dividend, rain tax, thermal position — luck score out of 100. No refunds.">
+<meta property="og:title" content="The Weather Lottery">
+<meta property="og:description" content="You were entered at birth. Check your ticket: sunshine dividend, rain tax, luck score. Act of God — no refunds.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=VT323&display=swap">
+<style>
+  :root{--counter:#131217;--glow:#1C1A22;--paper:#F7F4EA;--ink:#33322E;--ink-soft:#5C5A52;
+    --ink-faint:#8B887C;--red:#C0392B;--gold:#9A7B2F;--sun:#B07E10}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;padding:48px 12px 80px;
+    background:radial-gradient(120% 90% at 50% 0%,var(--glow),var(--counter) 70%);
+    color:#B8B4A6;font-family:"Courier Prime","Courier New",monospace;font-size:15px;line-height:1.6;
+    display:flex;flex-direction:column;align-items:center}
+  :focus-visible{outline:2px solid #E8E4D4;outline-offset:3px}
+  .ticket{position:relative;width:min(430px,100%);
+    background:linear-gradient(180deg,var(--paper),#EFEBDD 55%,var(--paper));color:var(--ink);
+    padding:34px 26px 38px;box-shadow:0 30px 60px -20px rgba(0,0,0,.75);font-variant-numeric:tabular-nums}
+  .ticket::before,.ticket::after{content:"";position:absolute;left:0;right:0;height:9px;
+    background:linear-gradient(45deg,var(--paper) 4.5px,transparent 0) 0 0/9px 9px repeat-x,
+      linear-gradient(-45deg,var(--paper) 4.5px,transparent 0) 4.5px 0/9px 9px repeat-x}
+  .ticket::before{top:-9px;transform:scaleY(-1)}
+  .ticket::after{bottom:-9px}
+  h1{font-family:"VT323",monospace;font-weight:400;font-size:44px;letter-spacing:.05em;
+    line-height:.95;text-align:center;margin:0}
+  .tag{text-align:center;font-size:11.5px;letter-spacing:.22em;margin:6px 0 2px;text-transform:uppercase}
+  .meta{text-align:center;font-size:11.5px;color:var(--ink-soft);line-height:1.7;margin-top:8px}
+  .rule{border:none;border-top:1.5px dashed var(--ink-faint);margin:16px 0}
+  label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+  select{font-family:"Courier Prime",monospace;font-size:16px;color:var(--ink);width:100%;
+    background:transparent;border:none;border-bottom:2px dashed var(--gold);padding:6px 2px;border-radius:0}
+  .go{display:block;width:100%;margin-top:18px;cursor:pointer;font-family:"Courier Prime",monospace;
+    font-weight:700;font-size:14px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--paper);background:var(--ink);border:none;padding:13px}
+  .go:hover{background:#000}
+  .anon{font-size:10px;letter-spacing:.16em;text-transform:uppercase;text-align:center;color:var(--ink-faint);margin-top:12px}
+  #out{display:none}
+  #out.on{display:block}
+  .sect{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);margin:14px 0 6px}
+  .li{display:flex;justify-content:space-between;align-items:baseline;line-height:2}
+  .li b{font-family:"VT323",monospace;font-size:22px;font-weight:400;white-space:nowrap}
+  .li.sun b{color:var(--sun)}
+  .li .lab{flex:1}
+  .note{text-align:right;font-size:11.5px;color:var(--ink-soft);margin-top:-6px}
+  .score{display:flex;justify-content:space-between;align-items:baseline}
+  .score b{font-family:"VT323",monospace;font-size:52px;font-weight:400}
+  .verdict{text-align:center;font-size:14px;font-weight:700;letter-spacing:.06em;margin-top:6px}
+  .greener{text-align:center;font-size:12px;color:var(--ink-soft);font-style:italic;margin-top:10px}
+  .stampwrap{position:relative;height:80px;margin:8px 0 0}
+  .stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);
+    font-weight:700;font-size:21px;letter-spacing:.14em;color:var(--red);
+    border:3.5px double var(--red);padding:7px 15px;border-radius:4px;opacity:.85;
+    mix-blend-mode:multiply;white-space:nowrap}
+  .stamp small{display:block;font-size:9.5px;letter-spacing:.28em;text-align:center;font-weight:400}
+  .thanks{text-align:center;font-size:11.5px;letter-spacing:.2em;line-height:1.9;margin-top:12px}
+  .reveal{opacity:0;transform:translateY(4px)}
+  .printed .reveal{animation:pl .18s ease-out forwards}
+  @keyframes pl{to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.reveal,.printed .reveal{opacity:1;transform:none;animation:none}}
+  .counter-ui{width:min(430px,100%);text-align:center;margin-top:32px}
+  .copy{cursor:pointer;font-family:"Courier Prime",monospace;font-size:13px;letter-spacing:.12em;
+    text-transform:uppercase;background:none;border:1.5px dashed var(--ink-faint);color:var(--paper);padding:11px 20px;display:none}
+  .copy:hover{border-style:solid}
+  .support{display:none;margin-top:24px;border:1.5px dashed #3A3742;padding:18px 16px;color:#B8B4A6}
+  .support.on{display:block}
+  .s-t{letter-spacing:.18em;text-transform:uppercase;font-size:12px;margin-bottom:10px;color:#D8D4C4}
+  .s-btn{display:inline-block;text-decoration:none;font-family:"Courier Prime",monospace;
+    font-size:13px;letter-spacing:.08em;background:var(--paper);color:var(--ink);padding:10px 18px}
+  .fine{max-width:430px;color:#5F5C66;font-size:11.5px;line-height:1.7;margin-top:36px;text-align:center}
+  .fine a{color:#8B8794}
+</style></head><body>
+
+<main class="ticket">
+  <h1>THE WEATHER LOTTERY</h1>
+  <div class="tag">You were entered at birth</div>
+  <div class="meta">DRAW 03 · ADJUDICATOR: THE SKY<br><span id="today"></span> · RESULTS ARE FINAL</div>
+  <hr class="rule">
+  <form id="f">
+    <label for="ctry">Your ticket (home country)</label>
+    <select id="ctry"></select>
+    <button class="go" type="submit">▸ Check my ticket</button>
+    <div class="anon">100% anonymous · nothing is saved · the sky already knows where you live</div>
+  </form>
+  <div id="out"></div>
+</main>
+
+<div class="counter-ui">
+  <button class="copy" id="copy">Copy my result</button>
+  <div class="support" id="support">
+    <div class="s-t">Tip the adjudicator</div>
+    <span id="s-buttons"></span>
+  </div>
+  <p class="fine"><b>Fine print.</b> Climate figures are approximate national normals anchored on the
+  main city (yearly sunshine hours, days with precipitation, mean temperature) from public
+  meteorological data, rounded. Luck score = 50% sunshine + 25% dry days + 25% thermal comfort
+  (distance from a civilised 16°C), ranked across the 44 tickets in the draw. Meteorology, not
+  destiny. Also at this register: <a href="../norefunds/">No Refunds</a> ·
+  <a href="../mirror/">The Money Mirror</a>.</p>
+</div>
+
+<script>
+const MONETIZE = { tipUrl:"https://buy.stripe.com/8x29AS86Y7tncla5BIbsc00", tipLabel:"Tip · CHF 3 (weatherproof)" };
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+document.getElementById("today").textContent=new Date().toISOString().slice(0,10);
+
+/* [name, sunshine h/yr, rain days/yr, mean °C] — approx. normals, main-city anchored */
+const W=[
+["Switzerland",1600,120,9],["Germany",1700,106,10],["Austria",1900,90,11],
+["France",1660,110,12],["United Kingdom",1480,110,11],["Ireland",1450,130,10],
+["Netherlands",1660,130,10],["Belgium",1550,130,11],["Denmark",1780,120,9],
+["Sweden",1820,100,7],["Norway",1670,115,6],["Finland",1860,105,6],
+["Portugal",2800,65,17],["Spain",2770,60,15],["Italy",2500,75,16],["Greece",2770,45,18],
+["Poland",1570,115,9],["Czechia",1670,100,9],["Hungary",1990,85,11],["Romania",2110,95,11],
+["Russia",1730,120,6],["Türkiye",2020,80,14],["United States",2600,90,13],["Canada",2050,110,8],
+["Mexico",2550,90,17],["Brazil",1900,135,19],["Argentina",2520,90,17],["Chile",2850,40,14],
+["Colombia",1330,185,14],["South Africa",3120,65,16],["Egypt",3540,8,22],["Nigeria",1880,150,27],
+["India",2680,55,25],["China",2670,60,13],["Japan",1930,105,16],["South Korea",2230,100,13],
+["Singapore",2020,170,27],["Thailand",2620,110,29],["Vietnam",1470,140,24],["Philippines",2100,145,28],
+["Indonesia",2280,130,27],["Australia",2670,95,18],["New Zealand",2060,135,15],
+["United Arab Emirates",3510,8,28]
+];
+const sel=document.getElementById("ctry");
+W.map(w=>w[0]).sort().forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;sel.appendChild(o);});
+sel.value="Switzerland";
+
+function pctRank(arr,v,invert){ /* % of entries strictly worse than v */
+  let worse=0; arr.forEach(x=>{ if(invert? x>v : x<v) worse++; });
+  return worse/(arr.length-1)*100;
+}
+const nf=new Intl.NumberFormat();
+let LAST=null;
+
+function chaChing(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+    const ctx=window.__ac||(window.__ac=new AC()); if(ctx.state==="suspended")ctx.resume();
+    const t0=ctx.currentTime, dur=REDUCED?0.5:1.4;
+    const n=Math.floor(ctx.sampleRate*dur), buf=ctx.createBuffer(1,n,ctx.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++){const t=i/ctx.sampleRate;
+      d[i]=(Math.random()*2-1)*(Math.sin(2*Math.PI*36*t)>-0.1?1:0.08);}
+    const src=ctx.createBufferSource();src.buffer=buf;
+    const bp=ctx.createBiquadFilter();bp.type="bandpass";bp.frequency.value=2400;
+    const g=ctx.createGain();g.gain.setValueAtTime(0.4,t0);g.gain.exponentialRampToValueAtTime(0.001,t0+dur);
+    src.connect(bp);bp.connect(g);g.connect(ctx.destination);src.start(t0);
+    [[1568,0],[2093,0.004]].forEach(([f,off])=>{
+      const o=ctx.createOscillator();o.frequency.value=f;const og=ctx.createGain();
+      const tb=t0+dur+0.02+off;og.gain.setValueAtTime(0.0001,tb);
+      og.gain.exponentialRampToValueAtTime(0.5,tb+0.012);og.gain.exponentialRampToValueAtTime(0.0001,tb+0.8);
+      o.connect(og);og.connect(ctx.destination);o.start(tb);o.stop(tb+0.9);});
+  }catch(e){}
+}
+
+function check(){
+  const name=sel.value, w=W.find(x=>x[0]===name);
+  const suns=W.map(x=>x[1]), rains=W.map(x=>x[2]), temps=W.map(x=>Math.abs(x[3]-16));
+  const sunP=pctRank(suns,w[1],false);
+  const rainP=pctRank(rains,w[2],true);
+  const comfP=pctRank(temps,Math.abs(w[3]-16),true);
+  const luck=Math.round(0.5*sunP+0.25*rainP+0.25*comfP);
+  const ranked=W.map(x=>({n:x[0],s:Math.round(0.5*pctRank(suns,x[1],false)+0.25*pctRank(rains,x[2],true)+0.25*pctRank(temps,Math.abs(x[3]-16),true))}))
+    .sort((a,b)=>b.s-a.s);
+  const rank=ranked.findIndex(x=>x.n===name)+1;
+  const better=ranked[Math.max(0,rank-2)];
+  const verdict=
+    luck>=80?"JACKPOT — BORN UNDER A WINNING SKY":
+    luck>=60?"A SOLID TICKET — DON'T PUSH YOUR LUCK":
+    luck>=40?"HOUSE ODDS — THE SKY OWES YOU NOTHING":
+    luck>=20?"ROUGH DRAW — CARRY AN UMBRELLA AND A GRUDGE":
+             "CONDOLENCES — THE DRAW WAS RIGGED, AND YOU KNOW IT";
+  const li=(lab,val,cls)=>'<div class="li reveal '+(cls||"")+'"><span class="lab">'+lab+'</span><b>'+val+'</b></div>';
+  const note=t=>'<div class="note reveal">'+t+'</div>';
+  let h='<hr class="rule reveal">'
+   +'<div class="sect reveal">TICKET: '+name.toUpperCase()+'</div>'
+   +li("SUNSHINE DIVIDEND",nf.format(w[1])+" h/yr","sun")
+   +note("outshines "+Math.round(sunP)+"% of tickets")
+   +li("RAIN TAX",w[2]+" wet days/yr")
+   +note("drier than "+Math.round(rainP)+"% of tickets")
+   +li("THERMAL POSITION",w[3]+"°C mean")
+   +note("comfier than "+Math.round(comfP)+"% of tickets")
+   +'<hr class="rule reveal">'
+   +'<div class="score reveal"><span class="lab" style="font-size:12px;letter-spacing:.2em">LUCK SCORE</span><b>'+luck+'/100</b></div>'
+   +li("DRAW RANK","#"+rank+" OF "+W.length,"small")
+   +'<div class="verdict reveal">'+verdict+'</div>'
+   +(rank>1?'<div class="greener reveal">Nearest better sky: '+better.n+'. The grass is measurably greener.</div>'
+           :'<div class="greener reveal">There is no better sky. Stop complaining.</div>')
+   +'<div class="stampwrap reveal"><div class="stamp">ACT OF GOD<small>NO REFUNDS · RESULTS FINAL</small></div></div>'
+   +'<div class="thanks reveal">THANK YOU FOR WEATHERING<br>DRAWN AGAIN TOMORROW · SAME SKY'
+   +'<br><span style="font-size:10px;letter-spacing:.28em;color:var(--ink-faint)">★ '
+   +((location.hostname||"konsil.ch").replace(/^www\./,""))+'/weather ★</span></div>';
+  const out=document.getElementById("out");
+  out.innerHTML=h; out.classList.add("on");
+  out.classList.remove("printed"); void out.offsetWidth;
+  out.querySelectorAll(".reveal").forEach((el,i)=>el.style.animationDelay=REDUCED?"0s":(i*0.07)+"s");
+  out.classList.add("printed");
+  chaChing();
+  document.getElementById("copy").style.display="inline-block";
+  LAST={name,luck,rank,rain:w[2],sun:w[1]};
+}
+document.getElementById("f").addEventListener("submit",e=>{e.preventDefault();check();});
+
+document.getElementById("copy").addEventListener("click",async()=>{
+  if(!LAST)return;
+  const txt="I checked my ticket in the Weather Lottery 🌦\n"
+    +"· "+LAST.name+": luck score "+LAST.luck+"/100 (draw rank #"+LAST.rank+"/"+W.length+")\n"
+    +"· Sunshine dividend: "+nf.format(LAST.sun)+" h/yr · Rain tax: "+LAST.rain+" days\n"
+    +"Act of God — no refunds. Check yours: "+location.href;
+  const b=document.getElementById("copy");
+  try{await navigator.clipboard.writeText(txt);b.textContent="Copied — go argue about it";}
+  catch(e){b.textContent="Screenshot it instead";}
+  setTimeout(()=>b.textContent="Copy my result",2600);
+});
+
+(function(){const M=MONETIZE,s=document.getElementById("support"),b=document.getElementById("s-buttons");
+  if(M.tipUrl){const a=document.createElement("a");a.className="s-btn";a.href=M.tipUrl;
+    a.target="_blank";a.rel="noopener";a.textContent=M.tipLabel;b.appendChild(a);s.classList.add("on");}})();
+</script>
+</body></html>

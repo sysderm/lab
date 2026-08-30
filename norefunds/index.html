@@ -105,6 +105,17 @@
   .print-btn:hover{background:#000}
   .print-btn:active{transform:translateY(1px)}
   .err{display:none;color:var(--red);font-size:12.5px;margin-top:10px;text-align:center}
+  .anon{
+    font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+    text-align:center;color:var(--ink-faint);margin-top:14px;
+  }
+  .langtog{
+    position:absolute;top:14px;right:14px;cursor:pointer;
+    font-family:"Courier Prime",monospace;font-size:10.5px;font-weight:700;
+    letter-spacing:.14em;color:var(--ink-soft);background:none;
+    border:1.5px dashed var(--ink-faint);padding:4px 9px;
+  }
+  .langtog:hover{border-style:solid;color:var(--ink)}
 
   /* printed body */
   #out{display:none}
@@ -181,38 +192,43 @@
 </style>
 
 <main class="receipt" aria-label="Your lifetime receipt">
+  <select class="langtog" id="langtog" aria-label="Language / Sprache / Langue / Idioma / 语言">
+    <option value="en">EN</option><option value="de">DE</option><option value="fr">FR</option>
+    <option value="es">ES</option><option value="zh">中文</option>
+  </select>
   <h1>NO REFUNDS</h1>
-  <div class="tagline">THE LIFETIME RECEIPT</div>
+  <div class="tagline" id="i-tagline">THE LIFETIME RECEIPT</div>
   <div class="meta">
-    REGISTER 03 · CASHIER: TIME<br>
-    <span id="today"></span> · ALL SALES FINAL
+    <span id="i-meta1">REGISTER 03 · CASHIER: TIME</span><br>
+    <span id="today"></span> · <span id="i-final">ALL SALES FINAL</span>
   </div>
   <hr class="rule">
 
   <form class="stub" id="stub" autocomplete="off">
-    <label for="age">Your age <span class="req-chip">required</span></label>
+    <label for="age" id="i-lage">Your age <span class="req-chip">required</span></label>
     <input id="age" type="number" inputmode="numeric" min="1" max="119" aria-required="true">
 
     <fieldset class="warranty">
-      <legend>Warranty plan <span class="opt">(life expectancy)</span></legend>
-      <label class="w"><input type="radio" name="plan" value="81" checked> STANDARD — 81 YRS (GLOBAL-NORTH AVG)</label>
-      <label class="w"><input type="radio" name="plan" value="92"> EXTENDED — 92 YRS (EATS VEGETABLES)</label>
-      <label class="w"><input type="radio" name="plan" value="100"> COLLECTOR'S — 100 YRS (PURE SPITE)</label>
+      <legend id="i-lplan">Warranty plan <span class="opt">(life expectancy)</span></legend>
+      <label class="w"><input type="radio" name="plan" value="81" checked> <span id="i-w81">STANDARD — 81 YRS (GLOBAL-NORTH AVG)</span></label>
+      <label class="w"><input type="radio" name="plan" value="92"> <span id="i-w92">EXTENDED — 92 YRS (EATS VEGETABLES)</span></label>
+      <label class="w"><input type="radio" name="plan" value="100"> <span id="i-w100">COLLECTOR'S — 100 YRS (PURE SPITE)</span></label>
     </fieldset>
 
-    <label for="income">Annual income <span class="opt">(optional — adds the money lines)</span></label>
+    <label for="income" id="i-lincome">Annual income <span class="opt">(optional — adds the money lines)</span></label>
     <div class="inline">
       <select id="cur" aria-label="Currency"></select>
       <input id="income" type="number" inputmode="numeric" min="0" step="any" placeholder="—">
     </div>
 
-    <label for="visits">Times you see your parents per year <span class="opt">(optional — careful)</span></label>
+    <label for="visits" id="i-lvisits">Times you see your parents per year <span class="opt">(optional — careful)</span></label>
     <input id="visits" type="number" inputmode="numeric" min="0" max="366" placeholder="—">
-    <label for="page">Their average age</label>
+    <label for="page" id="i-lpage">Their average age</label>
     <input id="page" type="number" inputmode="numeric" min="18" max="119" placeholder="—">
 
-    <button class="print-btn" type="submit">▸ Print receipt</button>
+    <button class="print-btn" type="submit" id="i-print">▸ Print receipt</button>
     <div class="err" id="err">The register needs your age. It already knows everything else.</div>
+    <div class="anon" id="i-anon">100% anonymous · nothing is saved · the math never leaves your device</div>
   </form>
 
   <div id="out"></div>
@@ -223,11 +239,11 @@
   <button class="copy" id="copy" style="display:none">Copy my receipt</button>
   <p class="nudge" id="nudge" style="display:none">Screenshot it. Send it to someone you'd like more time with.</p>
   <div class="support" id="support">
-    <div class="s-t">Tip the cashier</div>
+    <div class="s-t" id="i-stitle">Tip the cashier</div>
     <span id="s-buttons"></span>
     <div class="sponsor" id="s-sponsor"></div>
   </div>
-  <p class="fine">
+  <p class="fine" id="i-fine">
     <b>Fine print.</b> Estimates, not prophecy: averages stitched from public life-expectancy and
     consumption data (3 meals & ~5h of screen time a day, 1.5 coffees, a phone every 3 years, a car
     every 8 until 78, haircuts every 6 weeks, 12 nights of vacation and 5 finished books a year,
@@ -253,15 +269,196 @@ const MONETIZE = {
 };
 
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const CURRENCIES = ["USD","EUR","GBP","CHF","CAD","AUD","JPY","CNY","INR","BRL","MXN","SEK","SGD","AED","ZAR"];
+const CURRENCIES = ["CHF","USD","EUR","GBP","CAD","AUD","JPY","CNY","INR","BRL","MXN","SEK","SGD","AED","ZAR"];
+
+/* ═══ i18n — EN/DE/FR/ES/ZH, auto-picked from browser language, ?lang= overrides ═══ */
+const I18N = {
+en:{locale:"en-US",
+ tagline:"THE LIFETIME RECEIPT", meta1:"REGISTER 03 · CASHIER: TIME", final:"ALL SALES FINAL",
+ lage:'Your age <span class="req-chip">required</span>',
+ lplan:'Warranty plan <span class="opt">(life expectancy)</span>',
+ w81:"STANDARD — 81 YRS (GLOBAL-NORTH AVG)", w92:"EXTENDED — 92 YRS (EATS VEGETABLES)", w100:"COLLECTOR'S — 100 YRS (PURE SPITE)",
+ lincome:'Annual income <span class="opt">(optional — adds the money lines)</span>',
+ lvisits:'Times you see your parents per year <span class="opt">(optional — careful)</span>',
+ lpage:"Their average age", print:"▸ Print receipt",
+ err:"The register needs your age. It already knows everything else.",
+ anon:"100% anonymous · nothing is saved · the math never leaves your device",
+ elapsed:"LIFE ELAPSED", planAdj:"PLAN ADJUSTED: EXTENDED WARRANTY", autoApplied:"AUTO-APPLIED",
+ sTime:"TIME, REMAINING", weeks:"WEEKS", mondays:"MONDAYS", weekends:"WEEKENDS", summers:"SUMMERS", moons:"FULL MOONS",
+ sCons:"CONSUMPTION, REMAINING (EST.)", coffees:"COFFEES", meals:"MEALS", phones:"PHONES YOU'LL OWN", cars:"CARS",
+ haircuts:"HAIRCUTS", vacations:"NIGHTS OF VACATION", books:"BOOKS YOU'LL FINISH",
+ sGoes:"WHERE IT ACTUALLY GOES", stare:"STARING AT YOUR PHONE", yrs:"YRS",
+ ofYears:n=>"of your remaining "+n+" years", workh:"HOURS AT WORK (TO 65)",
+ sMoney:"MONEY, STILL INBOUND", futureEarn:"FUTURE EARNINGS (TO 65)", grossNote:"gross · flat wage · enjoy taxes",
+ sPeople:"PEOPLE", parents:"TIMES YOU'LL SEE YOUR PARENTS", priceless:"PRICELESS",
+ makeCount:"make them count", assumeNote:"assuming ~20 more of their years",
+ subtotal:"SUBTOTAL", everything:"EVERYTHING YOU'LL EVER HAVE", payMethod:"PAYMENT METHOD", timeW:"TIME", change:"CHANGE DUE",
+ stampS:"NO EXCHANGES · SALE IS FINAL", wRemaining:"YOUR REMAINING WEEKS",
+ thanks:"THANK YOU FOR LIVING<br>COME AGAIN · WHILE SUPPLIES LAST",
+ copyBtn:"Copy my receipt", copied:"Copied — go cause perspective", copyFail:"Screenshot the receipt instead",
+ shareBtn:"Share it",
+ nudge:"Screenshot it. Send it to someone you'd like more time with.",
+ tipTitle:"Tip the cashier",
+ shareLead:"My lifetime receipt 🧾", shareWeekends:"weekends left", shareCoffees:"coffees left",
+ shareStare:(s,y)=>"~"+s+" of my remaining "+y+" years staring at my phone",
+ shareParents:n=>"I'll see my parents ~"+n+" more times", shareTail:"No refunds. Print yours: ",
+ fine:'<b>Fine print.</b> Estimates, not prophecy: averages stitched from public life-expectancy and consumption data (3 meals &amp; ~5h of screen time a day, 1.5 coffees, a phone every 3 years, a car every 8 until 78, haircuts every 6 weeks, 12 nights of vacation and 5 finished books a year, working years to 65, parents’ expectancy 85). Your mileage will vary — that is the point. Everything is computed in your browser; nothing you type is stored or sent anywhere. Not medical, financial, or existential advice.'},
+de:{locale:"de-CH",
+ tagline:"DER KASSENZETTEL DEINES LEBENS", meta1:"KASSE 03 · ES BEDIENTE DICH: DIE ZEIT", final:"KEIN UMTAUSCH",
+ lage:'Dein Alter <span class="req-chip">Pflichtfeld</span>',
+ lplan:'Garantieplan <span class="opt">(Lebenserwartung)</span>',
+ w81:"STANDARD — 81 J. (Ø GLOBALER NORDEN)", w92:"VERLÄNGERT — 92 J. (ISST GEMÜSE)", w100:"SAMMLER-EDITION — 100 J. (AUS PUREM TROTZ)",
+ lincome:'Jahreseinkommen <span class="opt">(optional — schaltet die Geldzeilen frei)</span>',
+ lvisits:'Wie oft siehst du deine Eltern pro Jahr? <span class="opt">(optional — Vorsicht)</span>',
+ lpage:"Durchschnittsalter deiner Eltern", print:"▸ Kassenzettel drucken",
+ err:"Die Kasse braucht dein Alter. Alles andere weiss sie schon.",
+ anon:"100% anonym · nichts wird gespeichert · die Rechnung verlässt dein Gerät nie",
+ elapsed:"LEBEN VERBRAUCHT", planAdj:"GARANTIE VERLÄNGERT", autoApplied:"AUTOMATISCH",
+ sTime:"ZEIT — RESTBESTAND", weeks:"WOCHEN", mondays:"MONTAGE", weekends:"WOCHENENDEN", summers:"SOMMER", moons:"VOLLMONDE",
+ sCons:"KONSUM — RESTBESTAND (CA.)", coffees:"KAFFEES", meals:"MAHLZEITEN", phones:"HANDYS, DIE DU NOCH KAUFST", cars:"AUTOS",
+ haircuts:"HAARSCHNITTE", vacations:"FERIENNÄCHTE", books:"BÜCHER, DIE DU FERTIG LIEST",
+ sGoes:"WOFÜR ES WIRKLICH DRAUFGEHT", stare:"AUFS HANDY STARREN", yrs:"JAHRE",
+ ofYears:n=>"von deinen verbleibenden "+n+" Jahren", workh:"ARBEITSSTUNDEN (BIS 65)",
+ sMoney:"GELD, NOCH UNTERWEGS", futureEarn:"KÜNFTIGER LOHN (BIS 65)", grossNote:"brutto · konstanter Lohn · viel Spass mit den Steuern",
+ sPeople:"MENSCHEN", parents:"WIE OFT DU DEINE ELTERN NOCH SIEHST", priceless:"UNBEZAHLBAR",
+ makeCount:"jedes einzelne zählt", assumeNote:"angenommen, ihnen bleiben noch ~20 Jahre",
+ subtotal:"ZWISCHENSUMME", everything:"ALLES, WAS DU JE HABEN WIRST", payMethod:"ZAHLUNGSART", timeW:"ZEIT", change:"RÜCKGELD",
+ stampS:"VOM UMTAUSCH AUSGESCHLOSSEN", wRemaining:"DEINE VERBLEIBENDEN WOCHEN",
+ thanks:"DANKE FÜRS VORBEILEBEN<br>KOMM WIEDER · SOLANGE DER VORRAT REICHT",
+ copyBtn:"Zettel kopieren", copied:"Kopiert — geh Perspektive stiften", copyFail:"Mach lieber einen Screenshot",
+ shareBtn:"Teilen",
+ nudge:"Mach einen Screenshot. Schick ihn jemandem, mit dem du mehr Zeit verbringen willst.",
+ tipTitle:"Trinkgeld für die Kassiererin",
+ shareLead:"Mein Lebens-Kassenzettel 🧾", shareWeekends:"Wochenenden übrig", shareCoffees:"Kaffees übrig",
+ shareStare:(s,y)=>"~"+s+" meiner verbleibenden "+y+" Jahre starre ich aufs Handy",
+ shareParents:n=>"Ich sehe meine Eltern noch ~"+n+" Mal", shareTail:"Kein Umtausch. Druck deinen: ",
+ fine:'<b>Das Kleingedruckte.</b> Schätzungen, keine Prophezeiung: Durchschnittswerte aus öffentlichen Daten zu Lebenserwartung und Konsum (3 Mahlzeiten &amp; ~5h Bildschirmzeit pro Tag, 1.5 Kaffees, ein Handy alle 3 Jahre, ein Auto alle 8 Jahre bis 78, Haarschnitt alle 6 Wochen, 12 Feriennächte und 5 gelesene Bücher pro Jahr, Arbeitsjahre bis 65, Lebenserwartung der Eltern 85). Bei dir wird es anders sein — genau darum geht es. Alles wird in deinem Browser berechnet; nichts wird gespeichert oder gesendet. Keine medizinische, finanzielle oder existenzielle Beratung.'},
+fr:{locale:"fr-CH",
+ tagline:"LE TICKET DE CAISSE DE TA VIE", meta1:"CAISSE 03 · CAISSIER : LE TEMPS", final:"AUCUN REMBOURSEMENT",
+ lage:'Ton âge <span class="req-chip">obligatoire</span>',
+ lplan:'Formule de garantie <span class="opt">(espérance de vie)</span>',
+ w81:"STANDARD — 81 ANS (MOYENNE PAYS RICHES)", w92:"PROLONGÉE — 92 ANS (MANGE DES LÉGUMES)", w100:"ÉDITION COLLECTOR — 100 ANS (PAR PUR ESPRIT DE CONTRADICTION)",
+ lincome:'Revenu annuel <span class="opt">(facultatif — débloque les lignes argent)</span>',
+ lvisits:'Combien de fois vois-tu tes parents par an ? <span class="opt">(facultatif — attention)</span>',
+ lpage:"Leur âge moyen", print:"▸ Imprimer le ticket",
+ err:"La caisse a besoin de ton âge. Elle sait déjà tout le reste.",
+ anon:"100 % anonyme · rien n’est enregistré · le calcul ne quitte jamais ton appareil",
+ elapsed:"VIE ÉCOULÉE", planAdj:"GARANTIE PROLONGÉE", autoApplied:"AUTOMATIQUE",
+ sTime:"TEMPS RESTANT", weeks:"SEMAINES", mondays:"LUNDIS", weekends:"WEEK-ENDS", summers:"ÉTÉS", moons:"PLEINES LUNES",
+ sCons:"CONSO RESTANTE (ESTIM.)", coffees:"CAFÉS", meals:"REPAS", phones:"TÉLÉPHONES À VENIR", cars:"VOITURES",
+ haircuts:"COUPES DE CHEVEUX", vacations:"NUITS DE VACANCES", books:"LIVRES QUE TU FINIRAS",
+ sGoes:"OÙ ÇA PART VRAIMENT", stare:"FIXER TON TÉLÉPHONE", yrs:"ANS",
+ ofYears:n=>"sur tes "+n+" années restantes", workh:"HEURES DE TRAVAIL (JUSQU’À 65)",
+ sMoney:"ARGENT ENCORE À VENIR", futureEarn:"SALAIRE FUTUR (JUSQU’À 65 ANS)", grossNote:"brut · salaire constant · bon courage avec les impôts",
+ sPeople:"LES GENS", parents:"FOIS OÙ TU REVERRAS TES PARENTS", priceless:"ÇA N'A PAS DE PRIX",
+ makeCount:"que chacune compte", assumeNote:"en leur comptant encore ~20 ans",
+ subtotal:"SOUS-TOTAL", everything:"TOUT CE QUE TU AURAS DANS TA VIE", payMethod:"MOYEN DE PAIEMENT", timeW:"LE TEMPS", change:"RENDU MONNAIE",
+ stampS:"NI REPRIS, NI ÉCHANGÉ, NI REMBOURSÉ", wRemaining:"TES SEMAINES RESTANTES",
+ thanks:"MERCI DE VIVRE<br>REVIENS · JUSQU’À ÉPUISEMENT DES STOCKS",
+ copyBtn:"Copier mon ticket", copied:"Copié — va faire relativiser quelqu'un", copyFail:"Fais plutôt une capture d’écran",
+ shareBtn:"Partager",
+ nudge:"Fais une capture d’écran. Envoie-la à quelqu’un avec qui tu voudrais passer plus de temps.",
+ tipTitle:"Un pourboire pour le caissier",
+ shareLead:"Le ticket de caisse de ma vie 🧾", shareWeekends:"week-ends restants", shareCoffees:"cafés restants",
+ shareStare:(s,y)=>"~"+s+" de mes "+y+" années restantes à fixer mon téléphone",
+ shareParents:n=>"Je verrai encore mes parents ~"+n+" fois", shareTail:"Aucun remboursement. Imprime le tien : ",
+ fine:'<b>Les petites lignes.</b> Des estimations, pas une prophétie : moyennes tirées de données publiques d’espérance de vie et de consommation (3 repas et ~5h d’écran par jour, 1,5 café, un téléphone tous les 3 ans, une voiture tous les 8 ans jusqu’à 78, une coupe toutes les 6 semaines, 12 nuits de vacances et 5 livres finis par an, travail jusqu’à 65 ans, espérance de vie des parents 85). Chez toi, ce sera différent — c’est justement l’idée. Tout est calculé dans ton navigateur ; rien n’est enregistré ni envoyé. Ni conseil médical, ni financier, ni existentiel.'},
+es:{locale:"es-419",
+ tagline:"EL TICKET DE TU VIDA", meta1:"CAJA 03 · CAJERO: EL TIEMPO", final:"VENTA FINAL",
+ lage:'Tu edad <span class="req-chip">obligatorio</span>',
+ lplan:'Plan de garantía <span class="opt">(esperanza de vida)</span>',
+ w81:"ESTÁNDAR — 81 AÑOS (PROMEDIO DEL NORTE GLOBAL)", w92:"EXTENDIDA — 92 AÑOS (COME VERDURAS)", w100:"EDICIÓN COLECCIONISTA — 100 AÑOS (PURA TERQUEDAD)",
+ lincome:'Ingresos anuales <span class="opt">(opcional — añade las líneas de dinero)</span>',
+ lvisits:'¿Cuántas veces ves a tus padres al año? <span class="opt">(opcional — cuidado)</span>',
+ lpage:"Su edad promedio", print:"▸ Imprimir el ticket",
+ err:"La caja necesita tu edad. Todo lo demás ya lo sabe.",
+ anon:"100% anónimo · no se guarda nada · el cálculo nunca sale de tu dispositivo",
+ elapsed:"VIDA CONSUMIDA", planAdj:"GARANTÍA EXTENDIDA", autoApplied:"AUTOMÁTICA",
+ sTime:"TIEMPO RESTANTE", weeks:"SEMANAS", mondays:"LUNES", weekends:"FINES DE SEMANA", summers:"VERANOS", moons:"LUNAS LLENAS",
+ sCons:"CONSUMO RESTANTE (EST.)", coffees:"CAFÉS", meals:"COMIDAS", phones:"TELÉFONOS QUE TENDRÁS", cars:"AUTOS",
+ haircuts:"CORTES DE PELO", vacations:"NOCHES DE VACACIONES", books:"LIBROS QUE TERMINARÁS",
+ sGoes:"ADÓNDE SE VA DE VERDAD", stare:"MIRAR EL TELÉFONO", yrs:"AÑOS",
+ ofYears:n=>"de tus "+n+" años restantes", workh:"HORAS DE TRABAJO (HASTA LOS 65)",
+ sMoney:"DINERO POR COBRAR", futureEarn:"SUELDO FUTURO (HASTA LOS 65)", grossNote:"bruto · sueldo constante · disfruta de los impuestos",
+ sPeople:"PERSONAS", parents:"VECES QUE VERÁS A TUS PADRES", priceless:"IMPAGABLE",
+ makeCount:"aprovecha cada una", assumeNote:"suponiendo que les quedan ~20 años",
+ subtotal:"SUBTOTAL", everything:"TODO LO QUE LLEGARÁS A TENER", payMethod:"FORMA DE PAGO", timeW:"TIEMPO", change:"CAMBIO",
+ stampS:"SIN DEVOLUCIONES · VENTA FINAL", wRemaining:"TUS SEMANAS RESTANTES",
+ thanks:"GRACIAS POR VIVIR<br>VUELVE PRONTO · HASTA AGOTAR EXISTENCIAS",
+ copyBtn:"Copiar mi ticket", copied:"Copiado — reparte perspectiva", copyFail:"Mejor haz una captura",
+ shareBtn:"Compartir",
+ nudge:"Haz una captura. Mándasela a alguien con quien quieras pasar más tiempo.",
+ tipTitle:"Propina para el cajero",
+ shareLead:"El ticket de mi vida 🧾", shareWeekends:"fines de semana restantes", shareCoffees:"cafés restantes",
+ shareStare:(s,y)=>"~"+s+" de mis "+y+" años restantes mirando el teléfono",
+ shareParents:n=>"Veré a mis padres ~"+n+" veces más", shareTail:"Sin devoluciones. Imprime el tuyo: ",
+ fine:'<b>La letra pequeña.</b> Estimaciones, no profecía: promedios tomados de datos públicos de esperanza de vida y consumo (3 comidas y ~5h de pantalla al día, 1,5 cafés, un teléfono cada 3 años, un auto cada 8 hasta los 78, corte de pelo cada 6 semanas, 12 noches de vacaciones y 5 libros terminados al año, trabajo hasta los 65, esperanza de vida de los padres 85). Lo tuyo será distinto — de eso se trata. Todo se calcula en tu navegador; nada se guarda ni se envía. No es consejo médico, financiero ni existencial.'},
+zh:{locale:"zh-CN",
+ tagline:"人生收银小票", meta1:"03号收银台 · 收银员：时间", final:"概不退换",
+ lage:'你的年龄 <span class="req-chip">必填</span>',
+ lplan:'保修方案 <span class="opt">（预期寿命）</span>',
+ w81:"标准版 — 81岁（发达国家平均）", w92:"延长版 — 92岁（爱吃蔬菜）", w100:"收藏版 — 100岁（纯属不服）",
+ lincome:'年收入 <span class="opt">（选填——解锁跟钱有关的几行）</span>',
+ lvisits:'每年见父母几次？<span class="opt">（选填——慎填）</span>',
+ lpage:"他们的平均年龄", print:"▸ 打印小票",
+ err:"收银机需要你的年龄。别的它都已经知道了。",
+ anon:"100%匿名 · 不保存任何数据 · 所有计算都不出你的设备",
+ elapsed:"人生进度", planAdj:"保修已延长", autoApplied:"自动生效",
+ sTime:"剩余时间", weeks:"周", mondays:"周一", weekends:"周末", summers:"夏天", moons:"满月",
+ sCons:"剩余消费（估算）", coffees:"咖啡", meals:"餐食", phones:"还要换的手机", cars:"汽车",
+ haircuts:"理发次数", vacations:"度假（晚）", books:"还能读完的书",
+ sGoes:"时间真正的去向", stare:"刷手机", yrs:"年",
+ ofYears:n=>"（你一共还剩"+n+"年）", workh:"工作小时数（到65岁）",
+ sMoney:"还未到账的钱", futureEarn:"未来收入（到65岁）", grossNote:"税前 · 工资不变 · 祝报税愉快",
+ sPeople:"家人", parents:"你还能见父母的次数", priceless:"无价",
+ makeCount:"珍惜每一次", assumeNote:"假设他们还有约20年",
+ subtotal:"小计", everything:"你此生拥有的一切", payMethod:"支付方式", timeW:"时间", change:"找零",
+ stampS:"一经售出 · 概不退换", wRemaining:"你剩余的周数",
+ thanks:"感谢惠顾人生<br>欢迎再来 · 售完即止",
+ copyBtn:"复制我的小票", copied:"已复制——去让别人也清醒一下", copyFail:"还是截图吧",
+ shareBtn:"分享",
+ nudge:"截个图，发给你想多陪陪的人。",
+ tipTitle:"打赏收银员",
+ shareLead:"我的人生小票 🧾", shareWeekends:"个周末可用", shareCoffees:"杯咖啡待喝",
+ shareStare:(s,y)=>"剩下的"+y+"年里约"+s+"年在刷手机",
+ shareParents:n=>"我还能见父母约"+n+"次", shareTail:"概不退换。来打一张你自己的：",
+ fine:'<b>细则。</b>估算而非预言：基于公开的预期寿命与消费数据的平均值（每天3餐、约5小时屏幕时间、1.5杯咖啡，每3年换一部手机，78岁前每8年换一辆车，每6周理一次发，每年度假12晚、读完5本书，工作到65岁，父母预期寿命85岁）。你的人生会不一样——这正是重点。一切都在你的浏览器中计算；你输入的内容不会被保存或发送。不构成医疗、财务或人生建议。'}
+};
+let LANG = (()=>{
+  try{
+    const q = new URLSearchParams(location.search).get("lang");
+    if(q && I18N[q]) return q;
+    const saved = localStorage.getItem("till-lang");
+    if(saved && I18N[saved]) return saved;
+  }catch(e){}
+  const nav = (navigator.language||"en").toLowerCase().slice(0,2);
+  return I18N[nav] ? nav : "en";
+})();
+let T = I18N[LANG];
+let nf = new Intl.NumberFormat(T.locale);
+function applyLang(){
+  T = I18N[LANG];
+  nf = new Intl.NumberFormat(T.locale);
+  document.documentElement.setAttribute("lang", LANG);
+  const set=(id,val,html)=>{const el=document.getElementById(id);if(el){html?el.innerHTML=val:el.textContent=val;}};
+  set("i-tagline",T.tagline); set("i-meta1",T.meta1); set("i-final",T.final);
+  set("i-lage",T.lage,1); set("i-lplan",T.lplan,1);
+  set("i-w81",T.w81); set("i-w92",T.w92); set("i-w100",T.w100);
+  set("i-lincome",T.lincome,1); set("i-lvisits",T.lvisits,1); set("i-lpage",T.lpage);
+  set("i-print",T.print); set("err",T.err); set("i-anon",T.anon);
+  set("copy",T.copyBtn); set("share",T.shareBtn); set("nudge",T.nudge);
+  set("i-stitle",T.tipTitle); set("i-fine",T.fine,1);
+  const lt=document.getElementById("langtog"); if(lt) lt.value=LANG;
+  if(LAST) build();
+}
+
 const curSel = document.getElementById("cur");
 CURRENCIES.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;curSel.appendChild(o);});
 
 document.getElementById("today").textContent = new Date().toISOString().slice(0,10);
 
-const nf = new Intl.NumberFormat();
 function money(v,cur){
-  try{return new Intl.NumberFormat(undefined,{style:"currency",currency:cur,notation:"compact",maximumFractionDigits:1}).format(v);}
+  try{return new Intl.NumberFormat(T.locale,{style:"currency",currency:cur,notation:"compact",maximumFractionDigits:1}).format(v);}
   catch(e){return cur+" "+Math.round(v);}
 }
 
@@ -347,58 +544,58 @@ function build(){
   const rule=()=>L.push({t:"rule"});
   const note=lab=>L.push({t:"li",lab:"",val:lab,cls:"note small"});
 
-  if(extended) line("PLAN ADJUSTED: EXTENDED WARRANTY","AUTO-APPLIED","warn small");
-  L.push({t:"li",lab:"LIFE ELAPSED  "+elapsed+"%",val:blocks,cls:"barline"});
+  if(extended) line(T.planAdj,T.autoApplied,"warn small");
+  L.push({t:"li",lab:T.elapsed+"  "+elapsed+"%",val:blocks,cls:"barline"});
   rule();
-  sect("TIME, REMAINING");
-  line("WEEKS",nf.format(weeks));
-  line("MONDAYS",nf.format(weeks));
-  line("WEEKENDS",nf.format(weeks));
-  line("SUMMERS",nf.format(summers));
-  line("FULL MOONS",nf.format(moons));
+  sect(T.sTime);
+  line(T.weeks,nf.format(weeks));
+  line(T.mondays,nf.format(weeks));
+  line(T.weekends,nf.format(weeks));
+  line(T.summers,nf.format(summers));
+  line(T.moons,nf.format(moons));
   rule();
-  sect("CONSUMPTION, REMAINING (EST.)");
-  line("COFFEES",nf.format(coffees));
-  line("MEALS",nf.format(meals));
-  line("PHONES YOU'LL OWN",nf.format(phones));
-  if(cars>0) line("CARS",nf.format(cars));
-  line("HAIRCUTS",nf.format(haircuts));
-  line("NIGHTS OF VACATION",nf.format(vacations));
-  line("BOOKS YOU'LL FINISH",nf.format(books));
+  sect(T.sCons);
+  line(T.coffees,nf.format(coffees));
+  line(T.meals,nf.format(meals));
+  line(T.phones,nf.format(phones));
+  if(cars>0) line(T.cars,nf.format(cars));
+  line(T.haircuts,nf.format(haircuts));
+  line(T.vacations,nf.format(vacations));
+  line(T.books,nf.format(books));
   rule();
-  sect("WHERE IT ACTUALLY GOES");
-  line("STARING AT YOUR PHONE",screenYrs.toFixed(1)+" YRS");
-  note("of your remaining "+Y.toFixed(0)+" years");
+  sect(T.sGoes);
+  line(T.stare,screenYrs.toFixed(1)+" "+T.yrs);
+  note(T.ofYears(Y.toFixed(0)));
   if(workHours>0){
-    line("HOURS AT WORK (TO 65)",nf.format(workHours));
+    line(T.workh,nf.format(workHours));
   }
   if(isFinite(income)&&income>0&&workYrs>0){
     rule();
-    sect("MONEY, STILL INBOUND");
-    line("FUTURE EARNINGS (TO 65)",money(income*workYrs,cur));
-    note("gross · flat wage · enjoy taxes");
+    sect(T.sMoney);
+    line(T.futureEarn,money(income*workYrs,cur));
+    note(T.grossNote);
   }
   if(isFinite(visits)&&visits>0){
     rule();
-    sect("PEOPLE");
+    sect(T.sPeople);
     if(isFinite(pAge)&&pAge>=18&&pAge<85){
-      line("TIMES YOU'LL SEE YOUR PARENTS","~"+nf.format(Math.round(visits*(85-pAge))),"warn");
+      line(T.parents,"~"+nf.format(Math.round(visits*(85-pAge))),"warn");
     }else if(isFinite(pAge)&&pAge>=85){
-      line("TIMES YOU'LL SEE YOUR PARENTS","PRICELESS","warn small");
+      line(T.parents,T.priceless,"warn small");
     }else{
-      line("TIMES YOU'LL SEE YOUR PARENTS","~"+nf.format(Math.round(visits*20)),"warn");
-      note("assuming ~20 more of their years");
+      line(T.parents,"~"+nf.format(Math.round(visits*20)),"warn");
+      note(T.assumeNote);
     }
-    note("make them count");
+    note(T.makeCount);
   }
   rule();
-  L.push({t:"li",lab:"SUBTOTAL",val:"EVERYTHING YOU'LL EVER HAVE",cls:"subtotal small"});
-  line("PAYMENT METHOD","TIME","small");
-  line("CHANGE DUE","0.00","small");
+  L.push({t:"li",lab:T.subtotal,val:T.everything,cls:"subtotal small"});
+  line(T.payMethod,T.timeW,"small");
+  line(T.change,"0.00","small");
   L.push({t:"stamp"});
   rule();
   L.push({t:"barcode",weeks});
-  L.push({t:"bnum",lab:"W-"+weeks+"  ·  YOUR REMAINING WEEKS"});
+  L.push({t:"bnum",lab:"W-"+weeks+"  ·  "+T.wRemaining});
   L.push({t:"thanks"});
 
   render(L);
@@ -418,7 +615,7 @@ function render(L){
     else if(item.t==="rule"){el=document.createElement("hr");el.className="rule";}
     else if(item.t==="stamp"){
       el=document.createElement("div");el.className="stampwrap";
-      el.innerHTML='<div class="stamp">NO REFUNDS<small>NO EXCHANGES · SALE IS FINAL</small></div>';
+      el.innerHTML='<div class="stamp">NO REFUNDS<small>'+T.stampS+'</small></div>';
     }
     else if(item.t==="barcode"){
       el=document.createElement("div");el.className="barcode";el.setAttribute("aria-hidden","true");
@@ -434,9 +631,9 @@ function render(L){
     else if(item.t==="bnum"){el=document.createElement("div");el.className="b-num";el.textContent=item.lab;}
     else if(item.t==="thanks"){
       el=document.createElement("div");el.className="thanks";
-      const host=((location.hostname||"norefunds.life").replace(/^www\./,"")+
+      const host=((location.hostname||"konsil.ch").replace(/^www\./,"")+
         location.pathname.replace(/\/(index\.html)?$/,""));
-      el.innerHTML="THANK YOU FOR LIVING<br>COME AGAIN · WHILE SUPPLIES LAST"+
+      el.innerHTML=T.thanks+
         '<br><span style="font-size:10.5px;letter-spacing:.3em;color:var(--ink-faint)">★ '+host+' ★</span>';
     }
     else{
@@ -468,25 +665,27 @@ document.getElementById("stub").addEventListener("submit",e=>{e.preventDefault()
 
 document.getElementById("copy").addEventListener("click",async()=>{
   if(!LAST)return;
-  let txt="My lifetime receipt 🧾\n"+
-    "· "+nf.format(LAST.weeks)+" weekends left\n"+
-    "· "+nf.format(LAST.coffees)+" coffees left\n"+
-    "· ~"+LAST.screenYrs.toFixed(1)+" of my remaining "+LAST.Y.toFixed(0)+" years staring at my phone\n";
-  if(LAST.parents) txt+="· I'll see my parents ~"+nf.format(LAST.parents)+" more times\n";
-  txt+="No refunds. Print yours: "+location.href;
+  const txt=shareText().replace(/\.$/,"")+" "+location.href;
   const btn=document.getElementById("copy");
-  try{await navigator.clipboard.writeText(txt);btn.textContent="Copied — spend it well";}
-  catch(e){btn.textContent="Screenshot the receipt instead";}
-  setTimeout(()=>btn.textContent="Copy my receipt",2600);
+  try{await navigator.clipboard.writeText(txt);btn.textContent=T.copied;}
+  catch(e){btn.textContent=T.copyFail;}
+  setTimeout(()=>btn.textContent=T.copyBtn,2600);
 });
 
+document.getElementById("langtog").addEventListener("change",e=>{
+  LANG=e.target.value;
+  try{localStorage.setItem("till-lang",LANG);}catch(err){}
+  applyLang();
+});
+applyLang();
+
 function shareText(){
-  let txt="My lifetime receipt 🧾\n"+
-    "· "+nf.format(LAST.weeks)+" weekends left\n"+
-    "· "+nf.format(LAST.coffees)+" coffees left\n"+
-    "· ~"+LAST.screenYrs.toFixed(1)+" of my remaining "+LAST.Y.toFixed(0)+" years staring at my phone\n";
-  if(LAST.parents) txt+="· I'll see my parents ~"+nf.format(LAST.parents)+" more times\n";
-  return txt+"No refunds.";
+  let txt=T.shareLead+"\n"+
+    "· "+nf.format(LAST.weeks)+" "+T.shareWeekends+"\n"+
+    "· "+nf.format(LAST.coffees)+" "+T.shareCoffees+"\n"+
+    "· "+T.shareStare(LAST.screenYrs.toFixed(1),LAST.Y.toFixed(0))+"\n";
+  if(LAST.parents) txt+="· "+T.shareParents(nf.format(LAST.parents))+"\n";
+  return txt+T.shareTail.replace(/[:：]\s*$/,"").replace(/\s+$/,"")+".";
 }
 document.getElementById("share").addEventListener("click",async()=>{
   if(!LAST||!navigator.share)return;
