@@ -1,0 +1,646 @@
+<meta charset="utf-8">
+<title>The Money Mirror</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#ECEADB;
+    --bg-raised:#F4F2E6;
+    --ink:#1B2A20;
+    --ink-soft:#4A5A4E;
+    --ink-faint:#79846F;
+    --accent:#1E6B45;
+    --accent-ink:#F4F2E6;
+    --gold:#96772A;
+    --rule:#C9C8AE;
+    --receipt-paper:#FBFAF0;
+    --receipt-ink:#26302A;
+    --shadow:rgba(27,42,32,.20);
+    --focus:#1E6B45;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0C1712;
+      --bg-raised:#132119;
+      --ink:#E3E5D2;
+      --ink-soft:#A8B2A0;
+      --ink-faint:#6E7A6C;
+      --accent:#4CAA74;
+      --accent-ink:#0C1712;
+      --gold:#C79E44;
+      --rule:#26362C;
+      --receipt-paper:#F2F1E2;
+      --receipt-ink:#26302A;
+      --shadow:rgba(0,0,0,.55);
+      --focus:#4CAA74;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0C1712;
+    --bg-raised:#132119;
+    --ink:#E3E5D2;
+    --ink-soft:#A8B2A0;
+    --ink-faint:#6E7A6C;
+    --accent:#4CAA74;
+    --accent-ink:#0C1712;
+    --gold:#C79E44;
+    --rule:#26362C;
+    --receipt-paper:#F2F1E2;
+    --receipt-ink:#26302A;
+    --shadow:rgba(0,0,0,.55);
+    --focus:#4CAA74;
+  }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Newsreader",Georgia,"Times New Roman",serif;
+    font-size:18px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent)}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+
+  .frame{max-width:720px;margin:0 auto;padding:0 20px 60px}
+
+  /* ── Masthead ─────────────────────────────── */
+  .masthead{position:relative;text-align:center;padding:44px 0 30px;overflow:hidden}
+  #guilloche{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .masthead > *{position:relative}
+  .microprint{
+    font-family:"IBM Plex Mono",monospace;font-size:6.5px;letter-spacing:.35em;
+    color:var(--ink-faint);white-space:nowrap;overflow:hidden;user-select:none;
+    border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:3px 0;
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--gold);margin-top:26px;
+  }
+  h1{
+    font-family:"Marcellus",Georgia,serif;font-weight:400;
+    font-size:clamp(2.7rem,8vw,4.2rem);letter-spacing:.04em;
+    margin:.25em 0 .2em;text-wrap:balance;
+  }
+  .dek{max-width:52ch;margin:0 auto;color:var(--ink-soft);font-size:1.05rem;text-wrap:balance}
+  .dek em{color:var(--ink)}
+
+  /* ── The ask ──────────────────────────────── */
+  .ask{
+    background:var(--bg-raised);border:1px solid var(--rule);
+    padding:28px clamp(18px,5vw,40px) 32px;margin-top:26px;
+    box-shadow:0 1px 0 var(--rule), 0 14px 30px -22px var(--shadow);
+  }
+  .ask label{
+    display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;
+  }
+  .ask .row{display:flex;gap:10px}
+  .ask select,.ask input{
+    font-family:"IBM Plex Mono",monospace;font-size:1.15rem;color:var(--ink);
+    background:var(--bg);border:1px solid var(--rule);padding:12px 14px;border-radius:3px;
+  }
+  .ask select{flex:0 0 auto}
+  .ask input{flex:1 1 auto;min-width:0;font-variant-numeric:tabular-nums}
+  .ask input::placeholder{color:var(--ink-faint)}
+  .hint{font-size:.85rem;color:var(--ink-faint);margin:10px 0 18px;font-style:italic}
+  .go{
+    display:block;width:100%;cursor:pointer;
+    font-family:"Marcellus",Georgia,serif;font-size:1.2rem;letter-spacing:.08em;
+    color:var(--accent-ink);background:var(--accent);border:none;padding:15px 20px;border-radius:3px;
+  }
+  .go:hover{filter:brightness(1.08)}
+  .go:active{transform:translateY(1px)}
+  .err{color:var(--gold);font-size:.9rem;margin-top:10px;display:none}
+
+  /* ── Acts ─────────────────────────────────── */
+  #results{display:none}
+  #results.on{display:block}
+  section.act{margin-top:64px}
+  .act-head{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+  .act-head::before,.act-head::after{content:"";height:1px;background:var(--rule);flex:1}
+  .act-head span{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--gold);white-space:nowrap;
+  }
+  .lede{color:var(--ink-soft);max-width:56ch;margin:0 auto 26px;text-align:center;text-wrap:balance}
+
+  /* Verdict */
+  .verdict{text-align:center}
+  .verdict .big{
+    font-family:"Marcellus",Georgia,serif;font-size:clamp(1.7rem,5.4vw,2.5rem);
+    line-height:1.25;text-wrap:balance;margin:0 0 6px;
+  }
+  .verdict .big b{color:var(--gold);font-weight:400;font-variant-numeric:tabular-nums}
+  .verdict .sub{color:var(--ink-soft);font-style:italic;margin:0 0 28px}
+  .dots{display:grid;grid-template-columns:repeat(20,1fr);gap:7px;max-width:440px;margin:0 auto}
+  .dots i{aspect-ratio:1;border-radius:50%;background:var(--rule)}
+  .dots i.f{background:var(--accent)}
+  .dots i.you{background:var(--gold);box-shadow:0 0 0 3px var(--bg),0 0 0 4px var(--gold)}
+  .dots-cap{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--ink-faint);margin-top:14px;text-transform:uppercase}
+
+  /* Clock */
+  .tickers{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+  .tick{
+    background:var(--bg-raised);border:1px solid var(--rule);padding:18px 16px 16px;
+    text-align:center;border-radius:3px;
+  }
+  .tick .who{
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;
+  }
+  .tick .amt{
+    font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:clamp(1.15rem,3.4vw,1.45rem);
+    color:var(--ink);font-variant-numeric:tabular-nums;
+  }
+  .tick.gold .amt{color:var(--gold)}
+  .tick .rate{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-faint);margin-top:8px}
+  .punch{
+    text-align:center;font-size:1.1rem;margin:26px auto 0;max-width:52ch;text-wrap:balance;
+  }
+  .punch b{color:var(--gold);font-weight:500}
+
+  /* Exchange */
+  .xrow{
+    display:grid;grid-template-columns:1fr auto;gap:2px 14px;align-items:baseline;
+    padding:14px 2px;border-bottom:1px solid var(--rule);
+  }
+  .xrow:first-of-type{border-top:1px solid var(--rule)}
+  .xrow .item{font-size:1.05rem}
+  .xrow .price{font-family:"IBM Plex Mono",monospace;font-size:.9rem;color:var(--ink-faint);text-align:right}
+  .xrow .times{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px 26px;margin-top:4px}
+  .xrow .t{font-family:"IBM Plex Mono",monospace;font-size:.85rem;color:var(--ink-soft)}
+  .xrow .t b{font-weight:600;color:var(--ink)}
+  .xrow .t.rich b{color:var(--gold)}
+  .xnote{font-size:.85rem;color:var(--ink-faint);font-style:italic;text-align:center;margin-top:16px}
+
+  /* Future */
+  .fut{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .fcard{background:var(--bg-raised);border:1px solid var(--rule);border-radius:3px;padding:18px 14px;text-align:center}
+  .fcard .yrs{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft)}
+  .fcard .val{font-family:"Marcellus",Georgia,serif;font-size:clamp(1.4rem,4vw,1.8rem);color:var(--accent);margin-top:8px;font-variant-numeric:tabular-nums}
+  .disclaim{font-size:.82rem;color:var(--ink-faint);font-style:italic;text-align:center;margin-top:16px;max-width:52ch;margin-left:auto;margin-right:auto}
+
+  /* Receipt */
+  .receipt-zone{display:flex;flex-direction:column;align-items:center}
+  .receipt{
+    position:relative;background:var(--receipt-paper);color:var(--receipt-ink);
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.75;
+    width:min(340px,92%);padding:26px 24px 30px;transform:rotate(-1.2deg);
+    box-shadow:0 18px 40px -14px var(--shadow);
+    font-variant-numeric:tabular-nums;
+  }
+  .receipt::after{
+    content:"";position:absolute;left:0;right:0;bottom:-8px;height:8px;
+    background:
+      linear-gradient(45deg, var(--receipt-paper) 4px, transparent 0) 0 0 / 8px 8px repeat-x,
+      linear-gradient(-45deg, var(--receipt-paper) 4px, transparent 0) 4px 0 / 8px 8px repeat-x;
+  }
+  .receipt .rt{text-align:center;letter-spacing:.14em;font-weight:600}
+  .receipt .rs{text-align:center;letter-spacing:.06em;font-size:11px;margin-bottom:8px}
+  .receipt hr{border:none;border-top:1px dashed #9aa392;margin:10px 0}
+  .receipt .li{display:flex;justify-content:space-between;gap:12px}
+  .receipt .li span:last-child{text-align:right;font-weight:600}
+  .receipt .thanks{text-align:center;letter-spacing:.16em;font-size:11px;margin-top:10px}
+  .copy{
+    margin-top:30px;cursor:pointer;border-radius:3px;
+    font-family:"IBM Plex Mono",monospace;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;
+    background:none;border:1px solid var(--accent);color:var(--accent);padding:11px 22px;
+  }
+  .copy:hover{background:var(--accent);color:var(--accent-ink)}
+  .share-nudge{font-size:.92rem;color:var(--ink-soft);font-style:italic;text-align:center;margin-top:16px;text-wrap:balance}
+
+  /* Support (renders only when configured) */
+  .support{display:none;text-align:center;background:var(--bg-raised);border:1px solid var(--rule);padding:26px 22px;border-radius:3px}
+  .support.on{display:block}
+  .support .s-title{font-family:"Marcellus",Georgia,serif;font-size:1.25rem;margin-bottom:6px}
+  .support p{color:var(--ink-soft);font-size:.95rem;max-width:46ch;margin:0 auto 16px}
+  .s-btn{
+    display:inline-block;text-decoration:none;border-radius:3px;margin:4px 6px;
+    font-family:"IBM Plex Mono",monospace;font-size:.85rem;letter-spacing:.08em;
+    background:var(--accent);color:var(--accent-ink);padding:11px 20px;
+  }
+  .s-btn.alt{background:none;border:1px solid var(--accent);color:var(--accent)}
+  .sponsor{font-size:.8rem;color:var(--ink-faint);margin-top:14px}
+
+  /* Footer */
+  footer{margin-top:70px;border-top:1px solid var(--rule);padding-top:22px;text-align:center}
+  footer p{font-size:.8rem;color:var(--ink-faint);max-width:60ch;margin:0 auto 10px}
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{transition:none;opacity:1;transform:none}
+  }
+</style>
+
+<div class="frame">
+  <header class="masthead">
+    <canvas id="guilloche" aria-hidden="true"></canvas>
+    <div class="microprint" aria-hidden="true">· THE MONEY MIRROR · THE MONEY MIRROR · THE MONEY MIRROR · THE MONEY MIRROR · THE MONEY MIRROR · THE MONEY MIRROR · THE MONEY MIRROR · THE MONEY MIRROR · THE MONEY MIRROR ·</div>
+    <div class="eyebrow">Certificate of Perspective · Series 2026</div>
+    <h1>The Money Mirror</h1>
+    <p class="dek">Type in what you earn in a year. The mirror shows where you stand among eight billion people, what your hours are truly worth, and how different time looks from the top. <em>Your number never leaves this page.</em></p>
+  </header>
+
+  <section class="ask" aria-label="Enter your income">
+    <label for="income">Your annual income</label>
+    <div class="row">
+      <select id="cur" aria-label="Currency"></select>
+      <input id="income" type="number" inputmode="numeric" min="0" step="any" placeholder="50 000">
+    </div>
+    <div class="hint">Before tax is fine. Nothing is stored, sent, or judged — well, slightly judged.</div>
+    <button class="go" id="go">Hold up the mirror</button>
+    <div class="err" id="err">The mirror needs a number above zero to reflect anything.</div>
+  </section>
+
+  <div id="results">
+
+    <section class="act verdict reveal" aria-live="polite">
+      <div class="act-head"><span>I · The Verdict</span></div>
+      <p class="big">You out-earn <b id="pct">—</b> of humanity.</p>
+      <p class="sub" id="verdict-line"></p>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <div class="dots-cap">Every dot is 4 million people · gold is you</div>
+    </section>
+
+    <section class="act reveal">
+      <div class="act-head"><span>II · The Clock</span></div>
+      <p class="lede">Money arrives one second at a time — just not at the same speed for everyone. These counters started the moment you held up the mirror.</p>
+      <div class="tickers">
+        <div class="tick">
+          <div class="who">You</div>
+          <div class="amt" id="t-you">—</div>
+          <div class="rate" id="r-you"></div>
+        </div>
+        <div class="tick">
+          <div class="who">A top-paid CEO</div>
+          <div class="amt" id="t-ceo">—</div>
+          <div class="rate">≈ $200M a year</div>
+        </div>
+        <div class="tick gold">
+          <div class="who">The richest human</div>
+          <div class="amt" id="t-rich">—</div>
+          <div class="rate">fortune growing ≈ $100B a year</div>
+        </div>
+      </div>
+      <p class="punch">At that speed, your entire year lands at the very top in <b id="year-rich">—</b>. The CEO needs about <b id="year-ceo">—</b>.</p>
+    </section>
+
+    <section class="act reveal">
+      <div class="act-head"><span>III · The Exchange Rate</span></div>
+      <p class="lede">Every price tag is secretly a clock. Here is what things cost in your working time — and in the richest human's.</p>
+      <div id="xlist"></div>
+      <p class="xnote">Your time assumes a 40-hour week, ~2,000 working hours a year.</p>
+    </section>
+
+    <section class="act reveal">
+      <div class="act-head"><span>IV · The Future</span></div>
+      <p class="lede">The one trick the rich would never give back: money that earns money. If you paid your future self 10% of your income, growing at a historical-average 7% a year, you'd hold —</p>
+      <div class="fut">
+        <div class="fcard"><div class="yrs">In 10 years</div><div class="val" id="f10">—</div></div>
+        <div class="fcard"><div class="yrs">In 20 years</div><div class="val" id="f20">—</div></div>
+        <div class="fcard"><div class="yrs">In 30 years</div><div class="val" id="f30">—</div></div>
+      </div>
+      <p class="disclaim">Arithmetic, not advice. Markets wobble; compounding doesn't care about your feelings, in both directions.</p>
+    </section>
+
+    <section class="act receipt-zone reveal">
+      <div class="act-head" style="align-self:stretch"><span>V · The Receipt</span></div>
+      <div class="receipt" id="receipt">
+        <div class="rt">THE MONEY MIRROR</div>
+        <div class="rs">RECEIPT FOR ONE (1) REALITY CHECK</div>
+        <hr>
+        <div class="li"><span>DATE</span><span id="rc-date"></span></div>
+        <div class="li"><span>DECLARED INCOME</span><span id="rc-inc"></span></div>
+        <hr>
+        <div class="li"><span>GLOBAL RANK</span><span id="rc-rank"></span></div>
+        <div class="li"><span>RICHER THAN</span><span id="rc-richer"></span></div>
+        <div class="li"><span>YOUR HOUR</span><span id="rc-hour"></span></div>
+        <div class="li"><span>YOUR SECOND</span><span id="rc-sec"></span></div>
+        <hr>
+        <div class="li"><span>RICHEST HUMAN<br>EARNS YOUR YEAR IN</span><span id="rc-year"></span></div>
+        <hr>
+        <div class="thanks">THANK YOU FOR EARNING<br>COME AGAIN</div>
+      </div>
+      <button class="copy" id="copy">Copy my stats</button>
+      <p class="share-nudge">Screenshot the receipt. Send it to someone who needs perspective.</p>
+    </section>
+
+    <section class="act support reveal" id="support">
+      <div class="s-title">Keep the mirror polished</div>
+      <p>This page is free, private, and runs on caffeine. If it gave you a moment of clarity, you can leave something in the tray.</p>
+      <span id="s-buttons"></span>
+      <div class="sponsor" id="s-sponsor"></div>
+    </section>
+  </div>
+
+  <footer>
+    <p><strong>The fine print.</strong> Global rank is an estimate: a log-normal curve fitted to public PPP-adjusted global income data (median individual income ≈ $3,000/yr). CEO and wealth-growth figures are rounded public estimates; currency conversions are approximate. Prices are typical U.S. figures converted to your currency.</p>
+    <p>Everything is computed in your browser. Nothing you type is stored or sent anywhere. Not financial advice — just arithmetic with an attitude.</p>
+  </footer>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   MONETIZATION — fill these in to switch earning on.
+   tipUrl: a Stripe Payment Link (stripe.com → Payment Links) or
+           Buy Me a Coffee page. productUrl: e.g. a Gumroad item.
+   Leave empty and the support section stays hidden.
+   ═══════════════════════════════════════════════════════════════ */
+const MONETIZE = {
+  tipUrl: "",
+  tipLabel: "Tip the mirror · $3",
+  productUrl: "",
+  productLabel: "",
+  sponsorText: "",
+  sponsorUrl: ""
+};
+
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Approximate USD per 1 unit of currency */
+const CURRENCIES = [
+  ["USD",1],["EUR",1.10],["GBP",1.28],["CHF",1.15],["CAD",0.73],["AUD",0.66],
+  ["JPY",0.0068],["CNY",0.14],["INR",0.0115],["BRL",0.18],["MXN",0.055],
+  ["SEK",0.095],["SGD",0.75],["AED",0.27],["ZAR",0.055]
+];
+const curSel = document.getElementById("cur");
+CURRENCIES.forEach(([c])=>{
+  const o=document.createElement("option"); o.value=c; o.textContent=c; curSel.appendChild(o);
+});
+
+/* Items priced in USD */
+const ITEMS = [
+  ["A flat white", 5],
+  ["The newest phone", 1200],
+  ["A year of big-city rent", 24000],
+  ["A new car", 48000],
+  ["A median U.S. house", 420000]
+];
+
+const SEC_PER_YEAR = 31536000;
+const CEO_PER_SEC  = 200e6 / SEC_PER_YEAR;   // ≈ $6.34/s
+const RICH_PER_SEC = 100e9 / SEC_PER_YEAR;   // ≈ $3,171/s
+
+/* ── math ── */
+function normCdf(z){
+  const t = 1/(1+0.2316419*Math.abs(z));
+  const d = 0.3989423*Math.exp(-z*z/2);
+  const p = d*t*(0.31938153+t*(-0.356563782+t*(1.781477937+t*(-1.821255978+t*1.330274429))));
+  return z>0 ? 1-p : p;
+}
+function globalPercentile(usd){
+  const p = normCdf(Math.log(usd/3000)/1.3)*100;
+  return Math.min(99.99, Math.max(0.1, p));
+}
+
+/* ── formatting ── */
+function fmtMoney(v,cur,frac){
+  try{
+    return new Intl.NumberFormat(undefined,{style:"currency",currency:cur,
+      minimumFractionDigits:frac,maximumFractionDigits:frac}).format(v);
+  }catch(e){ return cur+" "+v.toFixed(frac); }
+}
+function fmtCompact(v,cur){
+  try{
+    return new Intl.NumberFormat(undefined,{style:"currency",currency:cur,
+      notation:"compact",maximumFractionDigits:2}).format(v);
+  }catch(e){ return cur+" "+Math.round(v); }
+}
+function fmtTicker(v,cur){
+  const frac = v>=1000?0 : v>=1?2 : 4;
+  return fmtMoney(v,cur,frac);
+}
+function humanWorkTime(hours){
+  if(hours*60 < 1)  return Math.max(1,Math.round(hours*3600))+" sec of work";
+  if(hours < 1)     return Math.round(hours*60)+" min of work";
+  if(hours < 8)     return (Math.round(hours*10)/10)+" hours of work";
+  const days = hours/8;
+  if(days < 250)    return Math.round(days)+" workdays";
+  const yrs = hours/2000;
+  return (Math.round(yrs*10)/10)+" working years";
+}
+function humanSeconds(s){
+  if(s < 0.01)  return (s*1000).toFixed(1)+" ms";
+  if(s < 1)     return s.toFixed(2)+" sec";
+  if(s < 60)    return (Math.round(s*10)/10)+" seconds";
+  if(s < 3600){ const m=Math.floor(s/60); return m+" min "+Math.round(s%60)+" sec"; }
+  if(s < 86400) return (Math.round(s/360)/10)+" hours";
+  return (Math.round(s/8640)/10)+" days";
+}
+
+/* ── guilloché rosette ── */
+function drawGuilloche(){
+  const cv = document.getElementById("guilloche");
+  const dpr = window.devicePixelRatio||1;
+  const w = cv.clientWidth, h = cv.clientHeight;
+  if(!w||!h) return;
+  cv.width=w*dpr; cv.height=h*dpr;
+  const ctx = cv.getContext("2d");
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,w,h);
+  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+  ctx.strokeStyle = accent; ctx.lineWidth = .6;
+  const cx=w/2, cy=h*0.56, R=Math.min(w,h)*0.52;
+  const rings=[[7,.9],[11,.72],[13,.5]];
+  rings.forEach(([n,scale],ri)=>{
+    ctx.globalAlpha = .10 - ri*.02;
+    ctx.beginPath();
+    for(let a=0;a<=Math.PI*2*n;a+=0.01){
+      const r = R*scale*(0.78+0.22*Math.sin(a*(n+2)/n));
+      const x = cx + r*Math.cos(a/n), y = cy + r*Math.sin(a/n)*0.55;
+      a===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  });
+  ctx.globalAlpha = .08;
+  ctx.beginPath();
+  for(let x=0;x<=w;x+=2){
+    const y = cy + Math.sin(x/18)*6 + Math.sin(x/47)*10;
+    x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+drawGuilloche();
+addEventListener("resize", drawGuilloche);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawGuilloche);
+new MutationObserver(drawGuilloche).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+/* ── count-up ── */
+function countUp(el, target, decimals, suffix){
+  if(REDUCED){ el.textContent = target.toFixed(decimals)+suffix; return; }
+  const t0 = performance.now(), dur = 900;
+  function step(t){
+    const k = Math.min(1,(t-t0)/dur), e = 1-Math.pow(1-k,3);
+    el.textContent = (target*e).toFixed(decimals)+suffix;
+    if(k<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ── state ── */
+let tickTimer = null;
+
+function run(){
+  const raw = parseFloat(document.getElementById("income").value);
+  const err = document.getElementById("err");
+  if(!isFinite(raw) || raw<=0){ err.style.display="block"; return; }
+  err.style.display="none";
+
+  const cur  = curSel.value;
+  const rate = CURRENCIES.find(c=>c[0]===cur)[1];
+  const usd  = raw*rate;
+
+  const pct      = globalPercentile(usd);
+  const perSec   = raw/SEC_PER_YEAR;          // in user currency
+  const perHour  = raw/2000;
+  const hourUsd  = usd/2000;
+
+  /* Verdict */
+  countUp(document.getElementById("pct"), pct, pct>99?2:1, "%");
+  const vl = document.getElementById("verdict-line");
+  vl.textContent =
+    pct>=99 ? "Careful up there — from this height, most of humanity is a rounding error." :
+    pct>=90 ? "Top tenth of the species. The view is better than it feels, isn't it?" :
+    pct>=50 ? "Richer than most people who have ever cashed a paycheck." :
+              "The mirror doesn't flatter — but most of the world is climbing right beside you.";
+  const dots = document.getElementById("dots");
+  dots.innerHTML = "";
+  const filled = Math.max(1,Math.round(pct));
+  for(let i=0;i<100;i++){
+    const d=document.createElement("i");
+    if(i<filled) d.className = (i===filled-1)?"you":"f";
+    dots.appendChild(d);
+  }
+
+  /* Clock */
+  const t0 = performance.now();
+  if(tickTimer) clearInterval(tickTimer);
+  const tYou=document.getElementById("t-you"),
+        tCeo=document.getElementById("t-ceo"),
+        tRich=document.getElementById("t-rich");
+  document.getElementById("r-you").textContent =
+    fmtMoney(perSec, cur, perSec<1?4:2)+" per second";
+  function tick(){
+    const s=(performance.now()-t0)/1000;
+    tYou.textContent  = fmtTicker(perSec*s, cur);
+    tCeo.textContent  = fmtTicker(CEO_PER_SEC*s, "USD");
+    tRich.textContent = fmtTicker(RICH_PER_SEC*s, "USD");
+  }
+  tick();
+  tickTimer = setInterval(tick, REDUCED?1000:100);
+
+  document.getElementById("year-rich").textContent = humanSeconds(usd/RICH_PER_SEC);
+  document.getElementById("year-ceo").textContent  = humanSeconds(usd/CEO_PER_SEC);
+
+  /* Exchange */
+  const xl = document.getElementById("xlist");
+  xl.innerHTML = "";
+  ITEMS.forEach(([name,usdCost])=>{
+    const row = document.createElement("div"); row.className="xrow";
+    const local = usdCost/rate;
+    row.innerHTML =
+      '<div class="item">'+name+'</div>'+
+      '<div class="price">'+fmtMoney(local,cur,local<20?2:0)+'</div>'+
+      '<div class="times">'+
+        '<span class="t">You: <b>'+humanWorkTime(usdCost/hourUsd)+'</b></span>'+
+        '<span class="t rich">Richest human: <b>'+humanSeconds(usdCost/RICH_PER_SEC)+'</b></span>'+
+      '</div>';
+    xl.appendChild(row);
+  });
+
+  /* Future */
+  const monthly = raw*0.10/12, r = 0.07/12;
+  [10,20,30].forEach(y=>{
+    const n=y*12, fv = monthly*((Math.pow(1+r,n)-1)/r);
+    document.getElementById("f"+y).textContent = fmtCompact(fv,cur);
+  });
+
+  /* Receipt */
+  const topPct = (100-pct);
+  document.getElementById("rc-date").textContent   = new Date().toISOString().slice(0,10);
+  document.getElementById("rc-inc").textContent    = fmtMoney(raw,cur,0)+"/yr";
+  document.getElementById("rc-rank").textContent   = "TOP "+(topPct<1?topPct.toFixed(2):topPct.toFixed(1))+"%";
+  document.getElementById("rc-richer").textContent = pct.toFixed(1)+"% OF HUMANITY";
+  document.getElementById("rc-hour").textContent   = fmtMoney(perHour,cur,2);
+  document.getElementById("rc-sec").textContent    = fmtMoney(perSec,cur,perSec<1?4:2);
+  document.getElementById("rc-year").textContent   = humanSeconds(usd/RICH_PER_SEC).toUpperCase();
+
+  /* Reveal */
+  const res = document.getElementById("results");
+  res.classList.add("on");
+  requestAnimationFrame(()=>{
+    document.querySelectorAll(".reveal").forEach((el,i)=>{
+      setTimeout(()=>el.classList.add("in"), REDUCED?0:i*120);
+    });
+  });
+  document.querySelector(".verdict").scrollIntoView({behavior:REDUCED?"auto":"smooth",block:"start"});
+
+  window.__mirror = {pct, raw, cur, perHour, perSec, usd};
+}
+
+document.getElementById("go").addEventListener("click", run);
+document.getElementById("income").addEventListener("keydown", e=>{ if(e.key==="Enter") run(); });
+
+/* ── copy stats ── */
+document.getElementById("copy").addEventListener("click", async ()=>{
+  const m = window.__mirror; if(!m) return;
+  const text =
+    "I looked into The Money Mirror 🪞\n"+
+    "· Richer than "+m.pct.toFixed(1)+"% of humanity\n"+
+    "· My hour: "+fmtMoney(m.perHour,m.cur,2)+"\n"+
+    "· The richest human earns my year in "+humanSeconds(m.usd/RICH_PER_SEC)+"\n"+
+    "See where you stand: "+location.href;
+  const btn = document.getElementById("copy");
+  try{
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "Copied — go cause perspective";
+  }catch(e){
+    btn.textContent = "Select the receipt & copy it";
+  }
+  setTimeout(()=>btn.textContent="Copy my stats", 2600);
+});
+
+/* cross-link to No Refunds, only where it actually exists */
+(function(){
+  const h=location.hostname;
+  if(h.endsWith("github.io")||h.endsWith("norefunds.life")||h==="localhost"){
+    const f=document.querySelector("footer");
+    const p=document.createElement("p");
+    p.innerHTML='Also at this register: <a href="./">No Refunds — the lifetime receipt</a>.';
+    f.appendChild(p);
+  }
+})();
+
+/* ── support section (only when configured) ── */
+(function(){
+  const M = MONETIZE, s = document.getElementById("support"),
+        b = document.getElementById("s-buttons"), sp = document.getElementById("s-sponsor");
+  let any=false;
+  if(M.tipUrl){
+    any=true;
+    const a=document.createElement("a"); a.className="s-btn"; a.href=M.tipUrl;
+    a.target="_blank"; a.rel="noopener"; a.textContent=M.tipLabel||"Leave a tip";
+    b.appendChild(a);
+  }
+  if(M.productUrl){
+    any=true;
+    const a=document.createElement("a"); a.className="s-btn alt"; a.href=M.productUrl;
+    a.target="_blank"; a.rel="noopener"; a.textContent=M.productLabel||"Get the guide";
+    b.appendChild(a);
+  }
+  if(M.sponsorText){
+    any=true;
+    sp.innerHTML = M.sponsorUrl
+      ? 'Polished this week by <a href="'+M.sponsorUrl+'" target="_blank" rel="noopener">'+M.sponsorText+'</a>'
+      : M.sponsorText;
+  }
+  if(any) s.classList.add("on");
+})();
+</script>
