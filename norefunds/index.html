@@ -436,7 +436,7 @@ document.getElementById("share").addEventListener("click",async()=>{
 /* cross-link to the Money Mirror, only where mirror.html actually exists */
 (function(){
   const h=location.hostname;
-  if(h.endsWith("github.io")||h.endsWith("norefunds.life")||h==="localhost"){
+  if(h.endsWith("github.io")||h.endsWith("pages.dev")||h.endsWith("norefunds.life")||h==="localhost"){
     const f=document.querySelector(".fine");
     f.innerHTML+=' Also at this register: <a href="../mirror/" style="color:#8B8794">The Money Mirror</a>.';
   }
