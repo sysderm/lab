@@ -53,34 +53,58 @@
   .scale{transform:scale(.42);transform-origin:top center;height:calc(420mm*.42)}
   @media (max-width:560px){.scale{transform:scale(.28);height:calc(420mm*.28)}}
   .poster{width:297mm;height:420mm;background:var(--paper);color:var(--ink);
-    padding:24mm 0;display:flex;flex-direction:column;align-items:center;
-    font-variant-numeric:tabular-nums;position:relative;overflow:hidden}
-  .poster.dark{background:#14131A}
-  .strip{width:180mm;background:var(--paper);padding:10mm 14mm 12mm;position:relative}
-  .poster.dark .strip{box-shadow:0 6mm 18mm rgba(0,0,0,.55)}
-  .poster:not(.dark) .strip{outline:.4mm solid #DDD8C6;outline-offset:0}
-  .p-title{font-family:"VT323",monospace;font-size:23mm;line-height:.9;text-align:center;letter-spacing:.04em}
-  .p-sub{text-align:center;font-size:3.6mm;letter-spacing:.3em;margin-top:2mm}
-  .p-meta{text-align:center;font-size:3.1mm;color:var(--ink-soft);line-height:1.7;margin-top:3mm}
-  .p-rule{border:none;border-top:.5mm dashed var(--ink-faint);margin:4.5mm 0}
-  .p-sect{font-size:3mm;letter-spacing:.26em;color:var(--ink-soft);margin:4mm 0 1.5mm}
-  .p-li{display:flex;justify-content:space-between;align-items:baseline;font-size:4.1mm;line-height:1.85}
-  .p-li b{font-family:"VT323",monospace;font-size:6.2mm;font-weight:400}
-  .p-li.red,.p-li.red b{color:var(--red)}
-  .p-li.small b{font-family:"Courier Prime",monospace;font-size:4.1mm;font-weight:700}
-  .p-note{text-align:right;font-size:2.9mm;color:var(--ink-soft)}
-  .p-stampwrap{position:relative;height:24mm;margin:2mm 0}
-  .p-stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);
-    font-weight:700;font-size:7.5mm;letter-spacing:.16em;color:var(--red);
-    border:1.2mm double var(--red);padding:2.5mm 6mm;border-radius:1.5mm;opacity:.85;white-space:nowrap}
-  .p-stamp small{display:block;font-size:2.9mm;letter-spacing:.32em;text-align:center;font-weight:400}
-  .p-barcode{display:flex;align-items:flex-end;justify-content:center;height:12mm;margin-top:4mm}
-  .p-barcode i{display:block;background:var(--ink)}
-  .p-bnum{text-align:center;font-size:3mm;letter-spacing:.4em;color:var(--ink-soft);margin-top:1.5mm}
-  .p-thanks{text-align:center;font-size:3.4mm;letter-spacing:.22em;line-height:1.9;margin-top:4mm}
-  .p-caption{position:absolute;bottom:10mm;left:0;right:0;text-align:center;
-    font-size:3mm;letter-spacing:.34em;color:var(--ink-faint)}
-  .poster.dark .p-caption{color:#6E6B78}
+    padding:15mm 16mm 12mm;position:relative;overflow:hidden;
+    font-variant-numeric:tabular-nums;display:flex;flex-direction:column}
+  .poster.dark{background:#14131A;color:#EDEBDD}
+  .pframe{position:absolute;inset:8mm;border:.5mm solid currentColor;pointer-events:none}
+  .pframe::after{content:"";position:absolute;inset:1.4mm;border:.16mm solid currentColor;opacity:.5}
+  .microline{font-size:2mm;letter-spacing:.42em;text-align:center;color:var(--ink-soft);
+    white-space:nowrap;overflow:hidden;margin-bottom:3.5mm}
+  .poster.dark .microline{color:#8B87A0}
+  .p-h1{font-family:"VT323",monospace;font-size:29mm;line-height:.85;text-align:center;letter-spacing:.03em}
+  .p-tag{text-align:center;font-size:3.9mm;letter-spacing:.44em;margin-top:2mm}
+  .p-meta{text-align:center;font-size:2.9mm;letter-spacing:.16em;color:var(--ink-soft);margin-top:2.6mm;line-height:1.8}
+  .poster.dark .p-meta{color:#A7A3B8}
+  .p-cols{display:flex;gap:8mm;margin-top:6mm;flex:1;min-height:0}
+  .p-left{width:148mm;display:flex;flex-direction:column}
+  .p-right{flex:1;display:flex;flex-direction:column;gap:5mm;min-width:0}
+  .g-label{font-size:2.5mm;letter-spacing:.28em;color:var(--ink-soft);margin-bottom:2.4mm}
+  .poster.dark .g-label{color:#A7A3B8}
+  .wgrid{display:grid;grid-template-columns:repeat(52,1fr);gap:.55mm;width:148mm}
+  .wc{border:.16mm solid rgba(46,45,41,.45)}
+  .poster.dark .wc{border-color:rgba(237,235,221,.35)}
+  .wc.on{background:var(--ink);border-color:var(--ink)}
+  .poster.dark .wc.on{background:#EDEBDD;border-color:#EDEBDD}
+  .wc.now{background:var(--red);border-color:var(--red)}
+  .chips{display:flex;gap:4mm;margin-top:4.5mm}
+  .chip{flex:1;border:.4mm solid currentColor;padding:2.4mm 3mm}
+  .chip .cl{font-size:2.3mm;letter-spacing:.24em;color:var(--ink-soft)}
+  .poster.dark .chip .cl{color:#A7A3B8}
+  .chip .cv{font-family:"VT323",monospace;font-size:7.2mm;line-height:1.05;margin-top:1.2mm}
+  .portrait{text-align:center}
+  .portrait img{width:42mm;height:42mm;outline:.5mm solid currentColor;outline-offset:1.5mm}
+  .portrait .pc{font-size:2.4mm;letter-spacing:.34em;color:var(--ink-soft);margin-top:2.4mm}
+  .poster.dark .portrait .pc{color:#A7A3B8}
+  .panel{background:var(--paper);color:var(--ink);border:.45mm solid var(--ink);
+    padding:4.5mm 5mm 8mm;position:relative}
+  .p2-sect{font-size:2.4mm;letter-spacing:.26em;color:var(--ink-soft);margin:2.6mm 0 .8mm}
+  .p2-li{display:flex;justify-content:space-between;align-items:baseline;font-size:3.2mm;line-height:1.72}
+  .p2-li b{font-family:"VT323",monospace;font-size:5mm;font-weight:400;white-space:nowrap}
+  .p2-li.red,.p2-li.red b{color:var(--red)}
+  .p2-note{text-align:right;font-size:2.4mm;color:var(--ink-soft);margin-top:-.5mm}
+  .p2-rule{border:none;border-top:.35mm dashed var(--ink-faint);margin:2.4mm 0}
+  .p-stamp2{position:absolute;right:-3mm;bottom:-4mm;transform:rotate(-9deg);background:var(--paper);
+    font-weight:700;font-size:5.6mm;letter-spacing:.13em;color:var(--red);
+    border:1mm double var(--red);padding:1.8mm 4mm;border-radius:1mm;opacity:.85}
+  .p-foot{display:flex;align-items:flex-end;justify-content:space-between;margin-top:5.5mm}
+  .bignum{font-family:"VT323",monospace;font-size:30mm;line-height:.78}
+  .bigcap{font-size:3mm;letter-spacing:.42em;color:var(--ink-soft);margin-top:2.2mm}
+  .poster.dark .bigcap{color:#A7A3B8}
+  .bcwrap{text-align:right}
+  .bcnum{font-size:2.6mm;letter-spacing:.32em;color:var(--ink-soft);margin-top:1.6mm}
+  .poster.dark .bcnum{color:#A7A3B8}
+  .p-capt{text-align:center;font-size:2.5mm;letter-spacing:.34em;color:var(--ink-faint);margin-top:4mm}
+  .poster.dark .p-capt{color:#7B7790}
 
   @media print{
     body{background:#fff;padding:0;display:block}
@@ -220,50 +244,86 @@ function compose(){
            :(isFinite(pAge)&&pAge>=85)?"PRICELESS":Math.round(visits*20);
   }
 
-  const li=(l,v,c)=>'<div class="p-li '+(c||"")+'"><span>'+l+'</span><b>'+v+'</b></div>';
-  const sect=t=>'<div class="p-sect">'+t+'</div>';
-  let h='<div class="strip">'
-    +'<div class="p-title">NO REFUNDS</div>'
-    +'<div class="p-sub">THE LIFETIME RECEIPT</div>'
-    +'<div class="p-meta">'+(name?("PRINTED FOR "+esc(name)+" · AGE "+age):("AGE "+age))
-    +' · '+new Date().toISOString().slice(0,10)+'<br>REGISTER 03 · CASHIER: TIME · ALL SALES FINAL'
-    +(extended?' · EXTENDED WARRANTY':'')+'</div>'
-    +(PHOTO?'<div style="text-align:center;margin-top:5mm"><img src="'+PHOTO+'" alt="Portrait" style="width:42mm;height:42mm;outline:.5mm solid #DDD8C6;outline-offset:1.5mm"><div style="font-size:2.6mm;letter-spacing:.32em;color:var(--ink-soft);margin-top:2.5mm">CUSTOMER OF RECORD</div></div>':'')
-    +'<hr class="p-rule">'
-    +li("LIFE ELAPSED "+elapsed+"%",blocks)
-    +'<hr class="p-rule">'+sect("TIME, REMAINING")
+  const liveWeeks=Math.round(age*52.18);
+  const rows=Math.round(exp), cells=rows*52;
+  const rowH=((238-(rows-1)*0.55)/rows).toFixed(3);
+  let gridcells="";
+  for(let i=0;i<cells;i++){
+    gridcells+='<div class="wc'+(i<liveWeeks?" on":(i===liveWeeks?" now":""))+'"></div>';
+  }
+  const hb=Y*36.8e6, br=Y*7.36e6, sunrises=Math.round(Y*365.25);
+  const hbTxt=hb>=1e9?(hb/1e9).toFixed(1).replace(/\.0$/,"")+" BN":Math.round(hb/1e6)+" M";
+  const brTxt=br>=1e9?(br/1e9).toFixed(1)+" BN":Math.round(br/1e6)+" M";
+  const workHours=age<65?Math.round((65-age)*1800):0;
+
+  function barcodeSVG(seed,wmm,hmm){
+    let s=seed||1234,x=0,bars="";const widths=[3];
+    for(let i=0;i<32;i++){s=(s*9301+49297)%233280;widths.push(1+(s%3));}
+    widths.push(3);
+    const total=widths.reduce((a,b)=>a+b,0)+(widths.length-1);
+    widths.forEach(wd=>{bars+='<rect x="'+x+'" y="0" width="'+wd+'" height="100" fill="currentColor"/>';x+=wd+1;});
+    return '<svg width="'+wmm+'mm" height="'+hmm+'mm" viewBox="0 0 '+total+' 100" preserveAspectRatio="none" aria-hidden="true">'+bars+'</svg>';
+  }
+
+  const li=(l,v,c)=>'<div class="p2-li '+(c||"")+'"><span>'+l+'</span><b>'+v+'</b></div>';
+  const sect=t=>'<div class="p2-sect">'+t+'</div>';
+  const rule='<hr class="p2-rule">';
+  const micro=("NO REFUNDS · THE LIFETIME RECEIPT · ").repeat(9);
+
+  let panel=sect("TIME, REMAINING")
     +li("WEEKENDS",nf.format(weeks))+li("SUMMERS",nf.format(Math.round(Y)))+li("FULL MOONS",nf.format(moons))
-    +'<hr class="p-rule">'+sect("CONSUMPTION, REMAINING (EST.)")
+    +rule+sect("CONSUMPTION, REMAINING (EST.)")
     +li("COFFEES",nf.format(coffees))+li("MEALS",nf.format(meals))
     +li("PHONES YOU'LL OWN",nf.format(phones))+li("HAIRCUTS",nf.format(haircuts))
     +li("BOOKS YOU'LL FINISH",nf.format(books))
-    +'<hr class="p-rule">'+sect("WHERE IT ACTUALLY GOES")
+    +rule+sect("WHERE IT ACTUALLY GOES")
     +li("STARING AT YOUR PHONE",screenYrs+" YRS")
-    +'<div class="p-note">of your remaining '+Y.toFixed(0)+' years</div>';
+    +'<div class="p2-note">of your remaining '+Y.toFixed(0)+' years</div>'
+    +(workHours>0?li("HOURS AT WORK (TO 65)",nf.format(workHours)):"");
   if(parents!==null){
-    h+='<hr class="p-rule">'+sect("PEOPLE")
+    panel+=rule+sect("PEOPLE")
       +li("TIMES YOU'LL SEE YOUR PARENTS",(typeof parents==="number"?"~"+nf.format(parents):parents),"red")
-      +'<div class="p-note">make them count</div>';
+      +'<div class="p2-note">make them count</div>';
   }
-  h+='<hr class="p-rule">'
-    +li("SUBTOTAL","EVERYTHING YOU'LL EVER HAVE","small")
-    +li("PAYMENT METHOD","TIME","small")+li("CHANGE DUE","0.00","small")
-    +'<div class="p-stampwrap"><div class="p-stamp">NO REFUNDS<small>NO EXCHANGES · SALE IS FINAL</small></div></div>'
-    +'<hr class="p-rule">'
-    +'<div class="p-barcode" id="pbc"></div>'
-    +'<div class="p-bnum">W-'+weeks+' · YOUR REMAINING WEEKS</div>'
-    +'<div class="p-thanks">THANK YOU FOR LIVING<br>COME AGAIN · WHILE SUPPLIES LAST</div>'
-    +'</div><div class="p-caption">A COMING OF AGE SOCIETY ARTEFACT · KONSIL.CH/NOREFUNDS</div>';
+  panel+=rule
+    +'<div class="p2-li"><span>SUBTOTAL</span><b style="font-family:\'Courier Prime\';font-size:3.2mm;font-weight:700">EVERYTHING YOU\'LL EVER HAVE</b></div>'
+    +'<div class="p2-li"><span>PAYMENT METHOD</span><b style="font-family:\'Courier Prime\';font-size:3.2mm;font-weight:700">TIME</b></div>'
+    +'<div class="p2-li"><span>CHANGE DUE</span><b style="font-family:\'Courier Prime\';font-size:3.2mm;font-weight:700">0.00</b></div>'
+    +'<div class="p-stamp2">NO REFUNDS</div>';
+
+  const h='<div class="pframe"></div>'
+    +'<div class="microline">'+micro+'</div>'
+    +'<div class="p-h1">NO REFUNDS</div>'
+    +'<div class="p-tag">THE LIFETIME RECEIPT</div>'
+    +'<div class="p-meta">'+(name?("PRINTED FOR "+esc(name)+" · AGE "+age):("AGE "+age))
+    +' · '+new Date().toISOString().slice(0,10)
+    +' · WARRANTY '+exp+' YRS'+(extended?" (EXTENDED)":"")
+    +'<br>REGISTER 03 · CASHIER: TIME · SERIES 2026 · PLATE № 001 · ALL SALES FINAL</div>'
+    +'<div class="p-cols">'
+      +'<div class="p-left">'
+        +'<div class="g-label">THE LEDGER OF WEEKS · ONE CELL = ONE WEEK · ■ SPENT '+nf.format(liveWeeks)+' · □ REMAINING '+nf.format(weeks)+' · <span style="color:var(--red)">■</span> YOU ARE HERE</div>'
+        +'<div class="wgrid" style="grid-auto-rows:'+rowH+'mm">'+gridcells+'</div>'
+        +'<div class="chips">'
+          +'<div class="chip"><div class="cl">HEARTBEATS LEFT</div><div class="cv">'+hbTxt+'</div></div>'
+          +'<div class="chip"><div class="cl">BREATHS LEFT</div><div class="cv">'+brTxt+'</div></div>'
+          +'<div class="chip"><div class="cl">SUNRISES LEFT</div><div class="cv">'+nf.format(sunrises)+'</div></div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="p-right">'
+        +(PHOTO?'<div class="portrait"><img src="'+PHOTO+'" alt="Portrait"><div class="pc">CUSTOMER OF RECORD</div></div>':"")
+        +'<div class="panel">'+panel+'</div>'
+      +'</div>'
+    +'</div>'
+    +'<div class="p-foot">'
+      +'<div><div class="bignum">'+nf.format(weeks)+'</div><div class="bigcap">WEEKENDS REMAIN — SPEND ACCORDINGLY</div></div>'
+      +'<div class="bcwrap">'+barcodeSVG(weeks,58,15)
+        +'<div class="bcnum">W-'+weeks+' · LIFE ELAPSED '+elapsed+'%</div></div>'
+    +'</div>'
+    +'<div class="p-capt">A COMING OF AGE SOCIETY ARTEFACT · KONSIL.CH/NOREFUNDS</div>';
 
   const poster=document.getElementById("poster");
   poster.classList.toggle("dark",dark);
   poster.innerHTML=h;
-  let seed=weeks;
-  const bc=document.getElementById("pbc");
-  for(let i=0;i<44;i++){seed=(seed*9301+49297)%233280;
-    const b=document.createElement("i");
-    b.style.width=(0.4+(seed%4)*0.25)+"mm";b.style.marginRight=(0.4+(seed%3)*0.3)+"mm";
-    b.style.height="100%";bc.appendChild(b);}
   document.getElementById("actions").style.display="flex";
   document.getElementById("printhint").style.display="block";
   LAST={weeks,name,age};
