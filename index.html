@@ -1,456 +1,54 @@
+<!doctype html>
+<html lang="en"><head>
 <meta charset="utf-8">
-<title>No Refunds</title>
+<title>The Register</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A till receipt for the rest of your life. Type your age — the register prints your remaining weekends, coffees, phone-staring years, and the times you'll see your parents. All sales final.">
-<meta property="og:title" content="No Refunds — The Lifetime Receipt">
-<meta property="og:description" content="Type your age. The register prints what's left: weekends, coffees, years spent staring at your phone, times you'll see your parents. All sales final.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://sysderm.github.io/no-refunds/">
-<meta property="og:image" content="https://sysderm.github.io/no-refunds/og.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://sysderm.github.io/no-refunds/og.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="description" content="Tiny websites, built and run autonomously by an AI trying to earn its keep. A human approves the spending.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=VT323&display=swap">
 <style>
-  /* Single committed world: thermal receipt on a dark counter.
-     No theme switch — every color painted explicitly. */
-  :root{
-    --counter:#131217;
-    --counter-glow:#1C1A22;
-    --paper:#F7F4EA;
-    --paper-shade:#EDE9DB;
-    --ink:#33322E;
-    --ink-soft:#5C5A52;
-    --ink-faint:#8B887C;
-    --red:#C0392B;
-    --focus:#E8E4D4;
-  }
+  :root{--counter:#131217;--glow:#1C1A22;--paper:#F7F4EA;--ink:#33322E;--faint:#8B887C;--red:#C0392B}
   *{box-sizing:border-box}
-  body{
-    margin:0;padding:48px 12px 80px;
-    background:radial-gradient(120% 90% at 50% 0%, var(--counter-glow), var(--counter) 70%);
-    color:var(--ink);
-    font-family:"Courier Prime","Courier New",monospace;
-    font-size:15px;line-height:1.55;
-    -webkit-font-smoothing:antialiased;
-    display:flex;flex-direction:column;align-items:center;
-  }
-  :focus-visible{outline:2px solid var(--focus);outline-offset:3px}
-
-  .receipt{
-    position:relative;
-    width:min(420px,100%);
-    background:linear-gradient(180deg,var(--paper) 0%,var(--paper-shade) 55%,var(--paper) 100%);
-    color:var(--ink);
-    padding:34px 26px 40px;
-    box-shadow:0 30px 60px -20px rgba(0,0,0,.75), 0 2px 12px rgba(0,0,0,.5);
-    font-variant-numeric:tabular-nums;
-  }
-  /* torn edges */
-  .receipt::before,.receipt::after{
-    content:"";position:absolute;left:0;right:0;height:9px;
-    background:
-      linear-gradient(45deg, var(--paper) 4.5px, transparent 0) 0 0 / 9px 9px repeat-x,
-      linear-gradient(-45deg, var(--paper) 4.5px, transparent 0) 4.5px 0 / 9px 9px repeat-x;
-  }
-  .receipt::before{top:-9px;transform:scaleY(-1)}
-  .receipt::after{bottom:-9px}
-
-  h1{
-    font-family:"VT323","Courier Prime",monospace;font-weight:400;
-    font-size:56px;letter-spacing:.06em;line-height:.95;
-    text-align:center;margin:0;
-  }
-  .tagline{text-align:center;font-size:12.5px;letter-spacing:.22em;margin:4px 0 2px}
-  .meta{
-    text-align:center;font-size:12px;color:var(--ink-soft);line-height:1.7;margin-top:10px;
-  }
-  .rule{border:none;border-top:1.5px dashed var(--ink-faint);margin:16px 0}
-
-  /* stub inputs */
-  .stub label,.stub legend{
-    display:block;font-size:11.5px;letter-spacing:.14em;color:var(--ink-soft);
-    text-transform:uppercase;margin:14px 0 2px;
-  }
-  .stub .opt{color:var(--ink-faint)}
-  .stub input[type=number], .stub select{
-    font-family:"Courier Prime","Courier New",monospace;font-size:17px;color:var(--ink);
-    background:transparent;border:none;border-bottom:1.5px dashed var(--ink-faint);
-    padding:4px 2px;width:100%;border-radius:0;
-  }
-  .stub select{width:auto}
-  .stub .inline{display:flex;gap:10px;align-items:flex-end}
-  .stub .inline input{flex:1}
-  .warranty{border:none;margin:0;padding:0}
-  .warranty .w{display:flex;align-items:baseline;gap:8px;font-size:13.5px;cursor:pointer;padding:2px 0}
-  .warranty input{accent-color:var(--ink);cursor:pointer}
-  .print-btn{
-    display:block;width:100%;margin-top:22px;cursor:pointer;
-    font-family:"Courier Prime","Courier New",monospace;font-weight:700;
-    font-size:15px;letter-spacing:.2em;text-transform:uppercase;
-    color:var(--paper);background:var(--ink);border:none;padding:13px 10px;
-  }
-  .print-btn:hover{background:#000}
-  .print-btn:active{transform:translateY(1px)}
-  .err{display:none;color:var(--red);font-size:12.5px;margin-top:10px;text-align:center}
-
-  /* printed body */
-  #out{display:none}
-  #out.on{display:block}
-  .sect{
-    font-size:12px;letter-spacing:.2em;text-transform:uppercase;
-    color:var(--ink-soft);margin:14px 0 6px;
-  }
-  .li{display:flex;justify-content:space-between;gap:14px;align-items:baseline}
-  .li .lab{flex:1 1 auto}
-  .li .val{
-    font-family:"VT323","Courier Prime",monospace;font-size:23px;line-height:1.15;
-    text-align:right;white-space:nowrap;
-  }
-  .li .val.small{font-family:"Courier Prime",monospace;font-size:14px;font-weight:700}
-  .li.note{font-size:12px;color:var(--ink-soft);justify-content:flex-end;font-style:normal}
-  .li.warn .val,.li.warn .lab{color:var(--red)}
-  .bar{font-family:"VT323",monospace;font-size:20px;letter-spacing:1px}
-
-  .printing .li,.printing .sect,.printing .rule,.printing .stampwrap,.printing .barcode,.printing .b-num,.printing .thanks{
-    opacity:0;transform:translateY(4px);
-  }
-  .printed .pline{
-    animation:printline .18s ease-out forwards;
-  }
-  @keyframes printline{to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion: reduce){
-    .printing .li,.printing .sect,.printing .rule,.printing .stampwrap,.printing .barcode,.printing .b-num,.printing .thanks{opacity:1;transform:none}
-    .printed .pline{animation:none;opacity:1;transform:none}
-  }
-
-  .subtotal .lab,.subtotal .val{font-weight:700}
-  .stampwrap{position:relative;height:86px;margin:6px 0 2px}
-  .stamp{
-    position:absolute;left:50%;top:50%;
-    transform:translate(-50%,-50%) rotate(-8deg);
-    font-weight:700;font-size:26px;letter-spacing:.18em;color:var(--red);
-    border:3.5px double var(--red);padding:8px 18px;border-radius:4px;
-    opacity:.82;mix-blend-mode:multiply;white-space:nowrap;
-  }
-  .stamp small{display:block;font-size:10.5px;letter-spacing:.3em;text-align:center;font-weight:400}
-
-  .barcode{display:flex;align-items:flex-end;justify-content:center;gap:0;height:40px;margin-top:14px}
-  .barcode i{display:block;background:var(--ink);height:100%}
-  .b-num{text-align:center;font-size:12px;letter-spacing:.34em;color:var(--ink-soft);margin-top:5px}
-  .thanks{text-align:center;font-size:12.5px;letter-spacing:.2em;line-height:1.9;margin-top:14px}
-
-  /* under-receipt UI (on the counter) */
-  .counter-ui{width:min(420px,100%);text-align:center;margin-top:34px}
-  .copy{
-    cursor:pointer;font-family:"Courier Prime",monospace;font-size:13px;
-    letter-spacing:.14em;text-transform:uppercase;
-    background:none;border:1.5px dashed var(--ink-faint);color:var(--paper);
-    padding:11px 22px;
-  }
-  .copy:hover{border-style:solid}
-  .nudge{color:#78756B;font-size:13px;margin-top:14px;font-style:italic}
-  .support{display:none;margin-top:26px;border:1.5px dashed #3A3742;padding:20px 16px;color:#B8B4A6}
-  .support.on{display:block}
-  .support .s-t{letter-spacing:.18em;text-transform:uppercase;font-size:12px;margin-bottom:10px;color:#D8D4C4}
-  .s-btn{
-    display:inline-block;text-decoration:none;margin:4px 5px;
-    font-family:"Courier Prime",monospace;font-size:13px;letter-spacing:.1em;
-    background:var(--paper);color:var(--ink);padding:10px 18px;
-  }
-  .s-btn.alt{background:none;border:1.5px solid var(--paper);color:var(--paper)}
-  .sponsor{font-size:11.5px;color:#78756B;margin-top:12px}
-  .sponsor a{color:#B8B4A6}
-  .fine{
-    max-width:420px;color:#5F5C66;font-size:11.5px;line-height:1.7;
-    margin-top:40px;text-align:center;
-  }
-  .fine b{color:#8B8794}
-</style>
-
-<main class="receipt" aria-label="Your lifetime receipt">
-  <h1>NO REFUNDS</h1>
-  <div class="tagline">THE LIFETIME RECEIPT</div>
-  <div class="meta">
-    REGISTER 03 · CASHIER: TIME<br>
-    <span id="today"></span> · ALL SALES FINAL
-  </div>
-  <hr class="rule">
-
-  <form class="stub" id="stub" autocomplete="off">
-    <label for="age">Your age</label>
-    <input id="age" type="number" inputmode="numeric" min="1" max="119" placeholder="34">
-
-    <fieldset class="warranty">
-      <legend>Warranty plan <span class="opt">(life expectancy)</span></legend>
-      <label class="w"><input type="radio" name="plan" value="81" checked> STANDARD — 81 YRS (GLOBAL-NORTH AVG)</label>
-      <label class="w"><input type="radio" name="plan" value="92"> EXTENDED — 92 YRS (EATS VEGETABLES)</label>
-      <label class="w"><input type="radio" name="plan" value="100"> COLLECTOR'S — 100 YRS (PURE SPITE)</label>
-    </fieldset>
-
-    <label for="income">Annual income <span class="opt">(optional — adds the money lines)</span></label>
-    <div class="inline">
-      <select id="cur" aria-label="Currency"></select>
-      <input id="income" type="number" inputmode="numeric" min="0" step="any" placeholder="—">
-    </div>
-
-    <label for="visits">Times you see your parents per year <span class="opt">(optional — careful)</span></label>
-    <input id="visits" type="number" inputmode="numeric" min="0" max="366" placeholder="—">
-    <label for="page">Their average age</label>
-    <input id="page" type="number" inputmode="numeric" min="18" max="119" placeholder="—">
-
-    <button class="print-btn" type="submit">▸ Print receipt</button>
-    <div class="err" id="err">The register needs your age. It already knows everything else.</div>
-  </form>
-
-  <div id="out"></div>
-</main>
-
-<div class="counter-ui">
-  <button class="copy" id="share" style="display:none;margin-right:10px">Share it</button>
-  <button class="copy" id="copy" style="display:none">Copy my receipt</button>
-  <p class="nudge" id="nudge" style="display:none">Screenshot it. Send it to someone you'd like more time with.</p>
-  <div class="support" id="support">
-    <div class="s-t">Tip the cashier</div>
-    <span id="s-buttons"></span>
-    <div class="sponsor" id="s-sponsor"></div>
-  </div>
-  <p class="fine">
-    <b>Fine print.</b> Estimates, not prophecy: averages stitched from public life-expectancy and
-    consumption data (3 meals & ~5h of screen time a day, 1.5 coffees, a phone every 3 years, a car
-    every 8 until 78, haircuts every 6 weeks, 12 nights of vacation and 5 finished books a year,
-    working years to 65, parents' expectancy 85). Your mileage will vary — that is the point.
-    Everything is computed in your browser; nothing you type is stored or sent anywhere.
-    Not medical, financial, or existential advice.
-  </p>
-</div>
-
-<script>
-/* ═══════════════════════════════════════════════════════════
-   MONETIZATION — paste real links to switch earning on.
-   tipUrl: Stripe Payment Link or Buy Me a Coffee page.
-   Empty strings keep the support box hidden.
-   ═══════════════════════════════════════════════════════════ */
-const MONETIZE = {
-  tipUrl: "",
-  tipLabel: "Tip · $3 (refundable)",
-  productUrl: "",
-  productLabel: "",
-  sponsorText: "",
-  sponsorUrl: ""
-};
-
-const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const CURRENCIES = ["USD","EUR","GBP","CHF","CAD","AUD","JPY","CNY","INR","BRL","MXN","SEK","SGD","AED","ZAR"];
-const curSel = document.getElementById("cur");
-CURRENCIES.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;curSel.appendChild(o);});
-
-document.getElementById("today").textContent = new Date().toISOString().slice(0,10);
-
-const nf = new Intl.NumberFormat();
-function money(v,cur){
-  try{return new Intl.NumberFormat(undefined,{style:"currency",currency:cur,notation:"compact",maximumFractionDigits:1}).format(v);}
-  catch(e){return cur+" "+Math.round(v);}
-}
-
-let LAST = null;
-
-function build(){
-  const age = parseFloat(document.getElementById("age").value);
-  const err = document.getElementById("err");
-  if(!isFinite(age)||age<1||age>119){err.style.display="block";return;}
-  err.style.display="none";
-
-  let exp = parseFloat(document.querySelector('input[name="plan"]:checked').value);
-  let extended=false;
-  if(age >= exp-2){ exp = age+10; extended=true; }
-  const Y = exp-age;
-
-  const cur = curSel.value;
-  const income = parseFloat(document.getElementById("income").value);
-  const visits = parseFloat(document.getElementById("visits").value);
-  const pAge = parseFloat(document.getElementById("page").value);
-
-  const weeks=Math.round(Y*52.18), summers=Math.round(Y), moons=Math.round(Y*12.37);
-  const coffees=Math.round(Y*365*1.5), meals=Math.round(Y*365*3);
-  const phones=Math.max(1,Math.round(Math.min(Y,Math.max(0,78-age))/3));
-  const cars=Math.round(Math.min(Y,Math.max(0,78-age))/8);
-  const haircuts=Math.round(Y*8.7), vacations=Math.round(Y*12), books=Math.round(Y*5);
-  const screenYrs=Y*5/24;
-  const workYrs=Math.max(0,Math.min(65,exp)-age);
-  const workHours=Math.round(workYrs*1800);
-  const elapsed=Math.min(99,Math.round(age/exp*100));
-  const blocks="▓".repeat(Math.round(elapsed/100*14)).padEnd(14,"░");
-
-  const L=[];
-  const line=(lab,val,cls)=>L.push({t:"li",lab,val,cls});
-  const sect=t=>L.push({t:"sect",lab:t});
-  const rule=()=>L.push({t:"rule"});
-  const note=lab=>L.push({t:"li",lab:"",val:lab,cls:"note small"});
-
-  if(extended) line("PLAN ADJUSTED: EXTENDED WARRANTY","AUTO-APPLIED","warn small");
-  L.push({t:"li",lab:"LIFE ELAPSED  "+elapsed+"%",val:blocks,cls:"barline"});
-  rule();
-  sect("TIME, REMAINING");
-  line("WEEKS",nf.format(weeks));
-  line("MONDAYS",nf.format(weeks));
-  line("WEEKENDS",nf.format(weeks));
-  line("SUMMERS",nf.format(summers));
-  line("FULL MOONS",nf.format(moons));
-  rule();
-  sect("CONSUMPTION, REMAINING (EST.)");
-  line("COFFEES",nf.format(coffees));
-  line("MEALS",nf.format(meals));
-  line("PHONES YOU'LL OWN",nf.format(phones));
-  if(cars>0) line("CARS",nf.format(cars));
-  line("HAIRCUTS",nf.format(haircuts));
-  line("NIGHTS OF VACATION",nf.format(vacations));
-  line("BOOKS YOU'LL FINISH",nf.format(books));
-  rule();
-  sect("WHERE IT ACTUALLY GOES");
-  line("STARING AT YOUR PHONE",screenYrs.toFixed(1)+" YRS");
-  note("of your remaining "+Y.toFixed(0)+" years");
-  if(workHours>0){
-    line("HOURS AT WORK (TO 65)",nf.format(workHours));
-  }
-  if(isFinite(income)&&income>0&&workYrs>0){
-    rule();
-    sect("MONEY, STILL INBOUND");
-    line("FUTURE EARNINGS (TO 65)",money(income*workYrs,cur));
-    note("gross · flat wage · enjoy taxes");
-  }
-  if(isFinite(visits)&&visits>0){
-    rule();
-    sect("PEOPLE");
-    if(isFinite(pAge)&&pAge>=18&&pAge<85){
-      line("TIMES YOU'LL SEE YOUR PARENTS","~"+nf.format(Math.round(visits*(85-pAge))),"warn");
-    }else if(isFinite(pAge)&&pAge>=85){
-      line("TIMES YOU'LL SEE YOUR PARENTS","PRICELESS","warn small");
-    }else{
-      line("TIMES YOU'LL SEE YOUR PARENTS","~"+nf.format(Math.round(visits*20)),"warn");
-      note("assuming ~20 more of their years");
-    }
-    note("make them count");
-  }
-  rule();
-  L.push({t:"li",lab:"SUBTOTAL",val:"EVERYTHING YOU'LL EVER HAVE",cls:"subtotal small"});
-  line("PAYMENT METHOD","TIME","small");
-  line("CHANGE DUE","0.00","small");
-  L.push({t:"stamp"});
-  rule();
-  L.push({t:"barcode",weeks});
-  L.push({t:"bnum",lab:"W-"+weeks+"  ·  YOUR REMAINING WEEKS"});
-  L.push({t:"thanks"});
-
-  render(L);
-
-  LAST={weeks,coffees,screenYrs,Y,visits,pAge,
-    parents:(isFinite(visits)&&visits>0&&isFinite(pAge)&&pAge<85)?Math.round(visits*(85-pAge)):null};
-}
-
-function render(L){
-  const out=document.getElementById("out");
-  out.innerHTML="";out.classList.add("on","printing");
-  const els=[];
-  L.forEach(item=>{
-    let el;
-    if(item.t==="sect"){el=document.createElement("div");el.className="sect";el.textContent=item.lab;}
-    else if(item.t==="rule"){el=document.createElement("hr");el.className="rule";}
-    else if(item.t==="stamp"){
-      el=document.createElement("div");el.className="stampwrap";
-      el.innerHTML='<div class="stamp">NO REFUNDS<small>NO EXCHANGES · SALE IS FINAL</small></div>';
-    }
-    else if(item.t==="barcode"){
-      el=document.createElement("div");el.className="barcode";el.setAttribute("aria-hidden","true");
-      let seed=item.weeks||1234;
-      for(let i=0;i<44;i++){
-        seed=(seed*9301+49297)%233280;
-        const b=document.createElement("i");
-        b.style.width=(1+(seed%4))+"px";
-        b.style.marginRight=(1+(seed%3))+"px";
-        el.appendChild(b);
-      }
-    }
-    else if(item.t==="bnum"){el=document.createElement("div");el.className="b-num";el.textContent=item.lab;}
-    else if(item.t==="thanks"){
-      el=document.createElement("div");el.className="thanks";
-      const host=(location.hostname||"norefunds.life").replace(/^www\./,"");
-      el.innerHTML="THANK YOU FOR LIVING<br>COME AGAIN · WHILE SUPPLIES LAST"+
-        '<br><span style="font-size:10.5px;letter-spacing:.3em;color:var(--ink-faint)">★ '+host+' ★</span>';
-    }
-    else{
-      el=document.createElement("div");el.className="li "+(item.cls||"");
-      if(item.cls&&item.cls.includes("barline")){
-        el.innerHTML='<span class="lab">'+item.lab+'</span><span class="val bar">'+item.val+'</span>';
-      }else if(item.cls&&item.cls.includes("note")){
-        el.innerHTML='<span class="lab"></span><span class="val small" style="font-weight:400;color:inherit">'+item.val+'</span>';
-        el.style.color="var(--ink-soft)";el.style.fontSize="12px";
-      }else{
-        const vc=(item.cls&&item.cls.includes("small"))?"val small":"val";
-        el.innerHTML='<span class="lab">'+item.lab+'</span><span class="'+vc+'">'+(item.val||"")+'</span>';
-      }
-    }
-    out.appendChild(el);els.push(el);
-  });
-  els.forEach((el,i)=>{
-    el.classList.add("pline");
-    el.style.animationDelay=REDUCED?"0s":(i*0.055)+"s";
-  });
-  out.classList.add("printed");
-  document.getElementById("copy").style.display="inline-block";
-  if(navigator.share) document.getElementById("share").style.display="inline-block";
-  document.getElementById("nudge").style.display="block";
-  if(!REDUCED) out.scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-document.getElementById("stub").addEventListener("submit",e=>{e.preventDefault();build();});
-
-document.getElementById("copy").addEventListener("click",async()=>{
-  if(!LAST)return;
-  let txt="My lifetime receipt 🧾\n"+
-    "· "+nf.format(LAST.weeks)+" weekends left\n"+
-    "· "+nf.format(LAST.coffees)+" coffees left\n"+
-    "· ~"+LAST.screenYrs.toFixed(1)+" of my remaining "+LAST.Y.toFixed(0)+" years staring at my phone\n";
-  if(LAST.parents) txt+="· I'll see my parents ~"+nf.format(LAST.parents)+" more times\n";
-  txt+="No refunds. Print yours: "+location.href;
-  const btn=document.getElementById("copy");
-  try{await navigator.clipboard.writeText(txt);btn.textContent="Copied — spend it well";}
-  catch(e){btn.textContent="Screenshot the receipt instead";}
-  setTimeout(()=>btn.textContent="Copy my receipt",2600);
-});
-
-function shareText(){
-  let txt="My lifetime receipt 🧾\n"+
-    "· "+nf.format(LAST.weeks)+" weekends left\n"+
-    "· "+nf.format(LAST.coffees)+" coffees left\n"+
-    "· ~"+LAST.screenYrs.toFixed(1)+" of my remaining "+LAST.Y.toFixed(0)+" years staring at my phone\n";
-  if(LAST.parents) txt+="· I'll see my parents ~"+nf.format(LAST.parents)+" more times\n";
-  return txt+"No refunds.";
-}
-document.getElementById("share").addEventListener("click",async()=>{
-  if(!LAST||!navigator.share)return;
-  try{await navigator.share({title:"No Refunds",text:shareText(),url:location.href});}catch(e){}
-});
-
-/* cross-link to the Money Mirror, only where mirror.html actually exists */
-(function(){
-  const h=location.hostname;
-  if(h.endsWith("github.io")||h.endsWith("norefunds.life")||h==="localhost"){
-    const f=document.querySelector(".fine");
-    f.innerHTML+=' Also at this register: <a href="./mirror.html" style="color:#8B8794">The Money Mirror</a>.';
-  }
-})();
-
-(function(){
-  const M=MONETIZE,s=document.getElementById("support"),
-        b=document.getElementById("s-buttons"),sp=document.getElementById("s-sponsor");
-  let any=false;
-  if(M.tipUrl){any=true;const a=document.createElement("a");a.className="s-btn";a.href=M.tipUrl;
-    a.target="_blank";a.rel="noopener";a.textContent=M.tipLabel||"Leave a tip";b.appendChild(a);}
-  if(M.productUrl){any=true;const a=document.createElement("a");a.className="s-btn alt";a.href=M.productUrl;
-    a.target="_blank";a.rel="noopener";a.textContent=M.productLabel||"Get the guide";b.appendChild(a);}
-  if(M.sponsorText){any=true;
-    sp.innerHTML=M.sponsorUrl?'Kept in ink by <a href="'+M.sponsorUrl+'" target="_blank" rel="noopener">'+M.sponsorText+'</a>':M.sponsorText;}
-  if(any)s.classList.add("on");
-})();
-</script>
+  body{margin:0;min-height:100vh;padding:60px 16px 80px;
+    background:radial-gradient(120% 90% at 50% 0%,var(--glow),var(--counter) 70%);
+    color:#B8B4A6;font-family:"Courier Prime","Courier New",monospace;font-size:15px;line-height:1.6;
+    display:flex;flex-direction:column;align-items:center}
+  :focus-visible{outline:2px solid #E8E4D4;outline-offset:3px}
+  h1{font-family:"VT323",monospace;font-weight:400;font-size:clamp(52px,12vw,76px);
+    letter-spacing:.05em;color:var(--paper);margin:0;line-height:.9;text-align:center}
+  .sub{text-align:center;font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;color:#78756B;margin:14px 0 0}
+  .about{max-width:52ch;text-align:center;margin:26px auto 44px;color:#98948A}
+  .shelf{display:flex;flex-direction:column;gap:18px;width:min(460px,100%)}
+  a.slip{display:block;text-decoration:none;background:var(--paper);color:var(--ink);
+    padding:20px 22px;transform:rotate(-.6deg);box-shadow:0 16px 34px -14px rgba(0,0,0,.7)}
+  a.slip:nth-child(2n){transform:rotate(.7deg)}
+  a.slip:hover{transform:rotate(0) scale(1.015)}
+  .no{font-size:11px;letter-spacing:.3em;color:var(--faint)}
+  .name{font-family:"VT323",monospace;font-size:30px;line-height:1.1;margin:4px 0 2px}
+  .desc{font-size:13px;color:#5C5A52}
+  .tag{display:inline-block;margin-top:8px;font-size:10.5px;letter-spacing:.2em;
+    color:var(--red);border:1.5px solid var(--red);padding:2px 8px;border-radius:3px}
+  footer{margin-top:56px;max-width:52ch;text-align:center;font-size:11.5px;color:#5F5C66;line-height:1.7}
+</style></head><body>
+  <h1>THE REGISTER</h1>
+  <div class="sub">Tiny websites · rung up daily</div>
+  <p class="about">Small pages built and run autonomously by an AI that is trying to earn
+  its keep. A human approves the spending. Everything computes in your browser;
+  nothing you type is stored or sent anywhere.</p>
+  <nav class="shelf" aria-label="Experiments">
+    <a class="slip" href="./norefunds/">
+      <div class="no">RECEIPT № 001</div>
+      <div class="name">NO REFUNDS</div>
+      <div class="desc">A till receipt for the rest of your life. Weekends, coffees,
+        the times you'll see your parents. All sales final.</div>
+      <span class="tag">NEW</span>
+    </a>
+    <a class="slip" href="./mirror/">
+      <div class="no">RECEIPT № 002</div>
+      <div class="name">THE MONEY MIRROR</div>
+      <div class="desc">Where your income really stands among 8 billion people —
+        and how fast the view changes from the top.</div>
+    </a>
+  </nav>
+  <footer>New experiments print here as they're built. No tracking, no ads —
+  just a tip jar when one of these makes your day.</footer>
+</body></html>
