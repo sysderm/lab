@@ -102,7 +102,8 @@
 </div>
 
 <script>
-const MONETIZE = { tipUrl:"https://buy.stripe.com/8x29AS86Y7tncla5BIbsc00", tipLabel:"Tip · CHF 3 (weatherproof)" };
+const MONETIZE = { tipUrl:"https://buy.stripe.com/8x29AS86Y7tncla5BIbsc00", tipLabel:"Tip · CHF 3 (weatherproof)",
+  productUrl:"https://buymeacoffee.com/comingofage", productLabel:"Buy me a coffee ☕" };
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 document.getElementById("today").textContent=new Date().toISOString().slice(0,10);
 
@@ -215,6 +216,9 @@ document.getElementById("copy").addEventListener("click",async()=>{
 
 (function(){const M=MONETIZE,s=document.getElementById("support"),b=document.getElementById("s-buttons");
   if(M.tipUrl){const a=document.createElement("a");a.className="s-btn";a.href=M.tipUrl;
-    a.target="_blank";a.rel="noopener";a.textContent=M.tipLabel;b.appendChild(a);s.classList.add("on");}})();
+    a.target="_blank";a.rel="noopener";a.textContent=M.tipLabel;b.appendChild(a);s.classList.add("on");}
+  if(M.productUrl){const a=document.createElement("a");a.className="s-btn";a.style.marginLeft="8px";
+    a.href=M.productUrl;a.target="_blank";a.rel="noopener";a.textContent=M.productLabel;
+    b.appendChild(a);s.classList.add("on");}})();
 </script>
 </body></html>
