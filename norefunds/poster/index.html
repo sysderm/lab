@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>No Refunds — Poster Edition</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=VT323&display=swap">
+<style>
+  :root{
+    --counter:#131217;--glow:#1C1A22;--paper:#FAF8F0;--paper2:#F1EEE0;
+    --ink:#2E2D29;--ink-soft:#5C5A52;--ink-faint:#8B887C;--red:#C0392B;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(120% 90% at 50% 0%,var(--glow),var(--counter) 70%);
+    color:#B8B4A6;font-family:"Courier Prime","Courier New",monospace;font-size:15px;line-height:1.6;
+    display:flex;flex-direction:column;align-items:center;padding:40px 12px 80px;min-height:100vh}
+  :focus-visible{outline:2px solid #E8E4D4;outline-offset:3px}
+  .ui{width:min(480px,100%)}
+  h1{font-family:"VT323",monospace;font-weight:400;font-size:44px;color:var(--paper);
+    letter-spacing:.05em;margin:0;text-align:center;line-height:1}
+  .sub{text-align:center;font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;color:#78756B;margin:8px 0 26px}
+
+  /* locked view */
+  #locked{display:none;text-align:center;background:var(--paper);color:var(--ink);
+    padding:34px 26px;max-width:420px}
+  #locked .big{font-family:"VT323",monospace;font-size:34px;line-height:1.05;margin-bottom:12px}
+  #locked p{font-size:13.5px;color:var(--ink-soft)}
+
+  /* form */
+  form{background:var(--paper);color:var(--ink);padding:26px 24px 30px;margin-bottom:34px}
+  label{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink-soft);margin:14px 0 2px}
+  input,select{font-family:"Courier Prime",monospace;font-size:16px;color:var(--ink);
+    background:transparent;border:none;border-bottom:1.5px dashed var(--ink-faint);
+    padding:4px 2px;width:100%;border-radius:0}
+  select{width:auto}
+  .row2{display:flex;gap:14px}
+  .row2>div{flex:1}
+  .btn{display:block;width:100%;margin-top:20px;cursor:pointer;
+    font-family:"Courier Prime",monospace;font-weight:700;font-size:14px;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--paper);
+    background:var(--ink);border:none;padding:13px}
+  .btn:hover{background:#000}
+  .actions{display:none;gap:10px;flex-wrap:wrap;justify-content:center;margin:0 0 26px}
+  .actions button{cursor:pointer;font-family:"Courier Prime",monospace;font-size:13px;
+    letter-spacing:.12em;text-transform:uppercase;background:none;
+    border:1.5px dashed var(--ink-faint);color:var(--paper);padding:11px 18px}
+  .actions button:hover{border-style:solid}
+  .hint{font-size:12px;color:#78756B;text-align:center;max-width:52ch;margin:0 auto 30px}
+
+  /* ── THE POSTER — designed in mm (A3: 297×420) ── */
+  .stage{width:100%;display:flex;justify-content:center}
+  .scale{transform:scale(.42);transform-origin:top center;height:calc(420mm*.42)}
+  @media (max-width:560px){.scale{transform:scale(.28);height:calc(420mm*.28)}}
+  .poster{width:297mm;height:420mm;background:var(--paper);color:var(--ink);
+    padding:24mm 0;display:flex;flex-direction:column;align-items:center;
+    font-variant-numeric:tabular-nums;position:relative;overflow:hidden}
+  .poster.dark{background:#14131A}
+  .strip{width:180mm;background:var(--paper);padding:10mm 14mm 12mm;position:relative}
+  .poster.dark .strip{box-shadow:0 6mm 18mm rgba(0,0,0,.55)}
+  .poster:not(.dark) .strip{outline:.4mm solid #DDD8C6;outline-offset:0}
+  .p-title{font-family:"VT323",monospace;font-size:23mm;line-height:.9;text-align:center;letter-spacing:.04em}
+  .p-sub{text-align:center;font-size:3.6mm;letter-spacing:.3em;margin-top:2mm}
+  .p-meta{text-align:center;font-size:3.1mm;color:var(--ink-soft);line-height:1.7;margin-top:3mm}
+  .p-rule{border:none;border-top:.5mm dashed var(--ink-faint);margin:4.5mm 0}
+  .p-sect{font-size:3mm;letter-spacing:.26em;color:var(--ink-soft);margin:4mm 0 1.5mm}
+  .p-li{display:flex;justify-content:space-between;align-items:baseline;font-size:4.1mm;line-height:1.85}
+  .p-li b{font-family:"VT323",monospace;font-size:6.2mm;font-weight:400}
+  .p-li.red,.p-li.red b{color:var(--red)}
+  .p-li.small b{font-family:"Courier Prime",monospace;font-size:4.1mm;font-weight:700}
+  .p-note{text-align:right;font-size:2.9mm;color:var(--ink-soft)}
+  .p-stampwrap{position:relative;height:24mm;margin:2mm 0}
+  .p-stamp{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);
+    font-weight:700;font-size:7.5mm;letter-spacing:.16em;color:var(--red);
+    border:1.2mm double var(--red);padding:2.5mm 6mm;border-radius:1.5mm;opacity:.85;white-space:nowrap}
+  .p-stamp small{display:block;font-size:2.9mm;letter-spacing:.32em;text-align:center;font-weight:400}
+  .p-barcode{display:flex;align-items:flex-end;justify-content:center;height:12mm;margin-top:4mm}
+  .p-barcode i{display:block;background:var(--ink)}
+  .p-bnum{text-align:center;font-size:3mm;letter-spacing:.4em;color:var(--ink-soft);margin-top:1.5mm}
+  .p-thanks{text-align:center;font-size:3.4mm;letter-spacing:.22em;line-height:1.9;margin-top:4mm}
+  .p-caption{position:absolute;bottom:10mm;left:0;right:0;text-align:center;
+    font-size:3mm;letter-spacing:.34em;color:var(--ink-faint)}
+  .poster.dark .p-caption{color:#6E6B78}
+
+  @media print{
+    body{background:#fff;padding:0;display:block}
+    .ui,.actions,.hint,h1,.sub{display:none !important}
+    .stage{display:block}
+    .scale{transform:none;height:auto}
+    .poster{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    @page{size:A3 portrait;margin:0}
+  }
+</style></head><body>
+
+<h1>POSTER EDITION</h1>
+<div class="sub">No Refunds · certified copy · A3</div>
+
+<div id="locked" class="ui">
+  <div class="big">THIS DOOR OPENS<br>AFTER THE PURCHASE</div>
+  <p>The Poster Edition unlocks through the link at the register on
+  <a href="../" style="color:var(--red)">norefunds</a>. If you've already paid,
+  use the link in your Stripe receipt e-mail — it carries the stamp.</p>
+</div>
+
+<form class="ui" id="pform">
+  <label for="pname">Name on the receipt (optional)</label>
+  <input id="pname" type="text" maxlength="24" placeholder="ANNA">
+  <div class="row2">
+    <div><label for="page2">Age</label>
+      <input id="page2" type="number" min="1" max="119" placeholder="34"></div>
+    <div><label for="pplan">Warranty</label>
+      <select id="pplan"><option value="81">STANDARD 81</option>
+        <option value="92">EXTENDED 92</option><option value="100">COLLECTOR'S 100</option></select></div>
+  </div>
+  <div class="row2">
+    <div><label for="pvisits">Parent visits / yr (optional)</label>
+      <input id="pvisits" type="number" min="0" max="366" placeholder="—"></div>
+    <div><label for="ppage">Their avg. age</label>
+      <input id="ppage" type="number" min="18" max="119" placeholder="—"></div>
+  </div>
+  <label for="pvariant">Edition</label>
+  <select id="pvariant"><option value="light">GALLERY WHITE</option><option value="dark">VAULT DARK</option></select>
+  <button class="btn" type="submit">▸ Compose my poster</button>
+</form>
+
+<div class="actions ui" id="actions">
+  <button id="printbtn">Print / save as PDF (A3)</button>
+  <button id="wallbtn">Phone wallpaper (PNG)</button>
+</div>
+<p class="hint" id="printhint" style="display:none">In the print dialog: paper size A3, margins none,
+"Save as PDF". Any print shop turns the PDF into a 30×42 or 50×70 print for a few francs.
+The wallpaper is 1290×2796 — fits any recent phone.</p>
+
+<div class="stage"><div class="scale"><div class="poster" id="poster"></div></div></div>
+<canvas id="wallcv" width="1290" height="2796" style="display:none"></canvas>
+
+<script>
+const KEY="stamped";
+const Q=new URLSearchParams(location.search);
+const nf=new Intl.NumberFormat("en-US");
+
+if(Q.get("k")!==KEY){
+  document.getElementById("locked").style.display="block";
+  document.getElementById("pform").style.display="none";
+}
+
+/* prefill from URL (Stripe redirect can carry nothing sensitive; these are optional) */
+["age2","name","visits","page","plan","v"].forEach(()=>{});
+if(Q.get("age"))   document.getElementById("page2").value=Q.get("age");
+if(Q.get("name"))  document.getElementById("pname").value=Q.get("name");
+if(Q.get("visits"))document.getElementById("pvisits").value=Q.get("visits");
+if(Q.get("page"))  document.getElementById("ppage").value=Q.get("page");
+if(Q.get("plan"))  document.getElementById("pplan").value=Q.get("plan");
+if(Q.get("v")==="dark")document.getElementById("pvariant").value="dark";
+
+let LAST=null;
+
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+function compose(){
+  const age=parseFloat(document.getElementById("page2").value);
+  if(!isFinite(age)||age<1||age>119){alert("The register needs an age.");return;}
+  let exp=parseFloat(document.getElementById("pplan").value), extended=false;
+  if(age>=exp-2){exp=age+10;extended=true;}
+  const Y=exp-age;
+  const name=(document.getElementById("pname").value||"").trim().toUpperCase().slice(0,24);
+  const visits=parseFloat(document.getElementById("pvisits").value);
+  const pAge=parseFloat(document.getElementById("ppage").value);
+  const dark=document.getElementById("pvariant").value==="dark";
+
+  const weeks=Math.round(Y*52.18), moons=Math.round(Y*12.37);
+  const coffees=Math.round(Y*365*1.5), meals=Math.round(Y*365*3);
+  const phones=Math.max(1,Math.round(Math.min(Y,Math.max(0,78-age))/3));
+  const haircuts=Math.round(Y*8.7), books=Math.round(Y*5);
+  const screenYrs=(Y*5/24).toFixed(1);
+  const elapsed=Math.min(99,Math.round(age/exp*100));
+  const blocks="▓".repeat(Math.round(elapsed/100*14)).padEnd(14,"░");
+  let parents=null;
+  if(isFinite(visits)&&visits>0){
+    parents=(isFinite(pAge)&&pAge>=18&&pAge<85)?Math.round(visits*(85-pAge))
+           :(isFinite(pAge)&&pAge>=85)?"PRICELESS":Math.round(visits*20);
+  }
+
+  const li=(l,v,c)=>'<div class="p-li '+(c||"")+'"><span>'+l+'</span><b>'+v+'</b></div>';
+  const sect=t=>'<div class="p-sect">'+t+'</div>';
+  let h='<div class="strip">'
+    +'<div class="p-title">NO REFUNDS</div>'
+    +'<div class="p-sub">THE LIFETIME RECEIPT</div>'
+    +'<div class="p-meta">'+(name?("PRINTED FOR "+esc(name)+" · AGE "+age):("AGE "+age))
+    +' · '+new Date().toISOString().slice(0,10)+'<br>REGISTER 03 · CASHIER: TIME · ALL SALES FINAL'
+    +(extended?' · EXTENDED WARRANTY':'')+'</div>'
+    +'<hr class="p-rule">'
+    +li("LIFE ELAPSED "+elapsed+"%",blocks)
+    +'<hr class="p-rule">'+sect("TIME, REMAINING")
+    +li("WEEKENDS",nf.format(weeks))+li("SUMMERS",nf.format(Math.round(Y)))+li("FULL MOONS",nf.format(moons))
+    +'<hr class="p-rule">'+sect("CONSUMPTION, REMAINING (EST.)")
+    +li("COFFEES",nf.format(coffees))+li("MEALS",nf.format(meals))
+    +li("PHONES YOU'LL OWN",nf.format(phones))+li("HAIRCUTS",nf.format(haircuts))
+    +li("BOOKS YOU'LL FINISH",nf.format(books))
+    +'<hr class="p-rule">'+sect("WHERE IT ACTUALLY GOES")
+    +li("STARING AT YOUR PHONE",screenYrs+" YRS")
+    +'<div class="p-note">of your remaining '+Y.toFixed(0)+' years</div>';
+  if(parents!==null){
+    h+='<hr class="p-rule">'+sect("PEOPLE")
+      +li("TIMES YOU'LL SEE YOUR PARENTS",(typeof parents==="number"?"~"+nf.format(parents):parents),"red")
+      +'<div class="p-note">make them count</div>';
+  }
+  h+='<hr class="p-rule">'
+    +li("SUBTOTAL","EVERYTHING YOU'LL EVER HAVE","small")
+    +li("PAYMENT METHOD","TIME","small")+li("CHANGE DUE","0.00","small")
+    +'<div class="p-stampwrap"><div class="p-stamp">NO REFUNDS<small>NO EXCHANGES · SALE IS FINAL</small></div></div>'
+    +'<hr class="p-rule">'
+    +'<div class="p-barcode" id="pbc"></div>'
+    +'<div class="p-bnum">W-'+weeks+' · YOUR REMAINING WEEKS</div>'
+    +'<div class="p-thanks">THANK YOU FOR LIVING<br>COME AGAIN · WHILE SUPPLIES LAST</div>'
+    +'</div><div class="p-caption">A COMING OF AGE SOCIETY ARTEFACT · THE-TILL-6DJ.PAGES.DEV/NOREFUNDS</div>';
+
+  const poster=document.getElementById("poster");
+  poster.classList.toggle("dark",dark);
+  poster.innerHTML=h;
+  let seed=weeks;
+  const bc=document.getElementById("pbc");
+  for(let i=0;i<44;i++){seed=(seed*9301+49297)%233280;
+    const b=document.createElement("i");
+    b.style.width=(0.4+(seed%4)*0.25)+"mm";b.style.marginRight=(0.4+(seed%3)*0.3)+"mm";
+    b.style.height="100%";bc.appendChild(b);}
+  document.getElementById("actions").style.display="flex";
+  document.getElementById("printhint").style.display="block";
+  LAST={weeks,name,age};
+}
+
+document.getElementById("pform").addEventListener("submit",e=>{e.preventDefault();compose();});
+document.getElementById("printbtn")?.addEventListener("click",()=>window.print());
+
+/* wallpaper 1290×2796 */
+document.getElementById("wallbtn")?.addEventListener("click",async()=>{
+  if(!LAST)return;
+  await document.fonts.load('200px VT323');await document.fonts.load('bold 60px "Courier Prime"');
+  const cv=document.getElementById("wallcv"),x=cv.getContext("2d");
+  x.fillStyle="#131217";x.fillRect(0,0,1290,2796);
+  x.textAlign="center";
+  x.fillStyle="#78756B";x.font="42px 'Courier Prime'";
+  x.letterSpacing="14px";
+  x.fillText("NO REFUNDS · THE LIFETIME RECEIPT",645,1050);
+  x.fillStyle="#F7F4EA";x.font="380px VT323";x.letterSpacing="0px";
+  x.fillText(nf.format(LAST.weeks),645,1450);
+  x.fillStyle="#B8B4A6";x.font="52px 'Courier Prime'";x.letterSpacing="18px";
+  x.fillText("WEEKENDS LEFT",645,1560);
+  x.strokeStyle="#C0392B";x.lineWidth=8;
+  x.save();x.translate(645,1780);x.rotate(-0.10);
+  x.strokeRect(-330,-70,660,140);
+  x.fillStyle="#C0392B";x.font="86px 'Courier Prime'";x.letterSpacing="8px";
+  x.fillText("NO REFUNDS",0,32);x.restore();
+  x.fillStyle="#5F5C66";x.font="34px 'Courier Prime'";x.letterSpacing="10px";
+  x.fillText("ALL SALES FINAL · W-"+LAST.weeks,645,2600);
+  const a=document.createElement("a");
+  a.download="no-refunds-wallpaper.png";a.href=cv.toDataURL("image/png");a.click();
+});
+
+if(Q.get("k")===KEY&&Q.get("age"))compose();
+</script>
+</body></html>
