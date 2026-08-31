@@ -215,6 +215,14 @@
       <label class="w"><input type="radio" name="plan" value="100"> <span id="i-w100">COLLECTOR'S — 100 YRS (PURE SPITE)</span></label>
     </fieldset>
 
+    <label for="edition">Edition <span class="opt">(English only, for now)</span></label>
+    <select id="edition" style="width:100%">
+      <option value="standard">STANDARD — THE LIFETIME RECEIPT</option>
+      <option value="medical">BODY WARRANTY — parts &amp; maintenance</option>
+      <option value="goth">MEMENTO MORI — the dark ledger</option>
+      <option value="sunny">SUNSHINE — joy inventory</option>
+    </select>
+
     <label for="income" id="i-lincome">Annual income <span class="opt">(optional — adds the money lines)</span></label>
     <div class="inline">
       <select id="cur" aria-label="Currency"></select>
@@ -519,6 +527,8 @@ function build(){
     return;
   }
   err.style.display="none";
+  const ED=document.getElementById("edition").value;
+  const TT=(ED==="standard")?T:I18N.en;
 
   let exp = parseFloat(document.querySelector('input[name="plan"]:checked').value);
   let extended=false;
@@ -547,63 +557,111 @@ function build(){
   const rule=()=>L.push({t:"rule"});
   const note=lab=>L.push({t:"li",lab:"",val:lab,cls:"note small"});
 
-  if(extended) line(T.planAdj,T.autoApplied,"warn small");
-  L.push({t:"li",lab:T.elapsed+"  "+elapsed+"%",val:blocks,cls:"barline"});
+  if(extended) line(TT.planAdj,TT.autoApplied,"warn small");
+  L.push({t:"li",lab:TT.elapsed+"  "+elapsed+"%",val:blocks,cls:"barline"});
   rule();
-  sect(T.sTime);
-  line(T.weeks,nf.format(weeks));
-  line(T.mondays,nf.format(weeks));
-  line(T.weekends,nf.format(weeks));
-  line(T.summers,nf.format(summers));
-  line(T.moons,nf.format(moons));
+  sect(TT.sTime);
+  line(TT.weeks,nf.format(weeks));
+  line(TT.mondays,nf.format(weeks));
+  line(TT.weekends,nf.format(weeks));
+  line(TT.summers,nf.format(summers));
+  line(TT.moons,nf.format(moons));
   rule();
-  sect(T.sCons);
-  line(T.coffees,nf.format(coffees));
-  line(T.meals,nf.format(meals));
-  line(T.phones,nf.format(phones));
-  if(cars>0) line(T.cars,nf.format(cars));
-  line(T.haircuts,nf.format(haircuts));
-  line(T.vacations,nf.format(vacations));
-  line(T.books,nf.format(books));
-  rule();
-  sect(T.sGoes);
-  line(T.stare,screenYrs.toFixed(1)+" "+T.yrs);
-  note(T.ofYears(Y.toFixed(0)));
-  if(workHours>0){
-    line(T.workh,nf.format(workHours));
+  if(ED==="medical"){
+    sect("PARTS &amp; LABOUR, REMAINING (POPULATION AVG.)");
+    line("HIPS, ORIGINAL PARTS",(age<70?Math.round(70-age)+" YRS":"AFTERMARKET ERA"));
+    line("KNEES, FACTORY SPEC",(age<66?Math.round(66-age)+" YRS":"LISTEN TO THEM"));
+    line("READING WITHOUT GLASSES",(age<45?Math.round(45-age)+" YRS":"SQUINTING ALREADY"));
+    line("FULL-RANGE HEARING",(age<55?Math.round(55-age)+" YRS":"PARDON?"));
+    rule();
+    sect("MAINTENANCE SCHEDULE (EST.)");
+    line("YEARS BEFORE DAILY PILLS",(age<57?Math.round(57-age):"IN PROGRESS"));
+    line("YEARS WITHOUT REGULAR PAIN",(age<52?Math.round(52-age):"CHECK YOUR BACK"));
+    line("HOSPITAL-FREE YEARS AHEAD",(age<63?Math.round(63-age):"KEEP THE CARD HANDY"));
+    line("DENTIST VISITS REMAINING",nf.format(Math.round(Y*2)));
+    line("COLONOSCOPIES AHEAD",(age<75?Math.max(1,Math.ceil((75-Math.max(age,50))/10))+" (ENJOY)":"0 (CONGRATS)"));
+    note("population averages, heavily satirical — your doctor knows you, this receipt does not");
+  } else if(ED==="goth"){
+    sect("THE DARK LEDGER, REMAINING");
+    line("HEARTBREAKS","~"+Math.max(1,Math.round(Y/18)));
+    line("NEAR MISSES, UNNOTICED","~"+Math.round(Y*2));
+    line("FUNERALS TO ATTEND","~"+Math.round(Y*0.9));
+    line("GRAVEYARD VISITS","~"+Math.round(Y*1.6));
+    line("BLACK GARMENTS TO BUY","~"+Math.round(Y*3));
+    line("CANDLES TO BURN","~"+nf.format(Math.round(Y*40)));
+    rule();
+    sect("THE FINAL ARRANGEMENTS");
+    line("TIME ABOVE GROUND",Y.toFixed(0)+" YRS");
+    line("TIME IN GRAVE","ETERNITY (INCL.)","small");
+    line("LAST SONG YOU'LL HEAR","ALREADY WRITTEN","warn small");
+    note("the management will see you eventually");
+  } else if(ED==="sunny"){
+    sect("JOY INVENTORY, REMAINING (EST.)");
+    line("LAUGHS",nf.format(Math.round(Y*365*13)));
+    line("HUGS",nf.format(Math.round(Y*365*4)));
+    line("DOGS YOU'LL PET",nf.format(Math.round(Y*130)));
+    line("SWIMS IN OPEN WATER",nf.format(Math.round(Y*8)));
+    line("SNOWFALLS",nf.format(Math.round(Y*12)));
+    line("BIRTHDAY CAKES",Math.round(Y));
+    line("NAPS",nf.format(Math.round(Y*80)));
+    rule();
+    sect("SPECIAL OFFERS");
+    line("FIRST TIMES STILL AHEAD","MORE THAN YOU THINK","small");
+    line("TIMES YOU'LL FALL IN LOVE","AT LEAST ONCE MORE","warn small");
+    note("averages, generously rounded up — joy compounds");
+  } else {
+    sect(TT.sCons);
+    line(TT.coffees,nf.format(coffees));
+    line(TT.meals,nf.format(meals));
+    line(TT.phones,nf.format(phones));
+    if(cars>0) line(TT.cars,nf.format(cars));
+    line(TT.haircuts,nf.format(haircuts));
+    line(TT.vacations,nf.format(vacations));
+    line(TT.books,nf.format(books));
+    rule();
+    sect(TT.sGoes);
+    line(TT.stare,screenYrs.toFixed(1)+" "+TT.yrs);
+    note(TT.ofYears(Y.toFixed(0)));
+    if(workHours>0){
+      line(TT.workh,nf.format(workHours));
+    }
   }
   if(isFinite(income)&&income>0&&workYrs>0){
     rule();
-    sect(T.sMoney);
-    line(T.futureEarn,money(income*workYrs,cur));
-    note(T.grossNote);
+    sect(TT.sMoney);
+    line(TT.futureEarn,money(income*workYrs,cur));
+    note(TT.grossNote);
   }
   if(isFinite(visits)&&visits>0){
     rule();
-    sect(T.sPeople);
+    sect(TT.sPeople);
     if(isFinite(pAge)&&pAge>=18&&pAge<85){
-      line(T.parents,"~"+nf.format(Math.round(visits*(85-pAge))),"warn");
+      line(TT.parents,"~"+nf.format(Math.round(visits*(85-pAge))),"warn");
     }else if(isFinite(pAge)&&pAge>=85){
-      line(T.parents,T.priceless,"warn small");
+      line(TT.parents,TT.priceless,"warn small");
     }else{
-      line(T.parents,"~"+nf.format(Math.round(visits*20)),"warn");
-      note(T.assumeNote);
+      line(TT.parents,"~"+nf.format(Math.round(visits*20)),"warn");
+      note(TT.assumeNote);
     }
-    note(T.makeCount);
+    note(TT.makeCount);
   }
   rule();
-  L.push({t:"li",lab:T.subtotal,val:T.everything,cls:"subtotal small"});
-  line(T.payMethod,T.timeW,"small");
-  line(T.change,"0.00","small");
+  L.push({t:"li",lab:TT.subtotal,val:TT.everything,cls:"subtotal small"});
+  line(TT.payMethod,TT.timeW,"small");
+  line(TT.change,"0.00","small");
   L.push({t:"stamp"});
   rule();
   L.push({t:"barcode",weeks});
-  L.push({t:"bnum",lab:"W-"+weeks+"  ·  "+T.wRemaining});
+  L.push({t:"bnum",lab:"W-"+weeks+"  ·  "+TT.wRemaining});
   L.push({t:"thanks"});
 
   render(L);
 
-  LAST={weeks,coffees,screenYrs,Y,visits,pAge,
+  let shareOv=null;
+  if(ED==="medical") shareOv="My Body Warranty receipt 🧾\n· Hips: "+(age<70?Math.round(70-age)+" yrs of original parts":"aftermarket era")+"\n· Years before daily pills: "+(age<57?Math.round(57-age):"in progress")+"\n· Colonoscopies ahead: "+(age<75?Math.max(1,Math.ceil((75-Math.max(age,50))/10)):0)+"\nAs-is, no warranty claims. Print yours:";
+  else if(ED==="goth") shareOv="My Memento Mori receipt 🕯️\n· Funerals to attend: ~"+Math.round(Y*0.9)+"\n· Graveyard visits: ~"+Math.round(Y*1.6)+"\n· The last song I'll hear: already written\nNo refunds. Print yours:";
+  else if(ED==="sunny") shareOv="My Sunshine receipt ☀️\n· Laughs left: "+nf.format(Math.round(Y*365*13))+"\n· Dogs I'll pet: "+nf.format(Math.round(Y*130))+"\n· Times I'll fall in love: at least once more\nNo refunds on joy. Print yours:";
+  LAST={weeks,coffees,screenYrs,Y,visits,pAge,shareOv,
     parents:(isFinite(visits)&&visits>0&&isFinite(pAge)&&pAge<85)?Math.round(visits*(85-pAge)):null};
 }
 
@@ -675,6 +733,15 @@ document.getElementById("copy").addEventListener("click",async()=>{
   setTimeout(()=>btn.textContent=T.copyBtn,2600);
 });
 
+(function(){
+  const edSel=document.getElementById("edition");
+  try{
+    const q=new URLSearchParams(location.search).get("ed");
+    if(q&&["standard","medical","goth","sunny"].includes(q)) edSel.value=q;
+  }catch(e){}
+  edSel.addEventListener("change",()=>{if(LAST)build();});
+})();
+
 document.getElementById("langtog").addEventListener("change",e=>{
   LANG=e.target.value;
   try{localStorage.setItem("till-lang",LANG);}catch(err){}
@@ -683,6 +750,7 @@ document.getElementById("langtog").addEventListener("change",e=>{
 applyLang();
 
 function shareText(){
+  if(LAST&&LAST.shareOv) return LAST.shareOv;
   let txt=T.shareLead+"\n"+
     "· "+nf.format(LAST.weeks)+" "+T.shareWeekends+"\n"+
     "· "+nf.format(LAST.coffees)+" "+T.shareCoffees+"\n"+
