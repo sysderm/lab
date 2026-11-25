@@ -1,0 +1,11 @@
+# NO REFUNDS state — 2026-11-25
+
+Branch: feature/norefunds-zazzle-receipt; Draft PR https://github.com/sysderm/lab/pull/1.
+
+Current task: four calculator-based 4×16-inch Zazzle editions (Standard, Body Warranty, Memento Mori, Sunshine), explicitly authorized by owner. Rendering, shared calculation model, private in-memory calculator/editor handoff and regression tests implemented. Existing A3 poster and portrait original preserved. Four fictional proof links prepared privately under norefunds/fulfillment/.qa/; do not commit tokens or links.
+
+Validation: 14 Node tests; original portrait browser suite (48 combinations) and new edition suite (180 combinations) pass in Chromium/WebKit/mobile emulation. Remote proof PNG checksums match. All code changes still require a reviewed atomic static deployment; no new calculator/editor files have been published. Actual four product import visual checks remain pending.
+
+Infrastructure: private R2 lifecycle one day, Turnstile and Worker provisioned; technical nginx proxy activated after explicit approval. Public checkout remains false. Owner-assisted original portrait proof imported correctly on Zazzle at 4×16 inches. Ambassador ID/domain/user-owned content/API parameters confirmed by owner. Linkover History remains zero. Authorized support request sent to api.help@zazzle.com; Gmail thread 1a212b5efb0aad58. No recurring mail check scheduled.
+
+Constraints: no purchases, paid subscriptions, or public checkout/static release without owner approval. No exact 24-hour physical-deletion promise. Remaining gates include commission/retention response, real consent/Turnstile upload and rate-IP testing, Free CPU budget at maximum image size, cost alerts, and physical iOS/print QA. See fulfillment README for deployment history and rollback. Preserve live calculator/poster and any newer changes when publishing.

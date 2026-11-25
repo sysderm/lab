@@ -5,9 +5,9 @@ const output=process.env.QA_OUTPUT || path.join(__dirname,'.qa');fs.mkdirSync(ou
 (async()=>{for(const [engine,mobile] of [[chromium,false],[webkit,false],[webkit,true]]){
  const browser=await engine.launch();const context=await browser.newContext(mobile?devices['iPhone 13']:{viewport:{width:1280,height:950}});
  const page=await context.newPage();const errors=[],requests=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
- await page.route('https://konsil.ch/**',r=>{const path=new URL(r.request().url()).pathname;if(path.endsWith('/config'))return r.fulfill({json:{enabled:false}});return r.fulfill({contentType:'text/html',body:fs.readFileSync(root+path+'index.html')});});
+ await page.route('https://konsil.ch/**',r=>{const path=new URL(r.request().url()).pathname;if(path.endsWith('/config'))return r.fulfill({json:{enabled:false}});return r.fulfill({contentType:path.endsWith('.js')?'text/javascript':'text/html',body:fs.readFileSync(root+path+(path.endsWith('/')?'index.html':''))});});
  await page.goto('https://konsil.ch/norefunds/receipt/');await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('not enabled'));
- assert.equal(await page.locator('#order-area').isVisible(),false);assert.equal(requests.length,2);
+ assert.equal(await page.locator('#order-area').isVisible(),false);assert.equal(requests.filter(url=>url.endsWith('/config')).length,1);
  let count=0;
  for(const lang of ['en','de'])for(const age of ['1','120'])for(const years of ['5','10','20','30']){
  await page.locator('#name').fill('Alexandria Maximiliane Muster');await page.locator('#age').fill(age);await page.locator('#language').selectOption(lang);await page.locator('#years').selectOption(years);
@@ -37,7 +37,7 @@ const output=process.env.QA_OUTPUT || path.join(__dirname,'.qa');fs.mkdirSync(ou
    if(mode==='fail')return r.fulfill({status:503,json:{error:'retry'}});
    return r.fulfill({json:{checkoutUrl:'https://www.zazzle.com/api/create/at-238446053942729400?pd=256629092171840156'}});
   }
-  return r.fulfill({contentType:'text/html',body:fs.readFileSync(root+pathname+'index.html')});
+  return r.fulfill({contentType:pathname.endsWith('.js')?'text/javascript':'text/html',body:fs.readFileSync(root+pathname+(pathname.endsWith('/')?'index.html':''))});
  });
  await context.route('https://challenges.cloudflare.com/**',r=>r.fulfill({contentType:'application/javascript',body:'window.turnstile={render:(selector,options)=>{window.testChallenge=options;return 1},remove:()=>{}}'}));
  await context.route('https://www.zazzle.com/**',r=>r.fulfill({contentType:'text/html',body:'<h1>Mock Zazzle destination</h1>'}));
