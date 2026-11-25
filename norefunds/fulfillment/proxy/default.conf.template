@@ -1,0 +1,84 @@
+# Included in nginx http {}. No bearer URLs, IPs, names or query strings in logs.
+log_format receipt_redacted '$time_iso8601 $request_method $status $body_bytes_sent';
+# Global prototype caps supplement the Worker per-IP limit and reduce usage exposure.
+limit_req_zone $server_name zone=receipt_upload_global:1m rate=2r/m;
+limit_req_zone $server_name zone=receipt_read_global:1m rate=60r/m;
+server {
+    listen 80;
+    server_name konsil.ch;
+    access_log /dev/stdout receipt_redacted;
+    # nginx errors can contain bearer request paths. Monitor redacted status logs.
+    error_log /dev/null;
+    client_max_body_size 1m;
+    limit_req_status 429;
+    client_body_timeout 30s;
+
+    # Hostinger's host-network Traefik reaches this external Docker bridge via
+    # its gateway. Confirm peer and forwarded-header trust before activating.
+    set_real_ip_from 172.19.0.1;
+    real_ip_header X-Forwarded-For;
+    real_ip_recursive on;
+
+    location = /norefunds/api/receipt {
+        limit_req zone=receipt_upload_global burst=4 nodelay;
+        # No trailing URI: preserve /norefunds/api/receipt exactly.
+        proxy_pass https://${RECEIPT_WORKER_HOST};
+        proxy_set_header Host ${RECEIPT_WORKER_HOST};
+        proxy_ssl_server_name on;
+        proxy_ssl_name ${RECEIPT_WORKER_HOST};
+        proxy_ssl_verify on;
+        proxy_ssl_verify_depth 3;
+        proxy_ssl_trusted_certificate /etc/ssl/cert.pem;
+        proxy_set_header X-Receipt-Proxy-Secret "${RECEIPT_PROXY_SECRET}";
+        proxy_set_header X-Receipt-Client-IP $remote_addr;
+        proxy_set_header Cookie "";
+        proxy_set_header Authorization "";
+        proxy_set_header Referer "";
+        # Identify this server hop without forwarding visitor fingerprints.
+        proxy_set_header User-Agent "NO-REFUNDS-Receipt-Proxy/1.0";
+        proxy_hide_header Set-Cookie;
+        proxy_hide_header NEL;
+        proxy_hide_header Report-To;
+        proxy_hide_header Alt-Svc;
+        proxy_hide_header Referrer-Policy;
+        proxy_hide_header X-Content-Type-Options;
+        proxy_request_buffering off;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_connect_timeout 10s;
+        proxy_read_timeout 60s;
+        add_header Referrer-Policy no-referrer always;
+        add_header X-Content-Type-Options nosniff always;
+    }
+    location / {
+        limit_req zone=receipt_read_global burst=60 nodelay;
+        # No trailing URI: preserve /norefunds/api/receipt exactly.
+        proxy_pass https://${RECEIPT_WORKER_HOST};
+        proxy_set_header Host ${RECEIPT_WORKER_HOST};
+        proxy_ssl_server_name on;
+        proxy_ssl_name ${RECEIPT_WORKER_HOST};
+        proxy_ssl_verify on;
+        proxy_ssl_verify_depth 3;
+        proxy_ssl_trusted_certificate /etc/ssl/cert.pem;
+        proxy_set_header X-Receipt-Proxy-Secret "${RECEIPT_PROXY_SECRET}";
+        proxy_set_header X-Receipt-Client-IP $remote_addr;
+        proxy_set_header Cookie "";
+        proxy_set_header Authorization "";
+        proxy_set_header Referer "";
+        # Identify this server hop without forwarding visitor fingerprints.
+        proxy_set_header User-Agent "NO-REFUNDS-Receipt-Proxy/1.0";
+        proxy_hide_header Set-Cookie;
+        proxy_hide_header NEL;
+        proxy_hide_header Report-To;
+        proxy_hide_header Alt-Svc;
+        proxy_hide_header Referrer-Policy;
+        proxy_hide_header X-Content-Type-Options;
+        proxy_request_buffering off;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_connect_timeout 10s;
+        proxy_read_timeout 60s;
+        add_header Referrer-Policy no-referrer always;
+        add_header X-Content-Type-Options nosniff always;
+    }
+}
