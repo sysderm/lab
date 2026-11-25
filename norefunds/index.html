@@ -17,13 +17,13 @@
   :root{
     --counter:#131217;
     --counter-glow:#1C1A22;
-    --paper:#F7F4EA;
-    --paper-shade:#EDE9DB;
-    --ink:#33322E;
-    --ink-soft:#5C5A52;
-    --ink-faint:#8B887C;
-    --red:#C0392B;
-    --gold:#9A7B2F;
+    --paper:#FAFAFA;
+    --paper-shade:#F0F0F0;
+    --ink:#252525;
+    --ink-soft:#555555;
+    --ink-faint:#888888;
+    --red:#252525;
+    --gold:#666666;
     --focus:#E8E4D4;
   }
   *{box-sizing:border-box}
@@ -86,7 +86,7 @@
     color:var(--paper);background:var(--red);padding:2px 7px;border-radius:2px;
     margin-left:8px;vertical-align:2px;
   }
-  #age{border-bottom:2.5px solid var(--red);background:rgba(192,57,43,.07)}
+  #age{border-bottom:2.5px solid var(--red);background:rgba(0,0,0,.07)}
   #age.bad{animation:shake .3s}
   @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
   @media (prefers-reduced-motion: reduce){#age.bad{animation:none}}
@@ -125,12 +125,12 @@
     color:var(--ink-soft);margin:14px 0 6px;
   }
   .li{display:flex;justify-content:space-between;gap:14px;align-items:baseline}
-  .li .lab{flex:1 1 auto}
+  .li .lab{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
   .li .val{
     font-family:"VT323","Courier Prime",monospace;font-size:23px;line-height:1.15;
     text-align:right;white-space:nowrap;
   }
-  .li .val.small{font-family:"Courier Prime",monospace;font-size:14px;font-weight:700}
+  .li .val.small{font-family:"Courier Prime",monospace;font-size:14px;font-weight:700;max-width:52%;white-space:normal;overflow-wrap:anywhere}
   .li.note{font-size:12px;color:var(--ink-soft);justify-content:flex-end;font-style:normal}
   .li.warn .val,.li.warn .lab{color:var(--red)}
   .bar{font-family:"VT323",monospace;font-size:20px;letter-spacing:1px}
@@ -154,7 +154,7 @@
     transform:translate(-50%,-50%) rotate(-8deg);
     font-weight:700;font-size:26px;letter-spacing:.18em;color:var(--red);
     border:3.5px double var(--red);padding:8px 18px;border-radius:4px;
-    opacity:.82;mix-blend-mode:multiply;white-space:nowrap;
+    opacity:.82;mix-blend-mode:multiply;white-space:normal;width:max-content;max-width:96%;text-align:center;
   }
   .stamp small{display:block;font-size:10.5px;letter-spacing:.3em;text-align:center;font-weight:400}
 
@@ -200,7 +200,7 @@
   <div class="tagline" id="i-tagline">THE LIFETIME RECEIPT</div>
   <div class="meta">
     <span id="i-meta1">REGISTER 03 · CASHIER: TIME</span><br>
-    <span id="today"></span> · <span id="i-final">ALL SALES FINAL</span>
+    <span id="today"></span>
   </div>
   <hr class="rule">
 
@@ -375,6 +375,8 @@ function build(){
     income:document.getElementById("income").value,visits:document.getElementById("visits").value,
     parentAge:document.getElementById("page").value});
   render(result.lines);
+  document.getElementById("i-tagline").textContent=result.edition==="standard"?T.tagline:({medical:"BODY WARRANTY",goth:"MEMENTO MORI",sunny:"SUNSHINE"}[result.edition]);
+  document.getElementById("i-fine").innerHTML=result.finePrint;
   LAST=result;
   document.getElementById("edition-print").style.display="inline-block";
 }
@@ -390,7 +392,8 @@ function render(L){
     else if(item.t==="rule"){el=document.createElement("hr");el.className="rule";}
     else if(item.t==="stamp"){
       el=document.createElement("div");el.className="stampwrap";
-      el.innerHTML='<div class="stamp">NO REFUNDS<small>'+T.stampS+'</small></div>';
+      const stamp=document.createElement("div");stamp.className="stamp";stamp.textContent=item.lab;
+      const sub=document.createElement("small");sub.textContent=item.val;stamp.appendChild(sub);el.appendChild(stamp);
     }
     else if(item.t==="barcode"){
       el=document.createElement("div");el.className="barcode";el.setAttribute("aria-hidden","true");
@@ -408,8 +411,8 @@ function render(L){
       el=document.createElement("div");el.className="thanks";
       const host=((location.hostname||"konsil.ch").replace(/^www\./,"")+
         location.pathname.replace(/\/(index\.html)?$/,""));
-      el.innerHTML=T.thanks+
-        '<br><span style="font-size:10.5px;letter-spacing:.3em;color:var(--ink-faint)">★ '+host+' ★</span>';
+      el.textContent=item.lab;el.append(document.createElement("br"),document.createTextNode(item.val),document.createElement("br"));
+      const site=document.createElement("span");site.style.cssText="font-size:10.5px;letter-spacing:.3em;color:var(--ink-faint)";site.textContent="★ "+host+" ★";el.appendChild(site);
     }
     else{
       el=document.createElement("div");el.className="li "+(item.cls||"");
