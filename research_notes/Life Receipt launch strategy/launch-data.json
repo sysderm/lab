@@ -1,0 +1,235 @@
+{
+  "recommendation": {
+    "text": "Run a 30-day zero-cash organic experiment around the personalized receipt reveal, optimizing retained contribution per creator-hour.",
+    "status": "Proposed plan; no publication, outreach, spending or product changes authorized",
+    "timeBudget": "Optional 20-hour ceiling, not user-approved",
+    "evidence": "Channel fit, hooks, targets and schedule are creative hypotheses, not validated demand or virality forecasts"
+  },
+  "positioning": {
+    "brand": "LIFE RECEIPT",
+    "tagline": "Your life. Itemized.",
+    "description": "Personalized receipt-shaped 4×16-inch satin photo print, with playful fictional everyday moments",
+    "editions": [
+      "Standard",
+      "Body",
+      "Dark",
+      "Sunshine"
+    ],
+    "leadEditions": [
+      "Standard",
+      "Sunshine"
+    ],
+    "liveFeatures": [
+      "Pixel art",
+      "Name/date",
+      "Public preview without print-file downloads",
+      "Consent/Turnstile-protected Zazzle transfer"
+    ],
+    "posterRecommendation": "Separate visually different Poster Edition promotion from main buying flow while retaining existing paid A3 URL; recommendation only",
+    "pendingOnly": [
+      "Optional family/pets",
+      "Square portraits across all editions",
+      "Webcam capture",
+      "Upload crop/pixelate/brightness controls",
+      "Investigation of non-paper Zazzle formats; received during launch planning, deferred and not researched or implemented"
+    ]
+  },
+  "channels": [
+    {
+      "name": "TikTok",
+      "priority": 1,
+      "rationale": "Test immediate visual surprise and personal recognition",
+      "experiment": "Six paired hook videos in first two weeks; four follow-ups, 12–20 seconds; counts are workload caps",
+      "metric": "Matched-age viewing/shares plus qualified visits, gift intent and retained contribution/hour",
+      "constraint": "Verify actual profile-link eligibility; use truthful preview footage"
+    },
+    {
+      "name": "Pinterest",
+      "priority": 2,
+      "rationale": "Test explicit gift-search intent with ordinary destination links",
+      "experiment": "Eight distinct linked Pins across four editions, then four informed follow-ups",
+      "metric": "Saves, qualified destination visits and attributable retained orders/hour",
+      "constraint": "No assumed Product rich Pin or catalog eligibility"
+    },
+    {
+      "name": "Reddit",
+      "priority": 3,
+      "rationale": "Obtain relevant design/maker discussion and comprehension feedback",
+      "experiment": "Read at most five communities; at most two original submissions where current rules permit",
+      "metric": "Useful discussion, gift intent and qualified visits per hour",
+      "constraint": "No community pre-approved; disclose maker role; link only where allowed"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "days": "1–7",
+      "focus": "Preflight and first reveal tests",
+      "schedule": {
+        "1": "Check existing fictional-data mobile preview-to-Zazzle path; no purchase; inventory accounts/measurement/sample",
+        "2": "Select real Standard/Sunshine output; capture base screen recording; write three hooks",
+        "3": "Edit two videos and four distinct Pins; safe generic tracking if existing tools support it",
+        "4": "Proposed first video and Pin",
+        "5": "Second Pin, community-rule reading, genuine comment replies",
+        "6": "Second video and third Pin; prepare allowed maker post",
+        "7": "Fourth Pin, optional permitted maker post, matched-age review"
+      }
+    },
+    {
+      "week": 2,
+      "days": "8–14",
+      "focus": "Complete initial six videos/eight Pins; at most one additional suitable Reddit post"
+    },
+    {
+      "week": 3,
+      "days": "15–21",
+      "focus": "Repeat two strongest hooks; four new Pins and a genuine-question response video"
+    },
+    {
+      "week": 4,
+      "days": "22–30",
+      "focus": "Reconcile retained outcomes, time and actual earnings; choose one channel or pause"
+    }
+  ],
+  "hooks": [
+    {
+      "hook": "Why did you frame a receipt?",
+      "execution": "Question → real line/name → full print"
+    },
+    {
+      "hook": "The receipt I actually kept.",
+      "execution": "Ordinary receipts → personalized art print"
+    },
+    {
+      "hook": "A very small spoiler for your birthday.",
+      "execution": "Label fictional future immediately; reveal real output"
+    },
+    {
+      "hook": "I found your name in the tiny print.",
+      "execution": "Pixel detail → personalized name → silhouette"
+    },
+    {
+      "hook": "Four gifts. One sense-of-humor test.",
+      "execution": "Show actual four editions; ask recipient preference"
+    },
+    {
+      "hook": "This birthday card got unusually long.",
+      "execution": "Reveal shape; identify receipt-shaped art print"
+    },
+    {
+      "hook": "The world’s least dramatic future.",
+      "execution": "Real everyday line → clearly staged ordinary moment"
+    },
+    {
+      "hook": "Which line made you say “that’s me”?",
+      "execution": "Voluntary favorite-line recognition; consent for real recipients"
+    }
+  ],
+  "decisionRules": [
+    "After two distinct creative rounds, pause a high-effort channel with no qualified visits or meaningful buyer intent; small samples remain inconclusive.",
+    "Watch/shares without visits: inspect actual link availability, CTA and gift positioning.",
+    "Previews without handoffs: inspect understanding/value; handoffs without confirmed orders: inspect delivered price, shipping and trust.",
+    "Scale time only when retained contribution/hour improves and actual payout economics are credible. No paid advertising recommendation.",
+    "Global upload cap 2/minute plus burst 4 can produce 429 on spikes; verify existing retry/failure behavior and monitor usage before concentrating distribution. Paid plans require new approval.",
+    "Recipient discomfort, privacy concern or perceived death prediction count as creative failures despite reach.",
+    "Use actual satin print proof before quality/unboxing/gifting claims; label mockups. No thermal-printer fulfillment implication or universal holiday delivery guarantee.",
+    "Share loop: preview/taste check → private enjoyment → optional favorite-line photo with identifiers covered → specific permission for any repost. No forced tagging or filming."
+  ],
+  "economicsAssumptions": {
+    "currency": "USD",
+    "status": "Illustrative arithmetic, not verified payout or measured conversion",
+    "observedItemPrices": [
+      4.68,
+      5.85
+    ],
+    "grossRoyaltyRateScenario": 0.05,
+    "grossEarningsPerItem": [
+      0.234,
+      0.2925
+    ],
+    "grossEarningsPer100RetainedItems": [
+      23.4,
+      29.25
+    ],
+    "illustrativeHourlyOpportunityCost": 25,
+    "salesForOneIllustrativeHour": [
+      107,
+      86
+    ],
+    "selfPromotion": "40% combined total conditionally published; eligibility unconfirmed; never add 5%",
+    "net": "Marketing deductions, reversals, currency/tax/payout effects can lower retained earnings",
+    "support": "Artwork retention confirmed; commission answer pending; permitted full-URL follow-up just sent",
+    "LinkoverHistory": 0,
+    "measurement": "Separate aggregate arrivals, previews, uploads, outbound clicks, paid retained orders, retained royalties/referrals and settled payouts. Unknown attribution remains unknown.",
+    "definitions": {
+      "contributionPerHour": "Attributable retained creator earnings minus creator costs, divided by creator hours",
+      "outboundClick": "Purchase-intent signal; not a paid order"
+    },
+    "noAuthorization": [
+      "Ads",
+      "Messages",
+      "Purchases",
+      "Subscriptions",
+      "Product changes",
+      "Camera/photo access"
+    ]
+  },
+  "sources": [
+    {
+      "title": "TikTok recommendations",
+      "url": "https://support.tiktok.com/en/using-tiktok/exploring-videos/how-tiktok-recommends-content"
+    },
+    {
+      "title": "TikTok account types",
+      "url": "https://support.tiktok.com/en/using-tiktok/growing-your-audience/switching-to-a-creator-or-business-account"
+    },
+    {
+      "title": "Create a Pinterest Pin",
+      "url": "https://help.pinterest.com/en/article/create-a-pin-from-an-image-or-video"
+    },
+    {
+      "title": "Pinterest Rich Pins",
+      "url": "https://help.pinterest.com/en/business/article/rich-pins"
+    },
+    {
+      "title": "Reddit spam policy",
+      "url": "https://support.reddithelp.com/hc/en-us/articles/360043504051-Spam"
+    },
+    {
+      "title": "Creator License Agreement",
+      "url": "https://www.zazzle.com/terms/creator_license_agreement"
+    },
+    {
+      "title": "Department earnings table",
+      "url": "https://www.zazzle.com/hc/article/ambassador_referral_commissions_creator_royalties-30810357489175"
+    },
+    {
+      "title": "Ambassador Agreement",
+      "url": "https://www.zazzle.com/terms/ambassadors_agreement"
+    },
+    {
+      "title": "Creator FAQ",
+      "url": "https://www.zazzle.com/hc/article/ambassador_program_faqs_creator-37460907460631"
+    },
+    {
+      "title": "Earnings payments",
+      "url": "https://www.zazzle.com/hc/article/earnings_payments_to_zazzle_creators-219577928"
+    },
+    {
+      "title": "What makes online content viral",
+      "url": "https://katherinemilkman.squarespace.com/s/what-makes-online-content-viral.pdf"
+    },
+    {
+      "title": "Benign violation theory",
+      "url": "https://leeds-faculty.colorado.edu/mcgrawp/pdf/mcgraw.warren.2014.pdf"
+    },
+    {
+      "title": "Gift preferences research",
+      "url": "https://www.gsb.stanford.edu/faculty-research/publications/give-them-what-they-want-benefits-explicitness-gift-exchange"
+    },
+    {
+      "title": "Spotify Wrapped overview",
+      "url": "https://newsroom.spotify.com/2025-12-03/2025-wrapped-user-experience/"
+    }
+  ]
+}
