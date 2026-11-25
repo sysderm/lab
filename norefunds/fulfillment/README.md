@@ -115,3 +115,20 @@ R2 activation was completed by the owner. The earlier R2/subdomain/Worker provis
 - Billing subscriptions API shows `R2 Paid` with **price 0 USD/month**, the R2 usage-billing enrollment, and a Cloudflare Free zone plan. No Workers Paid subscription was listed. No paid Workers plan was purchased. R2 overage charges remain possible; no global R2 spending cap or account alert has been configured.
 
 Still blocked: browser access host remains unavailable, so Zazzle account attribution and actual import cannot be checked. The production proxy remains preparation-only as requested. Before a real Zazzle test, establish a restricted staging arrangement whose config/public button stays disabled; do not expose an enabled upload endpoint merely to test it. Owner approval is still required for live activation or any paid order. Maximum-size PNG CPU suitability on Workers Free, actual Turnstile behavior, global logs, cost alerts and physical-device/printed proof remain acceptance gates.
+
+### Owner-provided Ambassador Center evidence — 2026-11-25
+
+The owner pasted the Ambassador Center account view. It shows Ambassador ID `238446053942729400`, exactly matching `worker.mjs` and the account-generated API link. This confirms the account ID association from owner-supplied evidence; it was not independently observed through browser control.
+
+The supplied page advertises self-promotion for the owner's public products/Create-a-Product API pages without adding referral parameters, and says links with `?rf=238446053942729400` are cross-promotion links eligible for 15% referral commission. Preserve the account-generated `at-` API link and do not add `rf=`. The advertised 35–50% self-promotion range does not establish eligibility or payout for this direct-only template containing user-generated imagery. Actual Linkover History, domain declaration, image ownership setting and qualifying-sale attribution remain unverified. No order was placed.
+
+Owner-provided Linkover History baseline (2026-11-25): `Total Linkovers: 0`, date/click table `[none]`. No tracked referral click is evidenced yet. This does not establish a configuration defect or successful attribution. The subsequent Store Link page is a generic store-referral builder, not the personalized Create-a-Product API configuration; no store link was generated or substituted.
+
+Owner-provided Declare Your Domains view (2026-11-25): `Your Domains: konsil.ch` confirms the intended image hostname is listed. The pasted text contains both content-ownership options but does not reveal the selected radio button or whether changes were saved. User-owned content mode remains unverified until the owner confirms the second option is selected and saved. Do not add the private workers.dev backend as an image domain; generated production artwork links use konsil.ch.
+
+Owner confirmed saving the second, user-owned content option after the domain view above. Ownership setting is now owner-confirmed saved (not independently inspected through browser automation).
+
+Owner-generated Create-a-Product API link (2026-11-25):
+`https://www.zazzle.com/api/create/at-238446053942729400?pd=256629092171840156&ed=false&ax=Linkover&t_receipt_iid=9b518b77-0165-48e1-9680-eafec223d37e&tc=NoRefunds`
+
+This confirms the account-generated at-ID, template ID, `ed=false`, `ax=Linkover`, tracking code and exact image parameter `t_receipt_iid` used by the Worker. Query parameter order is immaterial. The current UUID is a Zazzle internal image ID, not an uploaded synthetic receipt or temporary HTTPS artwork URL. For the actual receipt flow the Worker replaces only the image value with the expiring konsil.ch image URL. A click/import and Linkover History change have not yet been observed; eligibility/payout remain unverified. The owner was instructed not to click the placeholder test link yet.
