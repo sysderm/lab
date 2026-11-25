@@ -43,3 +43,59 @@ In this directory, use Wrangler >=4.36. Confirm rate-limit namespace is unused i
 - [ ] Set enabled only after successful controlled end-to-end verification, privacy review and owner approval.
 
 Official docs: https://www.zazzle.com/api ; https://www.zazzle.com/terms/ambassadors_agreement ; https://developers.cloudflare.com/turnstile/get-started/server-side-validation/ ; https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
+
+## Deployment inspection — 2026-11-25
+
+**Release blocked; no production deployment, purchase or paid plan activated.**
+
+- Clean initial checkout: `feature/norefunds-zazzle-receipt` at `5570cca`, matching Draft PR #1. No pre-existing uncommitted changes were present. Existing calculator and poster files were preserved.
+- Wrangler 4.168.0 authenticated successfully after owner-authorized OAuth. Account: `de34349a62264b11e35bde32778a54e1`. Never include its OAuth token in reports or commits.
+- R2 API returns code 10042, “Please enable R2 through the Cloudflare Dashboard”. Therefore no bucket, lifecycle or remote privacy settings have been provisioned or verified. Owner activation is pending because R2 may require billing enrollment.
+- `konsil.ch` is **not a Cloudflare zone in this account**. Public DNS uses `ns1.domains.ch` / `ns2.domains.ch`; A record `187.124.4.207`. HTTPS responds from nginx/1.29.8; API config path returns 404. The proposed zone route cannot currently work. The existing Cloudflare Pages project `the-till` has no custom domains and is not evidence of the live konsil.ch deployment path. Do not publish to that Pages project assuming it updates konsil.ch.
+- Free managed Turnstile widget `NO REFUNDS receipt` created for `konsil.ch`, with `no_clearance`. Its public key is in `wrangler.toml`. Secret is stored only in ignored, mode-0600 `.dev.vars` on this checkout, pending `wrangler secret put TURNSTILE_SECRET` once the deployment target is resolved. Do not commit it or copy it into a static artifact.
+- Browser account access unavailable (`browser access host is unavailable`): Ambassador Center, domain declaration, user-owned image setting and Linkover History remain unverified. No commission or earnings claim has been confirmed.
+
+### Reproducible checks
+
+From this directory: `npm ci`, `npx playwright install chromium webkit`, `npm test`, `npm run test:browser`, `npm run check:deploy`.
+Browser QA writes disposable screenshots and PNGs to ignored `.qa/` (override with `QA_OUTPUT`). It serves local HTML through intercepted test requests, uses fictional names and a synthetic portrait, and never contacts actual Zazzle or Turnstile. This is a client simulation, **not** proof of Zazzle import or real bot verification.
+
+- Worker suite: 11 passing cases covering exact account link/encoding, malformed PNG and checksum, disabled/incomplete config, expired image, origin/rate limits, mocked valid upload and private GET/HEAD, Turnstile failures/hostname/action, malformed/oversized body, safe storage/network errors.
+- Browser matrix: Chromium desktop, WebKit desktop, WebKit iPhone 13 emulation; EN/DE × ages 1/120 × periods 5/10/20/30 (48 combinations). Portrait, no-photo monogram, long name, 1800×7200 export/download, low-resolution rejection, layout bounds and no external requests before consent checked. Retry/cancel/redirect use mocks. WebKit emulation does not replace physical Safari/iOS device and memory testing. Screenshots reviewed for the long German name and age 120. Actual printed proof still required.
+- Wrangler deployment dry-run passes with checkout disabled. It validates bundling/config syntax, **not** remote bucket, route or rate-limit namespace availability.
+- PNG checks include chunk bounds, CRCs, header methods and critical-chunk handling. They still do not decode/re-encode or moderate content. Benchmark maximum-size uploads on the chosen Worker plan before launch; Free has a 10 ms CPU budget, which may be too small for CRC processing of large PNGs. Do not silently upgrade to Paid.
+
+### Privacy, security and costs before release
+
+The image contains the selected name, age and portrait; treat even the random image URL as private bearer access. The browser photo is not uploaded until consent and submit. Server expiration denies reads after 24 hours, but physical R2 lifecycle deletion is asynchronous, typically within 24 hours after expiration and sometimes later. Do not promise physical erasure exactly at 24 hours. Zazzle retention is independent. Complete the site's controller/contact disclosure and review Cloudflare/Zazzle processing and international transfers before collecting real personal data.
+
+Do not enable invocation logs or request tracing containing full URLs: the token is part of the image path. Verify Cloudflare account-level analytics, proxy access logs, error reporting and retention too. Disable raw path/access logging for any future nginx image proxy; local code avoiding `console.log` alone is insufficient.
+
+Official prices checked on 2026-11-25:
+
+- [R2 Standard](https://developers.cloudflare.com/r2/pricing/): monthly free allowance 10 GB-months, 1 million Class A and 10 million Class B operations, shared account-wide. Beyond that: $0.015/GB-month, $4.50/million Class A, $0.36/million Class B, no egress fee. Do not select Infrequent Access for one-day images. A one-day lifecycle limits retention, not total costs.
+- [Workers](https://developers.cloudflare.com/workers/platform/pricing/): Free includes 100,000 requests/day and 10 ms CPU per invocation. Paid starts at $5/month plus overages and is not authorized. Existing account plan and alerts still need verification. A Workers spending limit does not cap R2 charges.
+- [Turnstile](https://developers.cloudflare.com/turnstile/plans/): Free supports 20 widgets and unlimited verification requests. No Enterprise subscription was selected.
+- Five uploads/minute/IP is not a global cap: distributed abuse and repeated GET/HEAD requests can consume storage and request allowances. Configure account usage alerts and choose an acceptable budget/abuse response before enabling the public checkout.
+
+### Remaining release gates
+
+1. Owner completes any R2 enrollment; create a private dedicated Standard bucket, verify r2.dev/custom domains disabled, apply a one-day lifecycle and read it back.
+2. Resolve hosting architecture with owner: narrow proxy on existing nginx or a separately authorized Cloudflare DNS migration. No DNS, nginx or production route was changed during this inspection.
+3. Deploy a controlled bridge, upload the Turnstile secret without exposing it, verify unique rate-limit namespace and platform logs/alerts. Keep public checkout disabled. Restrict testing access, including the upload endpoint.
+4. Send a real generated synthetic portrait receipt through the actual bridge to Zazzle; verify 4×16 inches, complete uncropped artwork, anonymous/Swiss and mobile paths, retries, no duplicate order, and image availability for production after URL expiry. **Not performed yet.**
+5. Inspect Ambassador Center/Linkover History using the signed-in owner browser. The preserved `at-238446053942729400` link is structurally tested; this does not prove attribution, eligibility or payout. [Agreement sections 2–4](https://www.zazzle.com/terms/ambassadors_agreement) distinguish public products/primary content, tracking and completed sales. Paid test order and printed proof require separate owner approval; no email to Zazzle has been sent.
+6. Obtain explicit owner live-release approval only after the above checks; then deploy static files through the confirmed existing workflow and enable checkout. Keep rollback ready: false flag and redeploy; existing bearer images remain subject to their original expiration.
+
+
+### Owner-selected nginx proxy preparation
+
+Owner selected the narrow proxy on 2026-11-25; **preparation only, no activation**. `wrangler.proxy.toml` and `proxy/` implement this path. The original zone-route config remains available for a separately approved DNS migration, but must not be used with the current hosting.
+
+Read-only SSH via documented `vps` fallback succeeded after MagicDNS name `hostinger` failed. Confirmed `/opt/AGENTS.md`, existing `/opt/thetill/docker-compose.yml`, public root `/opt/thetill/public`, container `thetill`, read-only static mount, host-network Traefik, existing external network `traefik-proxy` gateway `172.19.0.1`. No files or services on the VPS were modified. Production calculator SHA256 `5ef5f8e3e565fe3f7d297494a89323656156a26aed92e33bd3b4e82eab2baaa8`; poster `f90182b7c2d24d1e57cbb48bd2d8fc55fa471286e01bed26c6e1bf3fbbfc2bfb`. Preserve these and any newer changes during release; do not copy the repository wholesale to the public root, as that would also expose source/configuration files.
+
+The dedicated proxy template follows host rules: unique container/router/service, priority 2000, existing external network, no exposed ports, no modification to shared Traefik or storefront. It forwards only the exact receipt API prefix via the Traefik rule and preserves the URI. TLS verification is enabled. A random shared secret authenticates nginx to the Worker; direct workers.dev calls are rejected in proxy mode. The Worker uses only the nginx-overwritten client-IP header for rate limiting in this mode. Proxy config fails closed without a secret of at least 64 characters. Do not use the example placeholder as a secret.
+
+Before deployment: establish the account workers.dev subdomain (API currently reports none), fill the upstream hostname, generate a unique 32-byte secret, store it as Worker `PROXY_SHARED_SECRET` and private proxy `.env` (0600), upload `TURNSTILE_SECRET` with `--config wrangler.proxy.toml`, and confirm account-level invocation logging is disabled. Keep `CHECKOUT_ENABLED=false`.
+
+Before **activation**, inspect the actual Traefik forwarded-header trust and peer IP: nginx only trusts the confirmed Docker gateway and overwrites inbound proxy headers. Test that clients cannot spoof their IP or shared secret; review Traefik/global access logs too. Run Compose config validation and `nginx -t` in an isolated container without production routing. Compose validation with fictional values passes. The rendered nginx configuration passes `nginx -t` in an isolated, network-disabled disposable container on the host (no production mounts or ports); upstream reachability and TLS/forwarded-header behavior still require integration testing. A live compose-up is not authorized. Static release should copy only the reviewed receipt HTML and narrowly merge the existing calculator CTA; the poster stays untouched. A separate owner-approved controlled testing route is needed before real Zazzle import.

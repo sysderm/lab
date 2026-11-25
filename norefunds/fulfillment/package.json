@@ -1,0 +1,13 @@
+{
+  "name": "norefunds-receipt-fulfillment",
+  "private": true,
+  "scripts": {
+    "test": "node --test worker.test.mjs",
+    "test:browser": "node browser-qa.cjs",
+    "check:deploy": "wrangler deploy --dry-run"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1",
+    "wrangler": "4.168.0"
+  }
+}

@@ -8,7 +8,7 @@ routes = [{ pattern = "konsil.ch/norefunds/api/receipt*", zone_name = "konsil.ch
 # Fail closed until the deployment and attribution acceptance tests pass.
 [vars]
 CHECKOUT_ENABLED = "false"
-TURNSTILE_SITE_KEY = ""
+TURNSTILE_SITE_KEY = "0x4AAAAAAGSLuM6fW_wJqy1j"
 
 [[r2_buckets]]
 binding = "RECEIPTS"
@@ -20,3 +20,6 @@ namespace_id = "84261125"
 simple = { limit = 5, period = 60 }
 
 # Confirm the domain is proxied and the route does not conflict with an existing worker.
+
+[observability]
+enabled = false

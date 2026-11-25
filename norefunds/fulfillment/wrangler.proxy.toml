@@ -1,0 +1,24 @@
+# Prepared for the owner-approved nginx proxy; NOT deployed.
+name = "norefunds-receipt-bridge"
+main = "worker.mjs"
+compatibility_date = "2026-11-25"
+workers_dev = true
+preview_urls = false
+routes = []
+
+[vars]
+PROXY_MODE = "true"
+CHECKOUT_ENABLED = "false"
+TURNSTILE_SITE_KEY = "0x4AAAAAAGSLuM6fW_wJqy1j"
+
+[[r2_buckets]]
+binding = "RECEIPTS"
+bucket_name = "norefunds-receipt-temp"
+
+[[ratelimits]]
+name = "UPLOAD_LIMIT"
+namespace_id = "84261125"
+simple = { limit = 5, period = 60 }
+
+[observability]
+enabled = false

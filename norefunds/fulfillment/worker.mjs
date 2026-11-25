@@ -19,19 +19,35 @@ export function zazzleLink(imageUrl) {
   })) url.searchParams.set(key,value);
   return url.href;
 }
+const CRC_TABLE = Uint32Array.from({length:256}, (_, value) => {
+  let crc=value;
+  for(let bit=0;bit<8;bit++) crc=(crc>>>1)^(0xedb88320 & -(crc&1));
+  return crc>>>0;
+});
+function crc32(bytes) {
+  let crc=0xffffffff;
+  for(const byte of bytes) crc=(crc>>>8)^CRC_TABLE[(crc^byte)&255];
+  return (crc^0xffffffff)>>>0;
+}
 export function validPng(bytes) {
   if (bytes.length < 45 || bytes.length > MAX_BYTES) return false;
   if (![137,80,78,71,13,10,26,10].every((v,i)=>bytes[i]===v)) return false;
   const d = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   if (d.getUint32(8)!==13 || d.getUint32(12)!==0x49484452 ||
       d.getUint32(16)!==WIDTH || d.getUint32(20)!==HEIGHT ||
-      bytes[24]!==8 || ![2,6].includes(bytes[25])) return false;
+      bytes[24]!==8 || ![2,6].includes(bytes[25]) ||
+      bytes[26]!==0 || bytes[27]!==0 || bytes[28]!==0) return false;
   // Structural check: bounded chunks, valid final IEND. This is not a full PNG decoder.
-  let offset=8, seenData=false;
+  let offset=8, seenData=false, dataEnded=false;
   while (offset+12<=bytes.length) {
     const n=d.getUint32(offset), type=d.getUint32(offset+4);
     if (n>bytes.length-offset-12) return false;
-    if (type===0x49444154) seenData=true;
+    if (crc32(bytes.subarray(offset+4,offset+8+n))!==d.getUint32(offset+8+n)) return false;
+    if (offset!==8 && type===0x49484452) return false;
+    // Browser canvas emits RGB/RGBA PNG. Reject unknown critical chunks.
+    if (![0x49484452,0x504c5445,0x49444154,0x49454e44].includes(type) && !(bytes[offset+4]&32)) return false;
+    if (type===0x49444154) {if(dataEnded) return false; seenData=true;}
+    else if(seenData) dataEnded=true;
     if (type===0x49454e44) return seenData && n===0 && offset+12===bytes.length;
     offset+=n+12;
   }
@@ -73,7 +89,12 @@ async function verified(token,env) {
 }
 async function handle(request,env) {
   const url=new URL(request.url);
-  if(url.origin!==ORIGIN) return json({error:"Not found"},404);
+  // In proxy mode the public workers.dev endpoint must never bypass nginx.
+  const proxyMode=env.PROXY_MODE==="true";
+  if(proxyMode) {
+    if(!env.PROXY_SHARED_SECRET || env.PROXY_SHARED_SECRET.length<64) return json({error:"Unavailable"},503);
+    if(request.headers.get("X-Receipt-Proxy-Secret")!==env.PROXY_SHARED_SECRET) return json({error:"Not found"},404);
+  } else if(url.origin!==ORIGIN) return json({error:"Not found"},404);
   const path=url.pathname;
   if(path===BASE+"/config" && request.method==="GET") {
     return json(enabled(env)?{enabled:true,siteKey:env.TURNSTILE_SITE_KEY}:{enabled:false});
@@ -93,7 +114,7 @@ async function handle(request,env) {
   if(!enabled(env)) return json({error:"Checkout not enabled"},503);
   if(request.headers.get("Origin")!==ORIGIN) return json({error:"Forbidden"},403);
   if(request.headers.get("Content-Type")!=="image/png") return json({error:"PNG required"},415);
-  const ip=request.headers.get("CF-Connecting-IP");
+  const ip=request.headers.get(proxyMode?"X-Receipt-Client-IP":"CF-Connecting-IP");
   if(!ip) return json({error:"Unavailable"},503);
   const rate=await env.UPLOAD_LIMIT.limit({key:ip});
   if(!rate.success) return json({error:"Please try again later"},429);
