@@ -156,146 +156,139 @@ zh:{locale:"zh-CN",
 };
 
 export const EDITIONS = {standard:"THE LIFETIME RECEIPT",medical:"BODY WARRANTY",goth:"MEMENTO MORI",sunny:"SUNSHINE"};
+export const EDITION_STYLE = Object.freeze({
+ standard:{accent:"#A92B21",panel:"#A92B21",panelInk:"#FFF9EE",paper:"#FAF6EC",ink:"#27231E",muted:"#665C50"},
+ medical:{accent:"#17665E",panel:"#17665E",panelInk:"#FFFFFF",paper:"#F4FAF6",ink:"#202C29",muted:"#4E6760"},
+ goth:{accent:"#673A73",panel:"#2D2035",panelInk:"#F9F0E3",paper:"#F3EBDF",ink:"#2A202B",muted:"#665260"},
+ sunny:{accent:"#96520D",panel:"#F2C85C",panelInk:"#38250F",paper:"#FFF9E7",ink:"#33291B",muted:"#76613D"}
+});
+
+// Each punchline is used once. The classic edition retains its five UI languages;
+// the three specialist editions retain the existing English-only behavior.
+const CLASSIC = {
+ en:{title:EDITIONS.standard,scenario:"ILLUSTRATIVE TARGET AGE",extended:"TARGET AGE (AUTO-EXTENDED)",hero:"WEEKENDS IN THE BASKET",s1:"CONSUMABLES",s2:"HIDDEN CHARGES",s3:"OPTIONAL EXTRAS",coffee:"COFFEES (LEGAL FUEL)",meals:"MEALS (DISHES NOT INCL.)",hair:"HAIRCUTS (RESULTS VARY)",books:"BOOKS YOU MIGHT FINISH",holiday:"NIGHTS AWAY",phone:"PHONE UPGRADES",screen:"TIME STARING AT A SCREEN",work:"WORK HOURS TO 65",manual:"USER MANUAL",manualVal:"NOT INCLUDED",service:"CUSTOMER SERVICE",serviceVal:"ON HOLD SINCE 0 AD",money:"GROSS PAY TO 65",parents:"PARENT VISITS (SCENARIO)",unknown:"NOT ESTIMATED",stamp:"ADULT SUPERVISION: NONE",barcode:"SCAN TO DO ABSOLUTELY NOTHING",end:"Please rate your existence after checkout.",disclaimer:"Illustrative estimates, not a forecast."},
+ de:{title:"DER LEBENSKASSENZETTEL",scenario:"RECHENBEISPIEL BIS ALTER",extended:"ZIELALTER (VERLÄNGERT)",hero:"WOCHENENDEN IM WARENKORB",s1:"VERBRAUCHSMATERIAL",s2:"VERSTECKTE KOSTEN",s3:"SONDERPOSTEN",coffee:"KAFFEE (LEGALER TREIBSTOFF)",meals:"MAHLZEITEN (ABWASCH EXTRA)",hair:"HAARSCHNITTE (OHNE GEWÄHR)",books:"BÜCHER, DIE DU FERTIG LIEST",holiday:"FERIENNÄCHTE",phone:"HANDY-UPGRADES",screen:"ZEIT VOR DEM BILDSCHIRM",work:"ARBEITSSTUNDEN BIS 65",manual:"BEDIENUNGSANLEITUNG",manualVal:"FEHLT",service:"KUNDENDIENST",serviceVal:"SEIT JAHR 0 BESETZT",money:"BRUTTOLOHN BIS 65",parents:"ELTERNBESUCHE (BEISPIEL)",unknown:"NICHT SCHÄTZBAR",stamp:"OHNE ERWACHSENENAUFSICHT",barcode:"SCANNEN BEWIRKT NICHTS",end:"Bitte bewerte dein Dasein an der Kasse.",disclaimer:"Rechenbeispiele, keine Vorhersage."},
+ fr:{title:"LE TICKET DE TA VIE",scenario:"ÂGE CIBLE (EXEMPLE)",extended:"ÂGE CIBLE (PROLONGÉ)",hero:"WEEK-ENDS DANS LE PANIER",s1:"CONSOMMABLES",s2:"FRAIS CACHÉS",s3:"OPTIONS",coffee:"CAFÉS (CARBURANT LÉGAL)",meals:"REPAS (VAISSELLE EN SUS)",hair:"COUPES (SANS GARANTIE)",books:"LIVRES QUE TU FINIRAS",holiday:"NUITS DE VACANCES",phone:"NOUVEAUX TÉLÉPHONES",screen:"TEMPS DEVANT UN ÉCRAN",work:"HEURES DE TRAVAIL AVANT 65 ANS",manual:"MODE D’EMPLOI",manualVal:"NON FOURNI",service:"SERVICE CLIENT",serviceVal:"OCCUPÉ DEPUIS L’AN 0",money:"SALAIRE BRUT AVANT 65 ANS",parents:"VISITES AUX PARENTS (EX.)",unknown:"NON ESTIMÉ",stamp:"SANS SURVEILLANCE ADULTE",barcode:"SCANNER NE SERT À RIEN",end:"Merci de noter ton existence en caisse.",disclaimer:"Estimations illustratives, pas une prédiction."},
+ es:{title:"EL TICKET DE TU VIDA",scenario:"EDAD OBJETIVO (EJEMPLO)",extended:"EDAD OBJETIVO AMPLIADA",hero:"FINES DE SEMANA EN LA CESTA",s1:"CONSUMIBLES",s2:"CARGOS OCULTOS",s3:"EXTRAS OPCIONALES",coffee:"CAFÉS (COMBUSTIBLE LEGAL)",meals:"COMIDAS (VAJILLA APARTE)",hair:"CORTES (SIN GARANTÍA)",books:"LIBROS QUE ACABARÁS",holiday:"NOCHES DE VACACIONES",phone:"MÓVILES NUEVOS",screen:"TIEMPO FRENTE A LA PANTALLA",work:"HORAS DE TRABAJO HASTA LOS 65",manual:"MANUAL DE USO",manualVal:"NO INCLUIDO",service:"ATENCIÓN AL CLIENTE",serviceVal:"OCUPADA DESDE EL AÑO 0",money:"SUELDO BRUTO HASTA LOS 65",parents:"VISITAS A TUS PADRES (EJ.)",unknown:"SIN ESTIMAR",stamp:"SIN SUPERVISIÓN ADULTA",barcode:"ESCANEAR NO SIRVE DE NADA",end:"Valora tu existencia al pasar por caja.",disclaimer:"Estimaciones ilustrativas, no predicciones."},
+ zh:{title:"人生收银小票",scenario:"示例目标年龄",extended:"目标年龄（已延长）",hero:"购物篮里的周末",s1:"日常消耗品",s2:"隐藏费用",s3:"可选附加项",coffee:"咖啡（合法燃料）",meals:"餐食（洗碗另算）",hair:"理发（效果不保）",books:"可能读完的书",holiday:"度假夜数",phone:"换新手机",screen:"盯着屏幕的时间",work:"65岁前的工作小时",manual:"使用说明书",manualVal:"未附送",service:"客服热线",serviceVal:"从公元元年起占线",money:"65岁前税前收入",parents:"探望父母（示例）",unknown:"不作估算",stamp:"无成人监管",barcode:"扫码并不会发生任何事",end:"结账后请为你的人生打分。",disclaimer:"示例估算，并非预测。"}
+};
+const SPECIAL = {
+ medical:{title:EDITIONS.medical,scenario:"ILLUSTRATIVE TARGET AGE",extended:"TARGET AGE (AUTO-EXTENDED)",hero:"HEARTBEATS · ENGINE RUNNING",money:"GROSS PAY TO 65",parents:"PARENT VISITS (SCENARIO)",unknown:"NOT ESTIMATED",stamp:"FACTORY SEAL BROKEN",barcode:"SCAN FOR SPARE PARTS (GOOD LUCK)",end:"Manual says rest. Owner insists on more tabs.",disclaimer:"Satire and illustrative rates, not medical forecasts."},
+ goth:{title:EDITIONS.goth,scenario:"ILLUSTRATIVE TARGET AGE",extended:"TARGET AGE (AUTO-EXTENDED)",hero:"FULL MOONS BEFORE CURTAIN CALL",money:"GROSS PAY TO 65",parents:"PARENT VISITS (SCENARIO)",unknown:"NOT ESTIMATED",stamp:"STILL NOT A GHOST",barcode:"NOT A VALID PASS TO THE AFTERLIFE",end:"Please leave a message after the final beep.",disclaimer:"Fictional shopping basket, not a death forecast."},
+ sunny:{title:EDITIONS.sunny,scenario:"ILLUSTRATIVE TARGET AGE",extended:"TARGET AGE (AUTO-EXTENDED)",hero:"SUNSETS TO SHOW UP FOR",money:"GROSS PAY TO 65",parents:"PARENT VISITS (SCENARIO)",unknown:"NOT ESTIMATED",stamp:"APPROVED FOR PLAY",barcode:"BEEP! YOU FOUND AN EASTER EGG.",end:"Wear the good outfit on a Tuesday.",disclaimer:"A playful wish list, not a promise."}
+};
 export function buildReceipt(input) {
   const age=Number(input.age);
-  if(!Number.isFinite(age)||age<1||age>119) throw new RangeError("Age must be between 1 and 119.");
-  if(![81,92,100].includes(Number(input.plan || 81))) throw new RangeError("Invalid warranty plan.");
-  if(!Object.hasOwn(EDITIONS,input.edition || "standard")) throw new RangeError("Invalid edition.");
+  if(!Number.isFinite(age)||age<1||age>119)throw new RangeError("Age must be between 1 and 119.");
+  const plan=Number(input.plan||81);
+  if(![81,92,100].includes(plan))throw new RangeError("Invalid warranty plan.");
+  const ED=input.edition||"standard";
+  if(!Object.hasOwn(EDITIONS,ED))throw new RangeError("Invalid edition.");
   const language=Object.hasOwn(I18N,input.language)?input.language:"en";
-  const T=I18N[language], nf=new Intl.NumberFormat(T.locale);
-  const money=(value,currency)=>new Intl.NumberFormat(T.locale,{style:"currency",currency,notation:"compact",maximumFractionDigits:1}).format(value);
-  const ED=input.edition || "standard";
-  const TT=(ED==="standard")?T:I18N.en;
-
-  let exp = Number(input.plan || 81);
-  let extended=false;
-  if(age >= exp-2){ exp = age+10; extended=true; }
-  const Y = exp-age;
-
-  const cur = CURRENCIES.includes(input.currency) ? input.currency : "CHF";
-  const income = parseFloat(input.income);
-  const visits = parseFloat(input.visits);
-  const pAge = parseFloat(input.parentAge);
-
-  const weeks=Math.round(Y*52.18), summers=Math.round(Y), moons=Math.round(Y*12.37);
-  const coffees=Math.round(Y*365*1.5), meals=Math.round(Y*365*3);
-  const phones=Math.max(1,Math.round(Math.min(Y,Math.max(0,78-age))/3));
-  const cars=Math.round(Math.min(Y,Math.max(0,78-age))/8);
-  const haircuts=Math.round(Y*8.7), vacations=Math.round(Y*12), books=Math.round(Y*5);
-  const screenYrs=Y*5/24;
-  const workYrs=Math.max(0,Math.min(65,exp)-age);
+  const contentLanguage=ED==="standard"?language:"en";
+  const T=I18N[contentLanguage], C=ED==="standard"?CLASSIC[contentLanguage]:SPECIAL[ED];
+  const nf=new Intl.NumberFormat(T.locale);
+  const f=n=>nf.format(Math.round(n));
+  const approx=n=>"~"+f(n);
+  const compact=n=>new Intl.NumberFormat(T.locale,{notation:"compact",maximumFractionDigits:1}).format(n);
+  const money=(n,currency)=>new Intl.NumberFormat(T.locale,{style:"currency",currency,notation:"compact",maximumFractionDigits:1}).format(n);
+  let exp=plan,extended=false;
+  if(age>=exp-2){exp=age+10;extended=true;}
+  const Y=exp-age;
+  const cur=CURRENCIES.includes(input.currency)?input.currency:"CHF";
+  const income=parseFloat(input.income),visits=parseFloat(input.visits),pAge=parseFloat(input.parentAge);
+  const weeks=Math.round(Y*52.18),moons=Math.round(Y*12.37),coffees=Math.round(Y*365*1.5);
+  const screenYrs=Y*5/24,workYrs=Math.max(0,Math.min(65,exp)-age);
   const workHours=Math.round(workYrs*1800);
-  const elapsed=Math.min(99,Math.round(age/exp*100));
-  const blocks="▓".repeat(Math.round(elapsed/100*14)).padEnd(14,"░");
-
+  const parents=Number.isFinite(visits)&&visits>0&&visits<=366&&Number.isFinite(pAge)&&pAge>=18&&pAge<85?Math.round(visits*(85-pAge)):null;
   const L=[];
-  const line=(lab,val,cls)=>L.push({t:"li",lab,val,cls});
-  const sect=t=>L.push({t:"sect",lab:t});
+  const line=(lab,val,cls)=>L.push({t:"li",lab,val:String(val),cls});
+  const sect=lab=>L.push({t:"sect",lab});
   const rule=()=>L.push({t:"rule"});
-  const note=lab=>L.push({t:"li",lab:"",val:lab,cls:"note small"});
+  const hero=(lab,val)=>L.push({t:"hero",lab,val:String(val)});
+  // A selected planning scenario, not an individualized lifespan prediction.
+  line(extended?C.extended:C.scenario,f(exp),"small");
+  if(ED==="standard"){
+    hero(C.hero,approx(weeks));
+    sect(C.s1);
+    line(C.coffee,approx(coffees));
+    line(C.meals,approx(Y*365*3));
+    line(C.hair,approx(Y*8.7));
+    line(C.books,approx(Y*5));
+    line(C.holiday,approx(Y*12));
+    const phones=Math.round(Math.min(Y,Math.max(0,78-age))/3);
+    if(phones>0)line(C.phone,approx(phones));
+    rule();
+    sect(C.s2);
+    line(C.screen,"~"+nf.format(Math.round(screenYrs*10)/10)+" "+T.yrs);
+    if(workHours>0)line(C.work,approx(workHours));
+    line(C.manual,C.manualVal,"small");
+    line(C.service,C.serviceVal,"small");
+  }else if(ED==="medical"){
+    hero(C.hero,"~"+compact(Y*365*24*60*70));
+    sect("ORIGINAL EQUIPMENT");
+    line("KNEES","FREE SOUND EFFECTS","small");
+    line("BACK","DO NOT FOLD","small");
+    line("EYES","FINE PRINT DLC","small");
+    line("MEMORY","PASSWORD?","small");
+    line("SKIN","PATINA INCLUDED","small");
+    rule();
+    sect("SERVICE SCHEDULE · EXAMPLE");
+    line("SLEEP (SYSTEM REBOOT)",approx(Y*365*8)+" H");
+    line("BLINKS (BUILT-IN WIPERS)","~"+compact(Y*365*16*60*15));
+    line("DENTAL CHECK-UP SLOTS",approx(Y*2));
+    line("SIDE EFFECTS OF BIRTHDAYS","MORE CAKE","small");
+  }else if(ED==="goth"){
+    hero(C.hero,approx(moons));
+    sect("FICTIONAL SHOPPING BASKET");
+    line("CANDLES TO BURN",approx(Y*40));
+    line("BLACK OUTFITS",approx(Y*3));
+    line("FUNERALS TO ATTEND",approx(Y*.9));
+    line("MIDNIGHT SNACKS",approx(Y*52));
+    rule();
+    sect("AFTER-SALES DEPARTMENT");
+    line("EXISTENTIAL DREAD","INCLUDED","small");
+    line("EULOGY","DRAFT 74","small");
+    line("AFTERLIFE WI-FI","NO SIGNAL","small");
+    line("IMMORTALITY","BACK ORDERED","small");
+  }else{
+    hero(C.hero,approx(Y*365));
+    sect("JOY INVENTORY · WISH LIST");
+    line("BELLY LAUGHS",approx(Y*365*13));
+    line("HUGS",approx(Y*365*4));
+    line("DOGS TO PET",approx(Y*130));
+    line("SWIMS OUTSIDE",approx(Y*8));
+    line("BIRTHDAY CAKES",approx(Y));
+    line("GLORIOUS NAPS",approx(Y*80));
+    rule();
+    sect("BONUS ITEMS");
+    line("BAD DANCE MOVES","UNLIMITED","small");
+    line("GOOD STORIES","IN PRODUCTION","small");
+    line("SMALL WINS","TAX FREE","small");
+  }
 
-  if(extended) line(TT.planAdj,TT.autoApplied,"warn small");
-  L.push({t:"li",lab:TT.elapsed+"  "+elapsed+"%",val:blocks,cls:"barline"});
-  rule();
-  sect(TT.sTime);
-  line(TT.weeks,nf.format(weeks));
-  line(TT.mondays,nf.format(weeks));
-  line(TT.weekends,nf.format(weeks));
-  line(TT.summers,nf.format(summers));
-  line(TT.moons,nf.format(moons));
-  rule();
-  if(ED==="medical"){
-    sect("PARTS &amp; LABOUR, REMAINING (POPULATION AVG.)");
-    line("HIPS, ORIGINAL PARTS",(age<70?Math.round(70-age)+" YRS":"AFTERMARKET ERA"));
-    line("KNEES, FACTORY SPEC",(age<66?Math.round(66-age)+" YRS":"LISTEN TO THEM"));
-    line("READING WITHOUT GLASSES",(age<45?Math.round(45-age)+" YRS":"SQUINTING ALREADY"));
-    line("FULL-RANGE HEARING",(age<55?Math.round(55-age)+" YRS":"PARDON?"));
-    rule();
-    sect("MAINTENANCE SCHEDULE (EST.)");
-    line("YEARS BEFORE DAILY PILLS",(age<57?Math.round(57-age):"IN PROGRESS"));
-    line("YEARS WITHOUT REGULAR PAIN",(age<52?Math.round(52-age):"CHECK YOUR BACK"));
-    line("HOSPITAL-FREE YEARS AHEAD",(age<63?Math.round(63-age):"KEEP THE CARD HANDY"));
-    line("DENTIST VISITS REMAINING",nf.format(Math.round(Y*2)));
-    line("COLONOSCOPIES AHEAD",(age<75?Math.max(1,Math.ceil((75-Math.max(age,50))/10))+" (ENJOY)":"0 (CONGRATS)"));
-    note("population averages, heavily satirical — your doctor knows you, this receipt does not");
-  } else if(ED==="goth"){
-    sect("THE DARK LEDGER, REMAINING");
-    line("HEARTBREAKS","~"+Math.max(1,Math.round(Y/18)));
-    line("NEAR MISSES, UNNOTICED","~"+Math.round(Y*2));
-    line("FUNERALS TO ATTEND","~"+Math.round(Y*0.9));
-    line("GRAVEYARD VISITS","~"+Math.round(Y*1.6));
-    line("BLACK GARMENTS TO BUY","~"+Math.round(Y*3));
-    line("CANDLES TO BURN","~"+nf.format(Math.round(Y*40)));
-    rule();
-    sect("THE FINAL ARRANGEMENTS");
-    line("TIME ABOVE GROUND",Y.toFixed(0)+" YRS");
-    line("TIME IN GRAVE","ETERNITY (INCL.)","small");
-    line("LAST SONG YOU'LL HEAR","ALREADY WRITTEN","warn small");
-    note("the management will see you eventually");
-  } else if(ED==="sunny"){
-    sect("JOY INVENTORY, REMAINING (EST.)");
-    line("LAUGHS",nf.format(Math.round(Y*365*13)));
-    line("HUGS",nf.format(Math.round(Y*365*4)));
-    line("DOGS YOU'LL PET",nf.format(Math.round(Y*130)));
-    line("SWIMS IN OPEN WATER",nf.format(Math.round(Y*8)));
-    line("SNOWFALLS",nf.format(Math.round(Y*12)));
-    line("BIRTHDAY CAKES",Math.round(Y));
-    line("NAPS",nf.format(Math.round(Y*80)));
-    rule();
-    sect("SPECIAL OFFERS");
-    line("FIRST TIMES STILL AHEAD","MORE THAN YOU THINK","small");
-    line("TIMES YOU'LL FALL IN LOVE","AT LEAST ONCE MORE","warn small");
-    note("averages, generously rounded up — joy compounds");
-  } else {
-    sect(TT.sCons);
-    line(TT.coffees,nf.format(coffees));
-    line(TT.meals,nf.format(meals));
-    line(TT.phones,nf.format(phones));
-    if(cars>0) line(TT.cars,nf.format(cars));
-    line(TT.haircuts,nf.format(haircuts));
-    line(TT.vacations,nf.format(vacations));
-    line(TT.books,nf.format(books));
-    rule();
-    sect(TT.sGoes);
-    line(TT.stare,screenYrs.toFixed(1)+" "+TT.yrs);
-    note(TT.ofYears(Y.toFixed(0)));
-    if(workHours>0){
-      line(TT.workh,nf.format(workHours));
-    }
+  // Optional customer inputs, once per receipt. Never present a death date
+  // or a guaranteed number of visits as fact.
+  const earnings=income*workYrs;
+  const hasMoney=Number.isFinite(income)&&income>0&&workYrs>0&&Number.isFinite(earnings);
+  const hasVisits=Number.isFinite(visits)&&visits>0&&visits<=366;
+  if(hasMoney||hasVisits){
+    rule();sect(ED==="standard"?C.s3:"PERSONAL ADD-ONS");
+    if(hasMoney)line(C.money,money(earnings,cur));
+    if(hasVisits)line(C.parents,parents===null?C.unknown:approx(parents),"warn small");
   }
-  if(isFinite(income)&&income>0&&workYrs>0){
-    rule();
-    sect(TT.sMoney);
-    line(TT.futureEarn,money(income*workYrs,cur));
-    note(TT.grossNote);
-  }
-  if(isFinite(visits)&&visits>0){
-    rule();
-    sect(TT.sPeople);
-    if(isFinite(pAge)&&pAge>=18&&pAge<85){
-      line(TT.parents,"~"+nf.format(Math.round(visits*(85-pAge))),"warn");
-    }else if(isFinite(pAge)&&pAge>=85){
-      line(TT.parents,TT.priceless,"warn small");
-    }else{
-      line(TT.parents,"~"+nf.format(Math.round(visits*20)),"warn");
-      note(TT.assumeNote);
-    }
-    note(TT.makeCount);
-  }
+
   rule();
-  L.push({t:"li",lab:TT.subtotal,val:TT.everything,cls:"subtotal small"});
-  line(TT.payMethod,TT.timeW,"small");
-  line(TT.change,"0.00","small");
-  L.push({t:"stamp"});
-  rule();
+  L.push({t:"stamp",lab:C.stamp});
   L.push({t:"barcode",weeks});
-  L.push({t:"bnum",lab:"W-"+weeks+"  ·  "+TT.wRemaining});
-  L.push({t:"thanks"});
+  L.push({t:"bnum",lab:C.barcode});
+  L.push({t:"thanks",lab:C.end});
 
-  let shareOv=null;
-  if(ED==="medical") shareOv="My Body Warranty receipt 🧾\n· Hips: "+(age<70?Math.round(70-age)+" yrs of original parts":"aftermarket era")+"\n· Years before daily pills: "+(age<57?Math.round(57-age):"in progress")+"\n· Colonoscopies ahead: "+(age<75?Math.max(1,Math.ceil((75-Math.max(age,50))/10)):0)+"\nAs-is, no warranty claims. Print yours:";
-  else if(ED==="goth") shareOv="My Memento Mori receipt 🕯️\n· Funerals to attend: ~"+Math.round(Y*0.9)+"\n· Graveyard visits: ~"+Math.round(Y*1.6)+"\n· The last song I'll hear: already written\nNo refunds. Print yours:";
-  else if(ED==="sunny") shareOv="My Sunshine receipt ☀️\n· Laughs left: "+nf.format(Math.round(Y*365*13))+"\n· Dogs I'll pet: "+nf.format(Math.round(Y*130))+"\n· Times I'll fall in love: at least once more\nNo refunds on joy. Print yours:";
-  return {lines:L,edition:ED,age,exp,extended,language,plan:Number(input.plan || 81),currency:cur,income,weeks,coffees,screenYrs,Y,visits,pAge,shareOv,
-    parents:(isFinite(visits)&&visits>0&&isFinite(pAge)&&pAge<85)?Math.round(visits*(85-pAge)):null};
+  // Share only the selected edition's actual content, not hidden metrics from
+  // another edition. No personal inputs or names are added to share URLs.
+  const highlight=L.find(l=>l.t==="hero");
+  const shareRows=L.filter(l=>l.t==="li"&&!l.cls?.includes("small")).slice(0,2);
+  const shareOv=C.title+" 🧾\n· "+highlight.lab+": "+highlight.val+
+    shareRows.map(row=>"\n· "+row.lab+": "+row.val).join("")+"\n"+C.end;
+  return {lines:L,title:C.title,style:EDITION_STYLE[ED],disclaimer:C.disclaimer,edition:ED,age,exp,extended,language,contentLanguage,plan,currency:cur,income,weeks,coffees,screenYrs,Y,visits,pAge,shareOv,parents};
 }
