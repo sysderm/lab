@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<title>NO REFUNDS — Original Lifetime Receipt</title>
+<title>Life Receipt — Personalize your print</title>
 <meta name="robots" content="noindex">
 <style>
 :root{color-scheme:dark;--bg:#161519;--paper:#f7f2e6;--ink:#232220;--accent:#b62d20}
@@ -14,17 +14,17 @@ main{max-width:900px;margin:auto}a{color:inherit}h1{font-size:clamp(32px,6vw,56p
 .panel{background:var(--paper);color:var(--ink);padding:24px;border-radius:3px}label{display:block;font-size:.9rem;font-weight:650;margin:16px 0 5px}input:not([type=checkbox]),select,button{font:inherit;width:100%;border-radius:3px;padding:10px;color:var(--ink);background:#fffdf5;border:1px solid #a39e91}button{cursor:pointer;font-weight:700}
 button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink);margin-top:14px}button.secondary{margin-top:10px;background:transparent}button:disabled{opacity:.5;cursor:not-allowed}
 :focus-visible{outline:3px solid #ad6c2d;outline-offset:3px}small,.note{font-size:.82rem;line-height:1.45}.consent{display:flex;align-items:flex-start;gap:8px;font-weight:400}.consent input{margin-top:5px;flex-shrink:0}.status{min-height:1.5em;font-size:.9rem}.status.error{color:#a0251b}
-canvas{width:100%;height:auto;display:block;box-shadow:0 10px 25px #0008;background:var(--paper)}figure{margin:0;max-width:265px;justify-self:center}figcaption{font-size:.8rem;text-align:center;color:#d5d0c4;margin-top:10px}
+canvas{width:100%;height:auto;display:block;box-shadow:0 10px 25px #0008;background:var(--paper)}figure{margin:0;max-width:300px;justify-self:center}figcaption{font-size:.8rem;text-align:center;color:#d5d0c4;margin-top:10px}
 @media(max-width:650px){.layout{display:flex;flex-direction:column;gap:24px}.panel{width:100%}figure{align-self:center;width:min(75%,265px)}}
 </style>
 </head>
 <body><main>
-<header><a href="../">← NO REFUNDS</a><h1>Not a poster.<br>A receipt for being alive.</h1><p>Personalized. Printed at 4 × 16 inches. One life. All moments priceless.</p></header>
+<header><a href="../">← LIFE RECEIPT</a><h1>Not a poster.<br>A receipt for being alive.</h1><p>Personalized. Printed at 4 × 16 inches. One life. All moments priceless.</p></header>
 <div class="layout">
 <section class="panel">
 <form id="form" autocomplete="off">
-<label for="design">Print edition</label><select id="design"><option value="portrait">ORIGINAL — personalized portrait</option><option value="standard">STANDARD — the lifetime receipt</option><option value="medical">BODY WARRANTY — parts &amp; maintenance</option><option value="goth">MEMENTO MORI — the dark ledger</option><option value="sunny">SUNSHINE — joy inventory</option></select>
-<div id="calculator-options" hidden><label for="plan">Warranty plan (illustration only)</label><select id="plan"><option value="81">STANDARD — 81 years</option><option value="92">EXTENDED — 92 years</option><option value="100">COLLECTOR’S — 100 years</option></select><label for="income">Annual income (optional)</label><input id="income" type="number" min="0" step="any"><label for="currency">Currency</label><select id="currency"></select><label for="visits">Parent visits per year (optional)</label><input id="visits" type="number" min="0" max="366"><label for="parent-age">Parents’ average age (optional)</label><input id="parent-age" type="number" min="18" max="119"><p class="note">Satirical estimates, not predictions or medical advice. Optional values appear as calculated totals in your print.</p></div>
+<label for="design">Print edition</label><select id="design"><option value="portrait">ORIGINAL — personalized portrait</option><option value="standard">STANDARD — the lifetime receipt</option><option value="medical">BODY WARRANTY — built-in wonders</option><option value="goth">MEMENTO MORI — after dark</option><option value="sunny">SUNSHINE — joy inventory</option></select>
+<div id="calculator-options" hidden><label for="plan">Warranty plan (illustration only)</label><select id="plan"><option value="81">STANDARD — 81 years</option><option value="92">EXTENDED — 92 years</option><option value="100">COLLECTOR’S — 100 years</option></select><div hidden><label for="income">Legacy income</label><input id="income" type="number" min="0" step="any"><label for="currency">Currency</label><select id="currency"></select></div><label for="visits">Parent visits per year (optional)</label><input id="visits" type="number" min="0" max="366"><label for="parent-age">Parents’ average age (optional)</label><input id="parent-age" type="number" min="18" max="119"><p class="note">Playful invented estimates, not predictions. Gift artwork is in English. Income is not included. Optional parent visits appear in your print.</p></div>
 <label for="name">Name / Name</label><input id="name" maxlength="28" required placeholder="Anna">
 <label for="date-kind">Date shown on the print</label><select id="date-kind"><option value="printed">Printing date</option><option value="birthday">Birthday</option></select><label for="print-date">Choose date</label><input id="print-date" type="date" required><small>The date is printed as entered; it does not change your selected age.</small>
 <label for="age">Age / Alter</label><input id="age" type="number" min="1" max="120" step="1" required placeholder="34">
@@ -149,7 +149,7 @@ $("photo").addEventListener("change",async()=>{
 });
 $("download").addEventListener("click",async()=>{
   if(!valid())return;
-  try{render();const blob=await imageBlob();const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=$("design").value==="portrait"?"no-refunds-receipt-4x16.png":"no-refunds-"+$("design").value+"-4x16.png";a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);}
+  try{render();const blob=await imageBlob();const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=$("design").value==="portrait"?"no-refunds-receipt-4x16.png":"life-receipt-"+$("design").value+"-v7-4x16.png";a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);}
   catch{status("Download failed. Please try again.",true);}
 });
 $("consent").addEventListener("change",()=>{if(!$("consent").checked && busy)resetOrder("Transfer cancelled. Any already transferred print expires automatically.");updateButton();});
@@ -199,13 +199,13 @@ CURRENCIES.forEach(value=>{const option=document.createElement("option");option.
 function selectDesign(){
  const portraitDesign=$("design").value==="portrait";
  document.querySelector("header h1").innerHTML=portraitDesign?"Not a poster.<br>A receipt for being alive.":"Your life.<br>In black and white.";
- document.querySelector("header p").textContent=portraitDesign?"Personalized. Printed at 4 × 16 inches. One life. All moments priceless.":"Your calculated receipt edition. A 4 × 16-inch print, fulfilled by Zazzle.";
+ document.querySelector("header p").textContent=portraitDesign?"Personalized. Printed at 4 × 16 inches. One life. All moments priceless.":"Your Life Receipt gift design, v7. Free 4 × 16-inch download; online ordering is not enabled yet.";
  document.querySelector('label[for="name"]').textContent=portraitDesign?"Name / Name":"Name (optional)";
  document.querySelector("figcaption").textContent=($("design").selectedOptions[0].textContent.split(" — ")[0])+" · 4 × 16 in · 10.16 × 40.64 cm";
  $("calculator-options").hidden=portraitDesign;$("name").required=portraitDesign;$("age").max=portraitDesign?120:119;
  for(const id of ["photo","years"]){$(id).hidden=!portraitDesign;document.querySelector('label[for="'+id+'"]').hidden=!portraitDesign;}
  $("photo").nextElementSibling.hidden=!portraitDesign;
- for(const option of $("language").options)option.disabled=portraitDesign?!["en","de"].includes(option.value):false;
+ for(const option of $("language").options)option.disabled=portraitDesign?!["en","de"].includes(option.value):option.value!=="en";
  if($("language").selectedOptions[0].disabled)$("language").value="en";
  render();
 }
@@ -217,7 +217,7 @@ window.addEventListener("message",event=>{
  const data=event.data.input||{};
  if(!["standard","medical","goth","sunny"].includes(data.edition))return;
  $("design").value=data.edition;
- for(const [key,id] of Object.entries({age:"age",plan:"plan",income:"income",currency:"currency",visits:"visits",parentAge:"parent-age",language:"language"}))if(data[key]!==undefined&&data[key]!==null)$(id).value=String(data[key]);
+ for(const [key,id] of Object.entries({age:"age",plan:"plan",income:"income",currency:"currency",visits:"visits",parentAge:"parent-age",language:"language",name:"name",date:"print-date",dateKind:"date-kind"}))if(data[key]!==undefined&&data[key]!==null)$(id).value=String(data[key]);
  selectDesign();status("Your calculated receipt is ready. Nothing has been uploaded.");
 });
 if(window.opener)window.opener.postMessage({type:"norefunds:poster-ready"},location.origin);

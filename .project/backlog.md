@@ -58,3 +58,11 @@ Status: pending — new feature suggestions received during active V5 content/la
 ### 2026-11-25 — V6 active visual corrections
 
 Owner requested clearer narrative formatting, restored “all you'll ever have” while keeping it readable, and much more pixel artwork in the current design revision. Implemented in V6 export renderer: single-line paired narrative answers, TOTAL / ALL YOU'LL EVER HAVE, dedicated per-row icon gutter and many original thematic pixel motifs. Optional relationship/pet personalization remains pending as a separate feature; no website rollout authorized.
+
+## 2026-11-25 — Square portrait variants of all four gift editions
+
+Status: pending — new feature received during the active v7 page-integration task, not marked dringend. Owner requests a variant of each of the four editions that integrates a square photograph of the recipient, sacrificing some text to make space. Preserve photo-free v7 and the separate legacy portrait design; choose concise edition-specific rows and square crop/placement in a later explicitly executed task. No personal image supplied for this variant yet. Existing consent/no-upload-before-permission and no-live-checkout constraints apply. Do not silently implement this addition alongside the active page integration.
+
+## 2026-11-25 — Customer acquisition economics
+
+Status: pending — new analysis request during the active v7 page integration; not marked dringend. Owner asks to calculate the best way to acquire customers while accounting for potential gains. Build a contribution-per-sale / break-even acquisition-cost model using current Zazzle base price, configurable royalty, discount/fee effects, and separately bounded Ambassador earnings (eligibility/tracking currently unverified). Compare free sharing, gift occasions, organic content/search, relevant communities/partnerships and paid acquisition, with explicit assumptions for click/conversion rates and time cost. Recommend financially sensible priorities and small measurable experiments; no ad spend, subscription, purchase or messaging to others is authorized. Complete this only on a later explicit execution request.

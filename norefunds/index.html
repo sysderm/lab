@@ -1,16 +1,14 @@
 <meta charset="utf-8">
-<title>No Refunds</title>
+<title>Life Receipt — One life. No returns.</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A till receipt for the rest of your life. Type your age — the register prints your remaining weekends, coffees, phone-staring years, and the times you'll see your parents. All sales final.">
-<meta property="og:title" content="No Refunds — The Lifetime Receipt">
-<meta property="og:description" content="Type your age. The register prints what's left: weekends, coffees, years spent staring at your phone, times you'll see your parents. All sales final.">
+<meta name="description" content="A playful Life Receipt gift: pixel artwork, everyday moments and four editions. Personalize it and download your 4 × 16-inch print for free.">
+<meta property="og:title" content="Life Receipt — One life. No returns.">
+<meta property="og:description" content="Four pixel-art gift receipts. One life. No returns.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://konsil.ch/norefunds/">
 <meta property="og:image" content="https://konsil.ch/norefunds/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://konsil.ch/norefunds/og.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=VT323&display=swap">
 <style>
   /* Single committed world: thermal receipt on a dark counter.
      No theme switch — every color painted explicitly. */
@@ -59,7 +57,7 @@
 
   h1{
     font-family:"VT323","Courier Prime",monospace;font-weight:400;
-    font-size:56px;letter-spacing:.06em;line-height:.95;
+    font-size:clamp(24px,7vw,40px);letter-spacing:.02em;line-height:.95;white-space:nowrap;
     text-align:center;margin:0;
   }
   .tagline{text-align:center;font-size:12.5px;letter-spacing:.22em;margin:4px 0 2px}
@@ -74,7 +72,7 @@
     text-transform:uppercase;margin:14px 0 2px;
   }
   .stub .opt{color:var(--gold)}
-  .stub input[type=number], .stub select{
+  .stub input[type=number], .stub input[type=text], .stub input[type=date], .stub select{
     font-family:"Courier Prime","Courier New",monospace;font-size:17px;color:var(--ink);
     background:transparent;border:none;border-bottom:1.5px dashed var(--gold);
     padding:4px 2px;width:100%;border-radius:0;
@@ -118,6 +116,11 @@
   .langtog:hover{border-style:solid;color:var(--ink)}
 
   /* printed body */
+  .gift-note{font-size:12px;line-height:1.45;color:var(--ink-soft)}
+  #gift-preview{display:block;width:100%;height:auto;background:#F8F5EA}
+  .receipt-transcript{margin-top:14px;font-size:13px}
+  .receipt-transcript p{display:flex;justify-content:space-between;gap:12px}
+  .receipt-transcript strong{overflow-wrap:anywhere}
   #out{display:none}
   #out.on{display:block}
   .sect{
@@ -196,7 +199,7 @@
     <option value="en">EN</option><option value="de">DE</option><option value="fr">FR</option>
     <option value="es">ES</option><option value="zh">中文</option>
   </select>
-  <h1>NO REFUNDS</h1>
+  <h1>LIFE RECEIPT</h1>
   <div class="tagline" id="i-tagline">THE LIFETIME RECEIPT</div>
   <div class="meta">
     <span id="i-meta1">REGISTER 03 · CASHIER: TIME</span><br>
@@ -218,16 +221,18 @@
     <label for="edition">Edition <span class="opt">(English only, for now)</span></label>
     <select id="edition" style="width:100%">
       <option value="standard">STANDARD — THE LIFETIME RECEIPT</option>
-      <option value="medical">BODY WARRANTY — parts &amp; maintenance</option>
-      <option value="goth">MEMENTO MORI — the dark ledger</option>
+      <option value="medical">BODY WARRANTY — built-in wonders</option>
+      <option value="goth">MEMENTO MORI — after dark</option>
       <option value="sunny">SUNSHINE — joy inventory</option>
     </select>
 
-    <label for="income" id="i-lincome">Annual income <span class="opt">(optional — adds the money lines)</span></label>
-    <div class="inline">
-      <select id="cur" aria-label="Currency"></select>
-      <input id="income" type="number" inputmode="numeric" min="0" step="any" placeholder="—">
-    </div>
+    <label for="recipient">Name on the gift <span class="opt">(optional)</span></label>
+    <input id="recipient" type="text" maxlength="28" placeholder="Alex" autocomplete="off">
+    <label for="date-kind">Date on the receipt</label>
+    <select id="date-kind"><option value="printed">Printing date</option><option value="birthday">Birthday</option></select>
+    <input id="print-date" type="date" required aria-label="Date on the receipt">
+    <p class="gift-note">Gift artwork is in English. The date does not change the age you enter.</p>
+    <div hidden><select id="cur" aria-label="Legacy currency" disabled></select><input id="income" type="number" disabled></div>
 
     <label for="visits" id="i-lvisits">Times you see your parents per year <span class="opt">(optional — careful)</span></label>
     <input id="visits" type="number" inputmode="numeric" min="0" max="366" placeholder="—">
@@ -243,7 +248,7 @@
 </main>
 
 <div class="counter-ui">
-  <button class="copy" id="edition-print" style="display:none;margin-bottom:12px">Print this edition · Zazzle</button>
+  <button class="copy" id="edition-print" style="display:none;margin-bottom:12px">Customize &amp; download this receipt</button>
   <button class="copy" id="share" style="display:none;margin-right:10px">Share it</button>
   <button class="copy" id="copy" style="display:none">Copy my receipt</button>
   <p class="nudge" id="nudge" style="display:none">Screenshot it. Send it to someone you'd like more time with.</p>
@@ -263,7 +268,9 @@
 </div>
 
 <script type="module">
-import {buildReceipt,I18N,CURRENCIES} from "./calculator-model.js";
+import {I18N,CURRENCIES} from "./calculator-model.js";
+import {buildGiftReceipt,localDate,GIFT_ASSUMPTIONS} from "./gift-model.js";
+import {renderEdition} from "./receipt/edition-renderer.js";
 /* ═══════════════════════════════════════════════════════════
    MONETIZATION — paste real links to switch earning on.
    tipUrl: Stripe Payment Link or Buy Me a Coffee page.
@@ -305,7 +312,7 @@ function applyLang(){
   set("i-lincome",T.lincome,1); set("i-lvisits",T.lvisits,1); set("i-lpage",T.lpage);
   set("i-print",T.print); set("err",T.err); set("i-anon",T.anon);
   set("copy",T.copyBtn); set("share",T.shareBtn); set("nudge",T.nudge);
-  set("i-stitle",T.tipTitle); set("i-fine",T.fine,1);
+  set("i-stitle",T.tipTitle); set("i-fine",GIFT_ASSUMPTIONS);
   const lt=document.getElementById("langtog"); if(lt) lt.value=LANG;
   if(LAST) build();
 }
@@ -313,7 +320,8 @@ function applyLang(){
 const curSel = document.getElementById("cur");
 CURRENCIES.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;curSel.appendChild(o);});
 
-document.getElementById("today").textContent = new Date().toISOString().slice(0,10);
+document.getElementById("today").textContent = localDate();
+document.getElementById("print-date").value=localDate();
 
 
 let LAST = null;
@@ -370,73 +378,38 @@ function build(){
     return;
   }
   err.style.display="none";
-  const result=buildReceipt({age,plan:document.querySelector('input[name="plan"]:checked').value,
+  const result=buildGiftReceipt({age,plan:document.querySelector('input[name="plan"]:checked').value,
     edition:document.getElementById("edition").value,language:LANG,currency:curSel.value,
-    income:document.getElementById("income").value,visits:document.getElementById("visits").value,
+    name:document.getElementById("recipient").value,date:document.getElementById("print-date").value,dateKind:document.getElementById("date-kind").value,visits:document.getElementById("visits").value,
     parentAge:document.getElementById("page").value});
-  render(result.lines);
-  document.getElementById("i-tagline").textContent=result.edition==="standard"?T.tagline:({medical:"BODY WARRANTY",goth:"MEMENTO MORI",sunny:"SUNSHINE"}[result.edition]);
+  render(result);
+  document.getElementById("i-tagline").textContent=result.title;
   document.getElementById("i-fine").innerHTML=result.finePrint;
   LAST=result;
   document.getElementById("edition-print").style.display="inline-block";
 }
 
-function render(L){
-  chaChing(L.length);
-  const out=document.getElementById("out");
-  out.innerHTML="";out.classList.add("on","printing");
-  const els=[];
-  L.forEach(item=>{
-    let el;
-    if(item.t==="sect"){el=document.createElement("div");el.className="sect";el.textContent=item.lab;}
-    else if(item.t==="rule"){el=document.createElement("hr");el.className="rule";}
-    else if(item.t==="stamp"){
-      el=document.createElement("div");el.className="stampwrap";
-      const stamp=document.createElement("div");stamp.className="stamp";stamp.textContent=item.lab;
-      const sub=document.createElement("small");sub.textContent=item.val;stamp.appendChild(sub);el.appendChild(stamp);
-    }
-    else if(item.t==="barcode"){
-      el=document.createElement("div");el.className="barcode";el.setAttribute("aria-hidden","true");
-      let seed=item.weeks||1234;
-      for(let i=0;i<44;i++){
-        seed=(seed*9301+49297)%233280;
-        const b=document.createElement("i");
-        b.style.width=(1+(seed%4))+"px";
-        b.style.marginRight=(1+(seed%3))+"px";
-        el.appendChild(b);
-      }
-    }
-    else if(item.t==="bnum"){el=document.createElement("div");el.className="b-num";el.textContent=item.lab;}
-    else if(item.t==="thanks"){
-      el=document.createElement("div");el.className="thanks";
-      const host=((location.hostname||"konsil.ch").replace(/^www\./,"")+
-        location.pathname.replace(/\/(index\.html)?$/,""));
-      el.textContent=item.lab;el.append(document.createElement("br"),document.createTextNode(item.val),document.createElement("br"));
-      const site=document.createElement("span");site.style.cssText="font-size:10.5px;letter-spacing:.3em;color:var(--ink-faint)";site.textContent="★ "+host+" ★";el.appendChild(site);
-    }
-    else{
-      el=document.createElement("div");el.className="li "+(item.cls||"");
-      if(item.cls&&item.cls.includes("barline")){
-        el.innerHTML='<span class="lab">'+item.lab+'</span><span class="val bar">'+item.val+'</span>';
-      }else if(item.cls&&item.cls.includes("note")){
-        el.innerHTML='<span class="lab"></span><span class="val small" style="font-weight:400;color:inherit">'+item.val+'</span>';
-        el.style.color="var(--ink-soft)";el.style.fontSize="12px";
-      }else{
-        const vc=(item.cls&&item.cls.includes("small"))?"val small":"val";
-        el.innerHTML='<span class="lab">'+item.lab+'</span><span class="'+vc+'">'+(item.val||"")+'</span>';
-      }
-    }
-    out.appendChild(el);els.push(el);
-  });
-  els.forEach((el,i)=>{
-    el.classList.add("pline");
-    el.style.animationDelay=REDUCED?"0s":(i*0.055)+"s";
-  });
-  out.classList.add("printed");
+function render(result){
+  chaChing(result.lines.length);
+  const out=document.getElementById("out");out.replaceChildren();out.className="on";
+  const canvas=document.createElement("canvas");canvas.id="gift-preview";canvas.width=1800;canvas.height=7200;
+  canvas.setAttribute("role","img");canvas.setAttribute("aria-label",result.title+" Life Receipt. Text version follows.");
+  out.appendChild(canvas);
+  window.giftPreview=renderEdition(canvas,{...result,parentAge:result.pAge});
+  const details=document.createElement("details");details.className="receipt-transcript";
+  const summary=document.createElement("summary");summary.textContent="Read the receipt as text";details.appendChild(summary);
+  for(const item of result.lines){
+    if(item.t==='rule')continue;
+    const row=document.createElement(item.t==='sect'?'h3':'p');
+    const label=document.createElement("span");label.textContent=item.lab||"";row.appendChild(label);
+    if(item.val){const value=document.createElement("strong");value.textContent=item.val;row.appendChild(value);}
+    details.appendChild(row);
+  }
+  out.appendChild(details);
   document.getElementById("copy").style.display="inline-block";
-  if(navigator.share) document.getElementById("share").style.display="inline-block";
+  if(navigator.share)document.getElementById("share").style.display="inline-block";
   document.getElementById("nudge").style.display="block";
-  if(!REDUCED) out.scrollIntoView({behavior:"smooth",block:"start"});
+  if(!REDUCED)out.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 document.getElementById("stub").addEventListener("submit",e=>{e.preventDefault();build();});
@@ -474,7 +447,7 @@ document.getElementById("edition-print").addEventListener("click",()=>{
 window.addEventListener("message",event=>{
  if(event.origin!==location.origin||event.source!==posterWindow||event.data?.type!=="norefunds:poster-ready"||!LAST)return;
  event.source.postMessage({type:"norefunds:poster-data",input:{edition:LAST.edition,age:LAST.age,plan:LAST.plan,language:LAST.language,currency:LAST.currency,
- income:Number.isFinite(LAST.income)?LAST.income:"",visits:Number.isFinite(LAST.visits)?LAST.visits:"",parentAge:Number.isFinite(LAST.pAge)?LAST.pAge:""}},location.origin);
+ name:LAST.name,date:LAST.date,dateKind:LAST.dateKind,visits:Number.isFinite(LAST.visits)?LAST.visits:"",parentAge:Number.isFinite(LAST.pAge)?LAST.pAge:""}},location.origin);
 });
 
 function shareText(){
@@ -488,7 +461,7 @@ function shareText(){
 }
 document.getElementById("share").addEventListener("click",async()=>{
   if(!LAST||!navigator.share)return;
-  try{await navigator.share({title:"No Refunds",text:shareText(),url:location.href});}catch(e){}
+  try{await navigator.share({title:"Life Receipt",text:shareText(),url:location.href});}catch(e){}
 });
 
 /* cross-link to the Money Mirror, only where mirror.html actually exists */
