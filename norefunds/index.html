@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Life Receipt — One life. No returns.</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A playful Life Receipt gift: pixel artwork, everyday moments and four editions. Personalize it and download your 4 × 16-inch print for free.">
+<meta name="description" content="A playful Life Receipt gift: pixel artwork, everyday moments and four editions. Personalize it and create your personalized 4 × 16-inch print.">
 <meta property="og:title" content="Life Receipt — One life. No returns.">
 <meta property="og:description" content="Four pixel-art gift receipts. One life. No returns.">
 <meta property="og:type" content="website">
@@ -222,7 +222,7 @@
     <select id="edition" style="width:100%">
       <option value="standard">STANDARD — THE LIFETIME RECEIPT</option>
       <option value="medical">BODY WARRANTY — built-in wonders</option>
-      <option value="goth">MEMENTO MORI — after dark</option>
+      <option value="goth">DARK — Memento Mori</option>
       <option value="sunny">SUNSHINE — joy inventory</option>
     </select>
 
@@ -248,7 +248,7 @@
 </main>
 
 <div class="counter-ui">
-  <button class="copy" id="edition-print" style="display:none;margin-bottom:12px">Customize &amp; download this receipt</button>
+  <button class="copy" id="edition-print" style="display:none;margin-bottom:12px">Customize &amp; order a print</button>
   <button class="copy" id="share" style="display:none;margin-right:10px">Share it</button>
   <button class="copy" id="copy" style="display:none">Copy my receipt</button>
   <p class="nudge" id="nudge" style="display:none">Screenshot it. Send it to someone you'd like more time with.</p>
@@ -392,7 +392,7 @@ function build(){
 function render(result){
   chaChing(result.lines.length);
   const out=document.getElementById("out");out.replaceChildren();out.className="on";
-  const canvas=document.createElement("canvas");canvas.id="gift-preview";canvas.width=1800;canvas.height=7200;
+  const canvas=document.createElement("canvas");canvas.id="gift-preview";canvas.width=720;canvas.height=2880;
   canvas.setAttribute("role","img");canvas.setAttribute("aria-label",result.title+" Life Receipt. Text version follows.");
   out.appendChild(canvas);
   window.giftPreview=renderEdition(canvas,{...result,parentAge:result.pAge});
@@ -427,7 +427,7 @@ document.getElementById("copy").addEventListener("click",async()=>{
   const edSel=document.getElementById("edition");
   try{
     const q=new URLSearchParams(location.search).get("ed");
-    if(q&&["standard","medical","goth","sunny"].includes(q)) edSel.value=q;
+    if(q&&["standard","medical","goth","dark","sunny"].includes(q)) edSel.value=q==="dark"?"goth":q;
   }catch(e){}
   edSel.addEventListener("change",()=>{if(LAST)build();});
 })();
@@ -442,11 +442,11 @@ applyLang();
 let posterWindow=null;
 document.getElementById("edition-print").addEventListener("click",()=>{
  if(!LAST)return;
- posterWindow=window.open("./receipt/?edition="+encodeURIComponent(LAST.edition),"_blank");
+ posterWindow=window.open("./receipt/?edition="+encodeURIComponent(LAST.edition==="goth"?"dark":LAST.edition),"_blank");
 });
 window.addEventListener("message",event=>{
  if(event.origin!==location.origin||event.source!==posterWindow||event.data?.type!=="norefunds:poster-ready"||!LAST)return;
- event.source.postMessage({type:"norefunds:poster-data",input:{edition:LAST.edition,age:LAST.age,plan:LAST.plan,language:LAST.language,currency:LAST.currency,
+ event.source.postMessage({type:"norefunds:poster-data",input:{edition:LAST.edition==="goth"?"dark":LAST.edition,age:LAST.age,plan:LAST.plan,language:LAST.language,currency:LAST.currency,
  name:LAST.name,date:LAST.date,dateKind:LAST.dateKind,visits:Number.isFinite(LAST.visits)?LAST.visits:"",parentAge:Number.isFinite(LAST.pAge)?LAST.pAge:""}},location.origin);
 });
 

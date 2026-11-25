@@ -43,7 +43,7 @@ for(const [engine,mobile] of [[chromium,false],[webkit,false],[webkit,true]]){
   assert.equal(data.readUInt32BE(16),1800);assert.equal(data.readUInt32BE(20),7200);
   if(engine===chromium)fs.writeFileSync(path.join(output,edition+'-edition.png'),data);
   await p.locator('canvas').screenshot({path:path.join(output,label+'-'+edition+'.png')});
-  const [download]=await Promise.all([p.waitForEvent('download'),p.locator('#download').click()]);assert.equal(download.suggestedFilename(),'life-receipt-'+edition+'-v7-4x16.png');
+  assert.equal(await p.locator('#download').isVisible(),false);
  }
  assert.equal(requests.every(url=>url.startsWith('https://konsil.ch/')||url.startsWith('blob:')),true);
  // The original paid A3 poster is a separate route and is not replaced by this work.
@@ -55,11 +55,11 @@ for(const [engine,mobile] of [[chromium,false],[webkit,false],[webkit,true]]){
  const [popup]=await Promise.all([p.waitForEvent('popup'),p.locator('#edition-print').click()]);
  await popup.waitForFunction(()=>window.receiptPrint?.model.age===50&&window.receiptPrint.model.plan===92);
  assert.equal(await popup.locator('#design').inputValue(),'goth');assert.equal(await popup.locator('#language').inputValue(),'en');assert.equal(await popup.locator('#name').inputValue(),'Alex');assert.equal(await popup.locator('#print-date').inputValue(),'1976-06-15');assert.equal(await popup.locator('#parent-age').inputValue(),'87');
- assert.equal(new URL(popup.url()).search,'?edition=goth');assert.equal(await popup.evaluate(()=>sessionStorage.length),0);
+ assert.equal(new URL(popup.url()).search,'?edition=dark');assert.equal(await popup.evaluate(()=>sessionStorage.length),0);
  const printed=await popup.evaluate(()=>window.receiptPrint.model.lines.filter(x=>x.lab).map(x=>[x.lab,x.val].filter(Boolean)));
  assert.deepEqual(printed,screen,'Same model rows in calculator and print');
  await popup.close();assert.deepEqual(errors,[]);
- console.log(label+': '+cases+' v7 gift layouts, Unicode/long names, aligned values, large icons, private handoff and downloads PASS');
+ console.log(label+': '+cases+' v7 gift layouts, Unicode/long names, aligned values, large icons, private handoff and no public download PASS');
  }finally{await b.close();}
 }
 })().catch(e=>{console.error(e);process.exit(1)});

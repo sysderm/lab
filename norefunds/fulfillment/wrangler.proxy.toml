@@ -1,4 +1,4 @@
-# Worker deployed with checkout disabled; nginx proxy NOT activated.
+# Owner approved ordering on 2026-11-25; narrow nginx proxy is active.
 name = "norefunds-receipt-bridge"
 main = "worker.mjs"
 compatibility_date = "2026-11-25"
@@ -8,7 +8,7 @@ routes = []
 
 [vars]
 PROXY_MODE = "true"
-CHECKOUT_ENABLED = "false"
+CHECKOUT_ENABLED = "true"
 TURNSTILE_SITE_KEY = "0x4AAAAAAGSLuM6fW_wJqy1j"
 
 [[r2_buckets]]

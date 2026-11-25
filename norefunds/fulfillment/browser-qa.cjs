@@ -18,9 +18,9 @@ const output=process.env.QA_OUTPUT || path.join(__dirname,'.qa');fs.mkdirSync(ou
  const png=await page.locator('canvas').evaluate(c=>c.toDataURL().split(',')[1]);fs.writeFileSync(output+'/'+label+'-receipt.png',Buffer.from(png,'base64'));
  assert.equal(Buffer.from(png,'base64').readUInt32BE(16),1800);assert.equal(Buffer.from(png,'base64').readUInt32BE(20),7200);
  const portrait=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=600;c.height=800;const x=c.getContext('2d');x.fillStyle='#478';x.fillRect(0,0,600,800);x.fillStyle='#edc';x.beginPath();x.arc(300,280,150,0,Math.PI*2);x.fill();x.fillRect(120,450,360,350);return c.toDataURL().split(',')[1];});
- await page.locator('#photo').setInputFiles({name:'synthetic.png',mimeType:'image/png',buffer:Buffer.from(portrait,'base64')});await page.waitForFunction(()=>!document.querySelector('#download').disabled);
+ await page.locator('#photo').setInputFiles({name:'synthetic.png',mimeType:'image/png',buffer:Buffer.from(portrait,'base64')});await page.waitForFunction(()=>document.querySelector('canvas').getAttribute('aria-busy')==='false');
  await page.screenshot({path:output+'/'+label+'-portrait.png',fullPage:true});
- const [download]=await Promise.all([page.waitForEvent('download'),page.locator('#download').click()]);await download.saveAs(output+'/'+label+'-download.png');
+ assert.equal(await page.locator('#download').isVisible(),false);
  const low=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=20;c.height=20;return c.toDataURL().split(',')[1]});
  await page.locator('#photo').setInputFiles({name:'low.png',mimeType:'image/png',buffer:Buffer.from(low,'base64')});await page.waitForFunction(()=>document.querySelector('#status').textContent.includes('400'));
  assert.deepEqual(errors,[]);assert.equal(requests.every(url=>url.startsWith('https://konsil.ch/')||url.startsWith('blob:')),true);
@@ -56,5 +56,5 @@ const output=process.env.QA_OUTPUT || path.join(__dirname,'.qa');fs.mkdirSync(ou
  mode='success';await page.evaluate(()=>{window.testChallenge=null});await page.locator('#consent').check();await page.locator('#order').click();await page.waitForFunction(()=>!!window.testChallenge);
  await page.evaluate(()=>window.testChallenge.callback('test-token'));await page.waitForURL('https://www.zazzle.com/**');assert.equal(attempts,2);
  assert.deepEqual(errors,[]);
- console.log(label+': '+count+' combinations, portrait, download, low-resolution rejection, no external requests before consent; mocked consent/retry/cancel/redirect: PASS');await browser.close();
+ console.log(label+': '+count+' combinations, portrait, no public download, low-resolution rejection, no external requests before consent; mocked consent/retry/cancel/redirect: PASS');await browser.close();
 }})().catch(e=>{console.error(e);process.exit(1)});

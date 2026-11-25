@@ -43,7 +43,7 @@ test("structural dimensions and bounds",()=>{
   assert.equal(validPng(wrong),false);
   assert.equal(validPng(b.slice(0,-1)),false);
   assert.equal(validPng(new Uint8Array(100)),false);
-  const oversized=new Uint8Array(16*1024*1024+1);
+  const oversized=new Uint8Array(1024*1024+1);
   assert.equal(validPng(oversized),false);
 });
 test("disabled and incompletely configured worker fails closed",async()=>{
@@ -107,7 +107,7 @@ test("Turnstile rejects missing token, wrong hostname/action, denial and outage"
 test("invalid bodies and storage failures do not return a checkout link",async t=>{
   t.mock.method(globalThis,"fetch",async()=>Response.json({success:true,hostname:"konsil.ch",action:"receipt_checkout"}));
   const env=configured();let writes=0;env.RECEIPTS.put=async()=>writes++;
-  for(const bytes of [new Uint8Array(0),new Uint8Array(100),new Uint8Array(16*1024*1024+1)])assert.equal((await worker.fetch(upload(bytes),env)).status,400);
+  for(const bytes of [new Uint8Array(0),new Uint8Array(100),new Uint8Array(1024*1024+1)])assert.equal((await worker.fetch(upload(bytes),env)).status,400);
   assert.equal(writes,0);
   assert.equal((await worker.fetch(upload(fixture(),{"Content-Type":"text/plain"}),env)).status,415);
   env.RECEIPTS.put=async()=>{throw new Error("storage secret");};

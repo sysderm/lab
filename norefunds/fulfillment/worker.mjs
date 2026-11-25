@@ -2,7 +2,7 @@
 // Do not deploy with CHECKOUT_ENABLED=true until the release checklist is satisfied.
 const ORIGIN = "https://konsil.ch";
 const BASE = "/norefunds/api/receipt";
-const MAX_BYTES = 16 * 1024 * 1024;
+const MAX_BYTES = 1024 * 1024;
 const TTL_MS = 24 * 60 * 60 * 1000;
 const WIDTH = 1800, HEIGHT = 7200;
 const TEMPLATE = "256629092171840156";
@@ -26,7 +26,7 @@ const CRC_TABLE = Uint32Array.from({length:256}, (_, value) => {
 });
 function crc32(bytes) {
   let crc=0xffffffff;
-  for(const byte of bytes) crc=(crc>>>8)^CRC_TABLE[(crc^byte)&255];
+  for(let i=0;i<bytes.length;i++) crc=(crc>>>8)^CRC_TABLE[(crc^bytes[i])&255];
   return (crc^0xffffffff)>>>0;
 }
 export function validPng(bytes) {
@@ -120,7 +120,7 @@ async function handle(request,env) {
   if(!rate.success) return json({error:"Please try again later"},429);
   if(!await verified(request.headers.get("X-Turnstile-Token"),env)) return json({error:"Verification failed; retry"},403);
   const bytes=await boundedRead(request);
-  if(!bytes || !validPng(bytes)) return json({error:"Invalid print file; expected 1800 x 7200 PNG, max 16 MB"},400);
+  if(!bytes || !validPng(bytes)) return json({error:"Invalid print file; expected 1800 x 7200 PNG, max 1 MB"},400);
   const key=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,"0")).join("");
   const expires=Date.now()+TTL_MS;
   await env.RECEIPTS.put(key,bytes,{httpMetadata:{contentType:"image/png",cacheControl:"private, no-store"},customMetadata:{expires:String(expires)}});
