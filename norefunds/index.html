@@ -780,6 +780,16 @@ document.getElementById("share").addEventListener("click",async()=>{
     a.target="_blank";a.rel="noopener";a.textContent=M.tipLabel||"Leave a tip";b.appendChild(a);}
   if(M.productUrl){any=true;const a=document.createElement("a");a.className="s-btn alt";a.href=M.productUrl;
     a.target="_blank";a.rel="noopener";a.textContent=M.productLabel||"Get the guide";b.appendChild(a);}
+  /* Physical print is offered only when its separate fulfillment backend is ready.
+     No receipt data is sent by this configuration request. */
+  if(location.origin==="https://konsil.ch"){
+    fetch("/norefunds/api/receipt/config",{cache:"no-store",referrerPolicy:"no-referrer"})
+      .then(r=>r.ok?r.json():null).then(config=>{
+        if(config?.enabled!==true)return;
+        const a=document.createElement("a");a.className="s-btn";a.href="./receipt/";
+        a.textContent="Order a real lifetime receipt ↗";b.prepend(a);s.classList.add("on");
+      }).catch(()=>{});
+  }
   if(M.sponsorText){any=true;
     sp.innerHTML=M.sponsorUrl?'Kept in ink by <a href="'+M.sponsorUrl+'" target="_blank" rel="noopener">'+M.sponsorText+'</a>':M.sponsorText;}
   if(any)s.classList.add("on");
