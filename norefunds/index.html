@@ -125,17 +125,17 @@
     color:var(--ink-soft);margin:14px 0 6px;
   }
   .li{display:flex;justify-content:space-between;gap:14px;align-items:baseline}
-  .li .lab{flex:1 1 auto}
+  .li .lab{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
   .li .val{
     font-family:"VT323","Courier Prime",monospace;font-size:23px;line-height:1.15;
     text-align:right;white-space:nowrap;
   }
-  .li .val.small{font-family:"Courier Prime",monospace;font-size:14px;font-weight:700}
+  .li .val.small{font-family:"Courier Prime",monospace;font-size:14px;font-weight:700;white-space:normal;max-width:53%;overflow-wrap:anywhere}
   .li.note{font-size:12px;color:var(--ink-soft);justify-content:flex-end;font-style:normal}
   .li.warn .val,.li.warn .lab{color:var(--red)}
   .bar{font-family:"VT323",monospace;font-size:20px;letter-spacing:1px}
 
-  .printing .li,.printing .sect,.printing .rule,.printing .stampwrap,.printing .barcode,.printing .b-num,.printing .thanks{
+  .printing .hero,.printing .li,.printing .sect,.printing .rule,.printing .stampwrap,.printing .barcode,.printing .b-num,.printing .thanks{
     opacity:0;transform:translateY(4px);
   }
   .printed .pline{
@@ -143,7 +143,7 @@
   }
   @keyframes printline{to{opacity:1;transform:none}}
   @media (prefers-reduced-motion: reduce){
-    .printing .li,.printing .sect,.printing .rule,.printing .stampwrap,.printing .barcode,.printing .b-num,.printing .thanks{opacity:1;transform:none}
+    .printing .hero,.printing .li,.printing .sect,.printing .rule,.printing .stampwrap,.printing .barcode,.printing .b-num,.printing .thanks{opacity:1;transform:none}
     .printed .pline{animation:none;opacity:1;transform:none}
   }
 
@@ -152,16 +152,19 @@
   .stamp{
     position:absolute;left:50%;top:50%;
     transform:translate(-50%,-50%) rotate(-8deg);
-    font-weight:700;font-size:26px;letter-spacing:.18em;color:var(--red);
-    border:3.5px double var(--red);padding:8px 18px;border-radius:4px;
-    opacity:.82;mix-blend-mode:multiply;white-space:nowrap;
+    font-weight:700;font-size:clamp(16px,4.7vw,24px);letter-spacing:.06em;color:var(--edition-accent,var(--red));
+    border:3.5px double var(--edition-accent,var(--red));padding:8px 12px;border-radius:4px;max-width:95%;width:max-content;text-align:center;
+    opacity:.9;mix-blend-mode:multiply;white-space:normal;line-height:1.15;
   }
   .stamp small{display:block;font-size:10.5px;letter-spacing:.3em;text-align:center;font-weight:400}
 
   .barcode{display:flex;align-items:flex-end;justify-content:center;gap:0;height:40px;margin-top:14px}
   .barcode i{display:block;background:var(--ink);height:100%}
   .b-num{text-align:center;font-size:12px;letter-spacing:.34em;color:var(--ink-soft);margin-top:5px}
-  .thanks{text-align:center;font-size:12.5px;letter-spacing:.2em;line-height:1.9;margin-top:14px}
+  .thanks{text-align:center;font-size:13px;letter-spacing:.045em;line-height:1.6;margin-top:14px}
+  .hero{background:var(--edition-panel,#A92B21);color:var(--edition-panel-ink,#fff);padding:18px 10px 16px;margin:16px 0;text-align:center;border-radius:1px}
+  .hero-label{font-size:12px;font-weight:700;letter-spacing:.11em;line-height:1.35}
+  .hero-value{font-family:"VT323","Courier Prime",monospace;font-size:clamp(46px,12vw,76px);line-height:1.05;overflow-wrap:anywhere}
 
   /* under-receipt UI (on the counter) */
   .counter-ui{width:min(420px,100%);text-align:center;margin-top:34px}
@@ -200,7 +203,7 @@
   <div class="tagline" id="i-tagline">THE LIFETIME RECEIPT</div>
   <div class="meta">
     <span id="i-meta1">REGISTER 03 · CASHIER: TIME</span><br>
-    <span id="today"></span> · <span id="i-final">ALL SALES FINAL</span>
+    <span id="today"></span>
   </div>
   <hr class="rule">
 
@@ -374,23 +377,34 @@ function build(){
     edition:document.getElementById("edition").value,language:LANG,currency:curSel.value,
     income:document.getElementById("income").value,visits:document.getElementById("visits").value,
     parentAge:document.getElementById("page").value});
-  render(result.lines);
+  render(result);
+  document.getElementById("i-tagline").textContent=result.title;
+  document.getElementById("i-fine").textContent=result.finePrint;
   LAST=result;
   document.getElementById("edition-print").style.display="inline-block";
 }
 
-function render(L){
+function render(model){
+  const L=model.lines;
   chaChing(L.length);
   const out=document.getElementById("out");
   out.innerHTML="";out.classList.add("on","printing");
+  out.style.setProperty("--edition-accent",model.style.accent);
+  out.style.setProperty("--edition-panel",model.style.panel);
+  out.style.setProperty("--edition-panel-ink",model.style.panelInk);
   const els=[];
   L.forEach(item=>{
     let el;
-    if(item.t==="sect"){el=document.createElement("div");el.className="sect";el.textContent=item.lab;}
+    if(item.t==="hero"){
+      el=document.createElement("div");el.className="hero";
+      const label=document.createElement("div");label.className="hero-label";label.textContent=item.lab;
+      const number=document.createElement("div");number.className="hero-value";number.textContent=item.val;
+      el.append(label,number);
+    }else if(item.t==="sect"){el=document.createElement("div");el.className="sect";el.textContent=item.lab;}
     else if(item.t==="rule"){el=document.createElement("hr");el.className="rule";}
     else if(item.t==="stamp"){
       el=document.createElement("div");el.className="stampwrap";
-      el.innerHTML='<div class="stamp">NO REFUNDS<small>'+T.stampS+'</small></div>';
+      const stamp=document.createElement("div");stamp.className="stamp";stamp.textContent=item.lab;el.appendChild(stamp);
     }
     else if(item.t==="barcode"){
       el=document.createElement("div");el.className="barcode";el.setAttribute("aria-hidden","true");
@@ -408,8 +422,8 @@ function render(L){
       el=document.createElement("div");el.className="thanks";
       const host=((location.hostname||"konsil.ch").replace(/^www\./,"")+
         location.pathname.replace(/\/(index\.html)?$/,""));
-      el.innerHTML=T.thanks+
-        '<br><span style="font-size:10.5px;letter-spacing:.3em;color:var(--ink-faint)">★ '+host+' ★</span>';
+      el.textContent=item.lab;
+      const site=document.createElement("span");site.style.cssText="font-size:10.5px;letter-spacing:.18em;color:var(--ink-faint)";site.textContent="★ "+host+" ★";el.append(document.createElement("br"),site);
     }
     else{
       el=document.createElement("div");el.className="li "+(item.cls||"");
