@@ -22,13 +22,21 @@ server {
         proxy_ssl_server_name on;
         proxy_ssl_name ${RECEIPT_WORKER_HOST};
         proxy_ssl_verify on;
+        proxy_ssl_verify_depth 3;
         proxy_ssl_trusted_certificate /etc/ssl/cert.pem;
         proxy_set_header X-Receipt-Proxy-Secret "${RECEIPT_PROXY_SECRET}";
         proxy_set_header X-Receipt-Client-IP $remote_addr;
         proxy_set_header Cookie "";
         proxy_set_header Authorization "";
         proxy_set_header Referer "";
+        # Identify this server hop without forwarding visitor fingerprints.
+        proxy_set_header User-Agent "NO-REFUNDS-Receipt-Proxy/1.0";
         proxy_hide_header Set-Cookie;
+        proxy_hide_header NEL;
+        proxy_hide_header Report-To;
+        proxy_hide_header Alt-Svc;
+        proxy_hide_header Referrer-Policy;
+        proxy_hide_header X-Content-Type-Options;
         proxy_request_buffering off;
         proxy_buffering off;
         proxy_cache off;

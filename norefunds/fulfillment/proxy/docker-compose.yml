@@ -1,4 +1,4 @@
-# Prepared only. Do not start before owner live-release approval.
+# Technical proxy activation approved by owner; public checkout remains disabled.
 services:
   norefunds-receipt-proxy:
     image: nginx:1.29.8-alpine
@@ -16,6 +16,7 @@ services:
       - traefik.http.routers.norefunds-receipt-proxy.entrypoints=websecure
       - traefik.http.routers.norefunds-receipt-proxy.rule=Host(`konsil.ch`) && (Path(`/norefunds/api/receipt`) || PathPrefix(`/norefunds/api/receipt/`))
       - traefik.http.routers.norefunds-receipt-proxy.priority=2000
+      - traefik.http.routers.norefunds-receipt-proxy.observability.accesslogs=false
       - traefik.http.routers.norefunds-receipt-proxy.tls=true
       - traefik.http.routers.norefunds-receipt-proxy.tls.certresolver=letsencrypt
       - traefik.http.routers.norefunds-receipt-proxy.service=norefunds-receipt-proxy
