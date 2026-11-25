@@ -54,3 +54,7 @@ After approving LIFE RECEIPT, owner explicitly requested replacing MONEY, STILL 
 ## 2026-11-25 — Optional gift relationships and positive personalization
 
 Status: pending — new feature suggestions received during active V5 content/layout corrections; not marked dringend. Do not automatically implement after V5. Owner requests optional children, partner, friends and pets, and creative positive gift content that makes the recipient happy. Consider opt-in/shared moments rather than asking for sensitive details or inventing relationship counts: dog walks, cat lap takeovers, shared adventures, favourite rituals, inside jokes, a message from the giver. Candidate non-numeric gift closings: JOY YOU BRING / NOT MEASURABLE; REPLACEMENT VALUE / IRREPLACEABLE. Keep optional fields voluntary and design sensitively for recipients without children, partner or pets. No changes to Alex's supplied inputs in V5.
+
+### 2026-11-25 — V6 active visual corrections
+
+Owner requested clearer narrative formatting, restored “all you'll ever have” while keeping it readable, and much more pixel artwork in the current design revision. Implemented in V6 export renderer: single-line paired narrative answers, TOTAL / ALL YOU'LL EVER HAVE, dedicated per-row icon gutter and many original thematic pixel motifs. Optional relationship/pet personalization remains pending as a separate feature; no website rollout authorized.
