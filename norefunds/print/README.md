@@ -33,3 +33,7 @@ All new counts are deliberately invented editorial assumptions, not health forec
 `make_v6.py` adds original vector pixel motifs from `pixel_icons.py` beside every label/value pair, plus two extra edition motifs at the top. Icons occupy their own 17pt gutter; labels reflow within the remaining width without shrinking. Each numerical value retains a common first baseline and right edge. Short narrative answers now follow the same paired-row layout rather than a staircase; wording is shortened where needed. The exporter rejects narrative pairs that would require the old fallback layout.
 
 TOTAL / ALL YOU'LL EVER HAVE restores the owner's preferred closing phrase, readable on a single line with the receipt icon. The three Mori answers are LIGHTS ON / JUST IN CASE, UPSTAIRS / PROBABLY NOTHING, MIRROR / YOU. PROBABLY. Sunshine's two narrative answers are shortened to fit the same grid. V5's life-used bar and other approved content remain. Review all four rendered pages before delivery; keep earlier exports.
+
+## Version 7 — large framing icons
+
+`make_v7.py` keeps V6 text and row layout. The two upper side motifs grow from 16pt to 45pt and move into the open left/right space beside ISSUED TO. A matching 36pt pair flanks the bottom thank-you lines. The motifs vary by edition. All are vector pixel shapes; the recipient name, copy, value alignment and page dimensions are retained. Render and visually inspect all four outputs for text/icon clearance.
