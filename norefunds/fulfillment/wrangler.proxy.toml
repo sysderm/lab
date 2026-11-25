@@ -1,4 +1,4 @@
-# Prepared for the owner-approved nginx proxy; NOT deployed.
+# Worker deployed with checkout disabled; nginx proxy NOT activated.
 name = "norefunds-receipt-bridge"
 main = "worker.mjs"
 compatibility_date = "2026-11-25"
