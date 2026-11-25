@@ -19,3 +19,11 @@ Requires Python reportlab and pypdf. Review rendered pages before delivery. Reta
 These are deliberately invented editorial estimates, not physiological or sleep predictions: remaining days = round((plan - age) × 365.25); 20,000 breaths/day, good sleep on 70% of nights, six bed turns/night, three daydreams/day. These assumptions exist solely to generate the playful counts. Values share the original numerical label baseline and right edge. No extra medical or personal input is requested. A supplied income can remain in the private source model for older exports but must not appear in V4 text or metadata; the exporter verifies that absence.
 
 V4 keeps the printing/birthday date and recipient inputs, 4×16-inch vector page geometry, and prior files. The website, worker, Zazzle template and checkout remain unchanged.
+
+## Version 5 — themed gift copy and clear totals
+
+`make_v5.py` keeps the V4 gift layout and adds a 20-cell life-used bar alongside the percentage. TOTAL / ONE LIFE, PAYMENT METHOD / TIME and CHANGE DUE / NONE replace the ambiguous multi-line subtotal. Numerical values stay on their labels' first baseline.
+
+Body Warranty replaces the earlier deterioration/colonoscopy section with non-gross fictional bodily-function counts: heartbeats, breaths, blinks, yawns, stretches, grins, goosebumps, sighs, sleep and pillow flips. Memento Mori becomes mildly uncanny rather than bereavement-focused: moving shadows, portraits making eye contact, unexplained noises, extra dream guests and floorboards in empty rooms. Standard and Sunshine retain their respective everyday/sunny themes.
+
+All new counts are deliberately invented editorial assumptions, not health forecasts: days as in V4; heartbeats 100,000/day, breaths 20,000/day, blinks 15,000/day, yawns 7/day, sighs 1/day, stretches and pillow flips 2/day, goosebumps 0.5/day, grins/daydreams 3/day, good nights 70% of days, bed turns 6/day. Creepy fiction counts use moving shadows 13/year, shoulder checks 24/year, portraits 9/year, ceiling inspections 13% of nights, extra dream guests 9% of nights, unexplained floorboards 17% of days. Visible section labels mark playful/fictional estimates. Optional partner/children/friends/pets features remain in the backlog and are not inferred from source data.
