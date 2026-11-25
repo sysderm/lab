@@ -156,6 +156,26 @@ zh:{locale:"zh-CN",
 };
 
 export const EDITIONS = {standard:"THE LIFETIME RECEIPT",medical:"BODY WARRANTY",goth:"MEMENTO MORI",sunny:"SUNSHINE"};
+// Receipt copy only: the original calculations and layout are retained.
+const CLASSIC_CLOSING={
+ en:["SOLD AS SEEN","QUALITY CONTROL: NONE","THANK YOU FOR YOUR CUSTOM.","YOU HAD NO CHOICE.","ITEM 000001 · HUMAN","Estimates, not prophecy."],
+ de:["GEKAUFT WIE GESEHEN","QUALITÄTSKONTROLLE: KEINE","DANKE FÜR DEINEN EINKAUF.","DU HATTEST KEINE WAHL.","ARTIKEL 000001 · MENSCH","Schätzungen, keine Prophezeiung."],
+ fr:["VENDU EN L’ÉTAT","CONTRÔLE QUALITÉ : AUCUN","MERCI POUR TON ACHAT.","TU N’AVAIS PAS LE CHOIX.","ARTICLE 000001 · HUMAIN","Estimations, pas une prophétie."],
+ es:["VENDIDO TAL CUAL","CONTROL DE CALIDAD: NINGUNO","GRACIAS POR TU COMPRA.","NO TENÍAS ELECCIÓN.","ARTÍCULO 000001 · HUMANO","Estimaciones, no predicciones."],
+ zh:["按现状出售","质量检查：无","感谢惠顾。","你别无选择。","商品 000001 · 人类","估算，并非预言。"]
+};
+const SPECIAL_CLOSING={
+ medical:["WARRANTY VOID","CAUSE: NORMAL USE","PLEASE RETURN ALL ORGANS","IN THEIR ORIGINAL PACKAGING.","ITEM 000001 · BIOLOGICAL UNIT","Fictional service intervals. Not medical predictions."],
+ goth:["NO LATE CHECKOUT","BAGGAGE ALLOWANCE: 0 KG","THANK YOU FOR NOT HAUNTING","THE STAFF.","ITEM 000001 · TEMPORARY RESIDENT","Satirical estimates, not a death forecast."],
+ sunny:["GOOD TIMES","BAD DECISIONS INCLUDED","IF FOUND BEHAVING RESPONSIBLY,","CALL A DOCTOR.","ITEM 000001 · QUESTIONABLE ADULT","Playful estimates, not guarantees."]
+};
+const CLASSIC_JOKES={
+ en:{sTime:"TIME LEFT (NON-TRANSFERABLE)",coffees:"COFFEES (LEGAL LIFE SUPPORT)",meals:"MEALS (YOU PICK. NO, YOU.)",phones:"PHONES WITH THE SAME CAMERA",cars:"CARS TO IMPRESS STRANGERS",haircuts:"HAIRCUTS (ASSUMING HAIR)",vacations:"NIGHTS OFF (BOSS HAS EMAIL)",books:"BOOKS YOU MIGHT ACTUALLY FINISH",stare:"STARING AT YOUR PHONE",workh:"HOURS SOLD TO EMPLOYER (TO 65)"},
+ de:{sTime:"RESTZEIT (NICHT ÜBERTRAGBAR)",coffees:"KAFFEES (LEGALE LEBENSERHALTUNG)",meals:"MAHLZEITEN (DU WÄHLST. NEIN, DU.)",phones:"HANDYS MIT DER GLEICHEN KAMERA",cars:"AUTOS FÜR FREMDE BLICKE",haircuts:"HAARSCHNITTE (SOFERN HAAR)",vacations:"FERIENNÄCHTE (CHEF HAT E-MAIL)",books:"BÜCHER, DIE DU WIRKLICH FERTIG LIEST",stare:"AUFS HANDY STARREN",workh:"AN DEN CHEF VERKAUFTE STUNDEN (BIS 65)"},
+ fr:{sTime:"TEMPS RESTANT (NON CESSIBLE)",coffees:"CAFÉS (ASSISTANCE VITALE LÉGALE)",meals:"REPAS (CHOISIS. NON, TOI.)",phones:"TÉLÉPHONES AU MÊME APPAREIL PHOTO",cars:"VOITURES POUR IMPRESSIONNER LES INCONNUS",haircuts:"COUPES (S’IL RESTE DES CHEVEUX)",vacations:"NUITS DE CONGÉ (LE CHEF A TES MAILS)",books:"LIVRES QUE TU FINIRAS VRAIMENT",workh:"HEURES VENDUES AU PATRON (AVANT 65 ANS)"},
+ es:{sTime:"TIEMPO RESTANTE (INTRANSFERIBLE)",coffees:"CAFÉS (SOPORTE VITAL LEGAL)",meals:"COMIDAS (ELIGE TÚ. NO, TÚ.)",phones:"MÓVILES CON LA MISMA CÁMARA",cars:"AUTOS PARA IMPRESIONAR A EXTRAÑOS",haircuts:"CORTES (SI QUEDA PELO)",vacations:"NOCHES LIBRES (EL JEFE TIENE EMAIL)",books:"LIBROS QUE DE VERDAD TERMINARÁS",workh:"HORAS VENDIDAS AL JEFE (HASTA LOS 65)"},
+ zh:{sTime:"剩余时间（不得转让）",coffees:"咖啡（合法生命维持）",meals:"餐食（你选。不，你选。）",phones:"摄像头没变的手机",cars:"用来打动陌生人的车",haircuts:"理发（假设还有头发）",vacations:"休假夜数（老板有邮箱）",books:"真的会读完的书",workh:"65岁前卖给老板的小时数"}
+};
 export function buildReceipt(input) {
   const age=Number(input.age);
   if(!Number.isFinite(age)||age<1||age>119) throw new RangeError("Age must be between 1 and 119.");
@@ -165,7 +185,8 @@ export function buildReceipt(input) {
   const T=I18N[language], nf=new Intl.NumberFormat(T.locale);
   const money=(value,currency)=>new Intl.NumberFormat(T.locale,{style:"currency",currency,notation:"compact",maximumFractionDigits:1}).format(value);
   const ED=input.edition || "standard";
-  const TT=(ED==="standard")?T:I18N.en;
+  const TT=(ED==="standard")?{...T,...CLASSIC_JOKES[language]}:I18N.en;
+  const C=ED==="standard"?CLASSIC_CLOSING[language]:SPECIAL_CLOSING[ED];
 
   let exp = Number(input.plan || 81);
   let extended=false;
@@ -198,54 +219,50 @@ export function buildReceipt(input) {
   L.push({t:"li",lab:TT.elapsed+"  "+elapsed+"%",val:blocks,cls:"barline"});
   rule();
   sect(TT.sTime);
-  line(TT.weeks,nf.format(weeks));
-  line(TT.mondays,nf.format(weeks));
+  // One weekly count is enough. Sunshine uses birthday cakes rather than a second annual count.
   line(TT.weekends,nf.format(weeks));
-  line(TT.summers,nf.format(summers));
+  if(ED!=="sunny") line(TT.summers,nf.format(summers));
   line(TT.moons,nf.format(moons));
   rule();
   if(ED==="medical"){
-    sect("PARTS &amp; LABOUR, REMAINING (POPULATION AVG.)");
+    sect("PARTS & LABOUR (FICTIONAL WARRANTY)");
     line("HIPS, ORIGINAL PARTS",(age<70?Math.round(70-age)+" YRS":"AFTERMARKET ERA"));
-    line("KNEES, FACTORY SPEC",(age<66?Math.round(66-age)+" YRS":"LISTEN TO THEM"));
-    line("READING WITHOUT GLASSES",(age<45?Math.round(45-age)+" YRS":"SQUINTING ALREADY"));
-    line("FULL-RANGE HEARING",(age<55?Math.round(55-age)+" YRS":"PARDON?"));
+    line("KNEES BEFORE THE SOUNDTRACK",(age<66?Math.round(66-age)+" YRS":"SOUND SYSTEM ACTIVE"));
+    line("SMALL PRINT WITHOUT ZOOM",(age<45?Math.round(45-age)+" YRS":"ARMS AT FULL EXTENSION"));
+    line("HEARING WITHOUT SUBTITLES",(age<55?Math.round(55-age)+" YRS":"PARDON?"));
     rule();
-    sect("MAINTENANCE SCHEDULE (EST.)");
-    line("YEARS BEFORE DAILY PILLS",(age<57?Math.round(57-age):"IN PROGRESS"));
-    line("YEARS WITHOUT REGULAR PAIN",(age<52?Math.round(52-age):"CHECK YOUR BACK"));
-    line("HOSPITAL-FREE YEARS AHEAD",(age<63?Math.round(63-age):"KEEP THE CARD HANDY"));
-    line("DENTIST VISITS REMAINING",nf.format(Math.round(Y*2)));
-    line("COLONOSCOPIES AHEAD",(age<75?Math.max(1,Math.ceil((75-Math.max(age,50))/10))+" (ENJOY)":"0 (CONGRATS)"));
-    note("population averages, heavily satirical — your doctor knows you, this receipt does not");
+    sect("SCHEDULED DETERIORATION (SATIRE)");
+    line("YEARS BEFORE PILLS FOR THE PILLS",(age<57?Math.round(57-age):"PHARMACY SUBSCRIPTION"));
+    line("YEARS BEFORE BACK GOES ON STRIKE",(age<52?Math.round(52-age):"NEGOTIATIONS FAILED"));
+    line("HOSPITAL-FREE YEARS (EXAMPLE)",(age<63?Math.round(63-age):"LOYALTY CARD READY"));
+    line("DENTIST VISITS (PAY TO SUFFER)",nf.format(Math.round(Y*2)));
+    line("COLONOSCOPIES (REVERSE CAMERA)",(age<75?Math.max(1,Math.ceil((75-Math.max(age,50))/10))+" (NO SELFIES)":"0 (IN THIS MODEL)"));
   } else if(ED==="goth"){
-    sect("THE DARK LEDGER, REMAINING");
-    line("HEARTBREAKS","~"+Math.max(1,Math.round(Y/18)));
-    line("NEAR MISSES, UNNOTICED","~"+Math.round(Y*2));
-    line("FUNERALS TO ATTEND","~"+Math.round(Y*0.9));
-    line("GRAVEYARD VISITS","~"+Math.round(Y*1.6));
-    line("BLACK GARMENTS TO BUY","~"+Math.round(Y*3));
+    sect("THE DARK LEDGER (FICTIONAL EST.)");
+    line("HEARTBREAKS (NO ANAESTHETIC)","~"+Math.max(1,Math.round(Y/18)));
+    line("NEAR MISSES (NOT INVOICED)","~"+Math.round(Y*2));
+    line("FUNERALS TO ATTEND (AS A GUEST)","~"+Math.round(Y*0.9));
+    line("GRAVEYARD PROPERTY VIEWINGS","~"+Math.round(Y*1.6));
+    line("BLACK OUTFITS (DRESS REHEARSAL)","~"+Math.round(Y*3));
     line("CANDLES TO BURN","~"+nf.format(Math.round(Y*40)));
     rule();
     sect("THE FINAL ARRANGEMENTS");
-    line("TIME ABOVE GROUND",Y.toFixed(0)+" YRS");
-    line("TIME IN GRAVE","ETERNITY (INCL.)","small");
-    line("LAST SONG YOU'LL HEAR","ALREADY WRITTEN","warn small");
-    note("the management will see you eventually");
+    line("NEXT OF KIN","DOING THE MATH","small");
+    line("TIME IN GRAVE","ETERNITY (RENT FREE)","small");
+    line("LAST SONG YOU'LL HEAR","CHOSEN BY SOMEONE ELSE","warn small");
   } else if(ED==="sunny"){
-    sect("JOY INVENTORY, REMAINING (EST.)");
-    line("LAUGHS",nf.format(Math.round(Y*365*13)));
-    line("HUGS",nf.format(Math.round(Y*365*4)));
-    line("DOGS YOU'LL PET",nf.format(Math.round(Y*130)));
-    line("SWIMS IN OPEN WATER",nf.format(Math.round(Y*8)));
-    line("SNOWFALLS",nf.format(Math.round(Y*12)));
-    line("BIRTHDAY CAKES",Math.round(Y));
-    line("NAPS",nf.format(Math.round(Y*80)));
+    sect("JOY INVENTORY (QUESTIONABLE EST.)");
+    line("LAUGHS (SOME AT YOUR EXPENSE)",nf.format(Math.round(Y*365*13)));
+    line("HUGS (NOT FROM HR)",nf.format(Math.round(Y*365*4)));
+    line("DOGS TO PET (IGNORE OWNERS)",nf.format(Math.round(Y*130)));
+    line("SWIMS (IT IS NOT WARM)",nf.format(Math.round(Y*8)));
+    line("SNOWFALLS (SHOVEL EXTRA)",nf.format(Math.round(Y*12)));
+    line("BIRTHDAY CAKES (CANDLES EXTRA)",Math.round(Y));
+    line("NAPS (ONCE A PUNISHMENT)",nf.format(Math.round(Y*80)));
     rule();
     sect("SPECIAL OFFERS");
-    line("FIRST TIMES STILL AHEAD","MORE THAN YOU THINK","small");
-    line("TIMES YOU'LL FALL IN LOVE","AT LEAST ONCE MORE","warn small");
-    note("averages, generously rounded up — joy compounds");
+    line("FIRST TIMES STILL AHEAD","NOT ALL FOR THE FAMILY CHAT","small");
+    line("TIMES YOU'LL FALL IN LOVE","1+ (CHECK WITH SPOUSE)","warn small");
   } else {
     sect(TT.sCons);
     line(TT.coffees,nf.format(coffees));
@@ -280,22 +297,31 @@ export function buildReceipt(input) {
       line(TT.parents,"~"+nf.format(Math.round(visits*20)),"warn");
       note(TT.assumeNote);
     }
-    note(TT.makeCount);
   }
   rule();
   L.push({t:"li",lab:TT.subtotal,val:TT.everything,cls:"subtotal small"});
   line(TT.payMethod,TT.timeW,"small");
   line(TT.change,"0.00","small");
-  L.push({t:"stamp"});
+  L.push({t:"stamp",lab:C[0],val:C[1]});
   rule();
   L.push({t:"barcode",weeks});
-  L.push({t:"bnum",lab:"W-"+weeks+"  ·  "+TT.wRemaining});
-  L.push({t:"thanks"});
+  L.push({t:"bnum",lab:C[4]});
+  L.push({t:"thanks",lab:C[2],val:C[3]});
 
+  // Share the actual edition's copy, not outdated lines or a second set of jokes.
   let shareOv=null;
-  if(ED==="medical") shareOv="My Body Warranty receipt 🧾\n· Hips: "+(age<70?Math.round(70-age)+" yrs of original parts":"aftermarket era")+"\n· Years before daily pills: "+(age<57?Math.round(57-age):"in progress")+"\n· Colonoscopies ahead: "+(age<75?Math.max(1,Math.ceil((75-Math.max(age,50))/10)):0)+"\nAs-is, no warranty claims. Print yours:";
-  else if(ED==="goth") shareOv="My Memento Mori receipt 🕯️\n· Funerals to attend: ~"+Math.round(Y*0.9)+"\n· Graveyard visits: ~"+Math.round(Y*1.6)+"\n· The last song I'll hear: already written\nNo refunds. Print yours:";
-  else if(ED==="sunny") shareOv="My Sunshine receipt ☀️\n· Laughs left: "+nf.format(Math.round(Y*365*13))+"\n· Dogs I'll pet: "+nf.format(Math.round(Y*130))+"\n· Times I'll fall in love: at least once more\nNo refunds on joy. Print yours:";
-  return {lines:L,edition:ED,age,exp,extended,language,plan:Number(input.plan || 81),currency:cur,income,weeks,coffees,screenYrs,Y,visits,pAge,shareOv,
+  if(ED!=="standard"){
+    const section=L.findIndex(x=>x.t==="sect"&&x.lab!==TT.sTime);
+    const sample=L.slice(section+1).filter(x=>x.t==="li"&&x.lab).slice(0,3);
+    shareOv="My "+EDITIONS[ED]+" receipt 🧾\n"+sample.map(x=>"· "+x.lab+": "+x.val).join("\n")+"\n"+C[2]+" "+C[3];
+  }
+  const printDisclaimer=C[5];
+  const specialFine={
+    medical:"Fictional warranty milestones and service intervals, not individual medical predictions or clinical recommendations.",
+    goth:"Fictional rates and dark-humour scenarios, not predictions of funerals, individual events or death.",
+    sunny:"Playful invented consumption rates and wish-list estimates, not guaranteed outcomes."
+  };
+  const finePrint=ED==="standard"?T.fine:specialFine[ED]+" The free calculation stays in your browser. The selected target age is a scenario, not a prognosis.";
+  return {lines:L,printDisclaimer,finePrint,edition:ED,age,exp,extended,language,plan:Number(input.plan || 81),currency:cur,income,weeks,coffees,screenYrs,Y,visits,pAge,shareOv,
     parents:(isFinite(visits)&&visits>0&&isFinite(pAge)&&pAge<85)?Math.round(visits*(85-pAge)):null};
 }
