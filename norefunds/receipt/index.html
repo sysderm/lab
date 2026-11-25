@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>NO REFUNDS — Original Lifetime Receipt</title>
+<meta name="robots" content="noindex">
+<style>
+:root{color-scheme:dark;--bg:#161519;--paper:#f7f2e6;--ink:#232220;--accent:#b62d20}
+*{box-sizing:border-box}body{margin:0;padding:28px 16px 60px;background:var(--bg);color:var(--paper);font:16px/1.5 system-ui,sans-serif}
+main{max-width:900px;margin:auto}a{color:inherit}h1{font-size:clamp(32px,6vw,56px);line-height:1.02;margin:20px 0 8px;letter-spacing:-.035em}header p{margin:0 0 25px;color:#d5d0c4}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,300px);gap:32px;align-items:start}
+.panel{background:var(--paper);color:var(--ink);padding:24px;border-radius:3px}label{display:block;font-size:.9rem;font-weight:650;margin:16px 0 5px}input:not([type=checkbox]),select,button{font:inherit;width:100%;border-radius:3px;padding:10px;color:var(--ink);background:#fffdf5;border:1px solid #a39e91}button{cursor:pointer;font-weight:700}
+button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink);margin-top:14px}button.secondary{margin-top:10px;background:transparent}button:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:3px solid #ad6c2d;outline-offset:3px}small,.note{font-size:.82rem;line-height:1.45}.consent{display:flex;align-items:flex-start;gap:8px;font-weight:400}.consent input{margin-top:5px;flex-shrink:0}.status{min-height:1.5em;font-size:.9rem}.status.error{color:#a0251b}
+canvas{width:100%;height:auto;display:block;box-shadow:0 10px 25px #0008;background:var(--paper)}figure{margin:0;max-width:265px;justify-self:center}figcaption{font-size:.8rem;text-align:center;color:#d5d0c4;margin-top:10px}
+@media(max-width:650px){.layout{display:flex;flex-direction:column;gap:24px}.panel{width:100%}figure{align-self:center;width:min(75%,265px)}}
+</style>
+</head>
+<body><main>
+<header><a href="../">← NO REFUNDS</a><h1>Not a poster.<br>A receipt for being alive.</h1><p>Personalized. Printed at 4 × 16 inches. One life. All moments priceless.</p></header>
+<div class="layout">
+<section class="panel">
+<form id="form" autocomplete="off">
+<label for="name">Name / Name</label><input id="name" maxlength="28" required placeholder="Anna">
+<label for="age">Age / Alter</label><input id="age" type="number" min="1" max="120" step="1" required placeholder="34">
+<label for="photo">Portrait (optional)</label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp">
+<small>JPEG, PNG or WebP, up to 20 MB. The photo stays in your browser until you explicitly send the print to Zazzle.</small>
+<label for="years">Look forward to</label><select id="years"><option value="5">5 years</option><option value="10" selected>10 years</option><option value="20">20 years</option><option value="30">30 years</option></select>
+<label for="language">Print language</label><select id="language"><option value="en">English</option><option value="de">Deutsch</option></select>
+<p class="note">The receipt illustrates a chosen future period. It does not predict life expectancy.</p>
+<button type="button" class="secondary" id="download">Download print image (free)</button>
+<div id="order-area" hidden>
+<label class="consent"><input type="checkbox" id="consent"><span>I have permission to use the name and photograph. I agree to transfer the finished print image to Zazzle for product creation. Konsil temporarily hosts the image via an unlisted link accessible to anyone who has it, for up to 24 hours; the file is then scheduled for deletion. Zazzle processes and may retain the image under its own <a href="https://www.zazzle.com/terms/privacy_notice" target="_blank" rel="noopener noreferrer">privacy notice</a>. Checkout, shipping, payment and support are provided by Zazzle. This is a commission-bearing referral. Cloudflare Turnstile checks for abuse when I continue.</span></label>
+<div id="challenge"></div>
+<button type="submit" class="primary" id="order" disabled>Order a real receipt ↗</button>
+<small>See the actual price, shipping and delivery options on Zazzle before payment.</small>
+</div>
+<p id="status" class="status" role="status" aria-live="polite"></p>
+</form>
+</section>
+<figure><canvas id="receipt" width="1800" height="7200" aria-label="Preview of your personalized Lifetime Receipt"></canvas><figcaption>Original Edition · 4 × 16 in · 10.16 × 40.64 cm</figcaption></figure>
+</div>
+</main>
+<script type="module">
+const $=id=>document.getElementById(id);
+const c=$("receipt"),ctx=c.getContext("2d",{alpha:false});
+const BASE="/norefunds/api/receipt";
+const palette={paper:"#f7f2e6",ink:"#232220",red:"#b62d20",muted:"#6b655b"};
+let portrait=null,loadingPhoto=false,photoVersion=0,busy=false,config=null,widget=null,token="",pendingBlob=null,scriptPromise=null,challengeTimer=null;
+function status(message,error=false){$("status").textContent=message;$("status").classList.toggle("error",error);}
+const en={copy:"ORIGINAL COPY",sub:"THE LIFETIME RECEIPT",to:"ISSUED TO",age:"AGE",human:"1 OF 1 / ORIGINAL HUMAN",future:"OVER THE NEXT",years:"YEARS",weekends:"WEEKENDS",count:"MAKE THEM COUNT.",desc:"DESCRIPTION",value:"VALUE",items:[["COFFEE DATES","OPEN TAB"],["GOOD STORIES","PENDING"],["BAD IDEAS","CLASSIFIED"],["LAUGHTER","UNLIMITED"]],total:"TOTAL",priceless:"PRICELESS.",paid:"PAID IN TIME & LOVE",valid:"VALID FOR A LIFETIME",final:"ONE LIFE. ALL SALES FINAL.",disclaimer:"A playful illustration, not a life prediction.",photo:"YOUR PORTRAIT"};
+const de={copy:"ORIGINALBELEG",sub:"DER LEBENSKASSENZETTEL",to:"AUSGESTELLT FÜR",age:"ALTER",human:"1 VON 1 / UNIKAT",future:"IN DEN NÄCHSTEN",years:"JAHREN",weekends:"WOCHENENDEN",count:"MACH ETWAS DARAUS.",desc:"POSITION",value:"WERT",items:[["KAFFEE MIT FREUNDEN","OFFEN"],["GUTE GESCHICHTEN","FOLGEN"],["VERRÜCKTE IDEEN","GEHEIM"],["LACHEN","UNBEGRENZT"]],total:"TOTAL",priceless:"UNBEZAHLBAR.",paid:"MIT ZEIT & LIEBE BEZAHLT",valid:"EIN LEBEN LANG GÜLTIG",final:"EIN LEBEN. KEINE RÜCKGABE.",disclaimer:"Spielerische Illustration, keine Lebensprognose.",photo:"DEIN PORTRÄT"};
+function rect(x,y,w,h,fill){ctx.fillStyle=fill;ctx.fillRect(x,y,w,h);}
+function text(value,x,y,size=16,{weight=700,face="sans-serif",align="left",color=palette.ink,max=390}={}){
+  ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline="top";
+  const family=face==="mono"?"'Courier New', monospace":"'Arial Black', Arial, sans-serif";
+  const valueString=String(value);
+  ctx.font=weight+" "+size+"px "+family;
+  while(ctx.measureText(valueString).width>max && size>9){size--;ctx.font=weight+" "+size+"px "+family;}
+  ctx.fillText(valueString,x,y,max);
+}
+function dashed(y){ctx.save();ctx.strokeStyle=palette.muted;ctx.lineWidth=1.25;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(31,y);ctx.lineTo(419,y);ctx.stroke();ctx.restore();}
+function barCode(x,y,w,h){
+  // Decorative barcode, not a scannable customer identifier.
+  rect(x,y,w,h,palette.paper);
+  let cursor=x+10,i=0;while(cursor<x+w-10){const width=[2,4,1,3,2,1,5][(i*5+2)%7];rect(cursor,y,width,h,palette.ink);cursor+=width+[2,1,3][i%3];i++;}
+}
+function drawPortrait(x,y,w,h,caption){
+  rect(x,y,w,h,"#ded8ca");
+  if(!portrait){text(caption,x+w/2,y+h/2-10,22,{align:"center",face:"mono",color:palette.muted,max:w-12});return;}
+  const s=Math.max(w/portrait.naturalWidth,h/portrait.naturalHeight);
+  const dw=portrait.naturalWidth*s,dh=portrait.naturalHeight*s;
+  ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+  if("filter" in ctx)ctx.filter="grayscale(100%) contrast(1.08)";
+  ctx.drawImage(portrait,x+(w-dw)/2,y+(h-dh)/2,dw,dh);ctx.restore();
+}
+function render(){
+  const l=$("language").value==="de"?de:en;
+  const name=$("name").value.trim()||"YOUR NAME";
+  const age=$("age").value||"–";
+  const years=Number($("years").value);
+  ctx.setTransform(4,0,0,4,0,0);
+  rect(0,0,450,1800,palette.paper);
+  text("NO. 000001",31,33,14,{face:"mono"});
+  text(l.copy,419,33,14,{align:"right",face:"mono",max:180});
+  dashed(61);
+  text("NO REFUNDS.",225,82,52,{align:"center",max:388});
+  text(l.sub,225,147,17,{align:"center",face:"mono"});
+  dashed(181);
+  text(l.to,31,198,13,{face:"mono"});
+  text(l.age,419,198,13,{face:"mono",align:"right"});
+  text(name.toLocaleUpperCase(),31,223,48,{max:292});
+  text(age,419,223,48,{align:"right",max:76});
+  drawPortrait(31,296,388,424,l.photo);
+  rect(31,720,388,35,palette.ink);
+  text(l.human,225,728,15,{face:"mono",align:"center",color:palette.paper,max:370});
+  rect(31,773,388,332,palette.red);
+  text(l.future+" "+years+" "+l.years,225,794,18,{face:"mono",align:"center",color:palette.paper,max:356});
+  text(years*52,225,837,134,{align:"center",color:palette.paper,max:365});
+  text(l.weekends,225,990,39,{align:"center",color:palette.paper,max:365});
+  text(l.count,225,1051,17,{face:"mono",align:"center",color:palette.paper,max:365});
+  dashed(1126);
+  text(l.desc,31,1145,14,{face:"mono"});
+  text(l.value,419,1145,14,{face:"mono",align:"right"});
+  l.items.forEach(([a,b],i)=>{text(a,31,1183+43*i,19,{face:"mono",max:245});text(b,419,1183+43*i,18,{face:"mono",align:"right",max:138});});
+  dashed(1354);
+  text(l.total,31,1370,16,{face:"mono"});
+  text("CHF 0.00",419,1370,16,{face:"mono",align:"right"});
+  text(l.priceless,225,1402,47,{align:"center",max:388});
+  rect(31,1472,388,43,palette.ink);
+  text(l.paid,225,1484,19,{face:"mono",align:"center",color:palette.paper,max:365});
+  text(l.valid,225,1535,17,{face:"mono",align:"center",max:388});
+  barCode(43,1577,364,90);
+  text("0 0 0 0 0 1  •  1 / 1",225,1680,13,{face:"mono",align:"center"});
+  text(l.final,225,1720,16,{face:"mono",align:"center",max:388});
+  text(l.disclaimer,225,1755,12,{align:"center",weight:400,color:palette.muted,max:388});
+}
+function valid(){return $("form").reportValidity() && $("name").value.trim()!=="" && !loadingPhoto;}
+function imageBlob(){return new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(new Error("Could not render image")),"image/png"));}
+function updateButton(){$("order").disabled=busy||loadingPhoto||!config||!$("consent").checked;$("download").disabled=busy||loadingPhoto;}
+["name","age","years","language"].forEach(id=>$(id).addEventListener("input",render));
+$("photo").addEventListener("change",async()=>{
+  const version=++photoVersion, f=$("photo").files[0];portrait=null;loadingPhoto=!!f;updateButton();render();
+  if(!f)return;
+  let objectUrl;
+  try{
+    if(f.size>20*1024*1024||!["image/jpeg","image/png","image/webp"].includes(f.type))throw new Error("Please use a JPEG, PNG or WebP up to 20 MB.");
+    objectUrl=URL.createObjectURL(f);const im=new Image();
+    await new Promise((resolve,reject)=>{im.onload=resolve;im.onerror=()=>reject(new Error("Unable to open portrait."));im.src=objectUrl;});
+    if(im.naturalWidth<400||im.naturalHeight<400)throw new Error("Choose a photo at least 400 × 400 pixels.");
+    if(im.naturalWidth*im.naturalHeight>50000000)throw new Error("Please choose a smaller photograph.");
+    if(version!==photoVersion)return;
+    portrait=im;status("");
+  }catch(e){if(version===photoVersion){$("photo").value="";status(e.message,true);}}
+  finally{if(objectUrl)URL.revokeObjectURL(objectUrl);if(version===photoVersion){loadingPhoto=false;render();updateButton();}}
+});
+$("download").addEventListener("click",async()=>{
+  if(!valid())return;
+  try{render();const blob=await imageBlob();const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="no-refunds-receipt-4x16.png";a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);}
+  catch{status("Download failed. Please try again.",true);}
+});
+$("consent").addEventListener("change",()=>{if(!$("consent").checked && busy)resetOrder("Transfer cancelled.");updateButton();});
+function resetOrder(message,error=false){
+  if(challengeTimer!==null){clearTimeout(challengeTimer);challengeTimer=null;}
+  if(widget!==null && window.turnstile){try{window.turnstile.remove(widget);}catch{}}
+  widget=null;token="";pendingBlob=null;busy=false;updateButton();status(message,error);
+}
+function loadChallenge(){
+  if(window.turnstile)return Promise.resolve();
+  if(!scriptPromise)scriptPromise=new Promise((resolve,reject)=>{
+    const s=document.createElement("script");s.src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";s.async=true;s.onload=resolve;s.onerror=()=>{s.remove();scriptPromise=null;reject(new Error("Verification could not load."));};document.head.appendChild(s);
+  });
+  return scriptPromise;
+}
+async function submitImage(value){
+  if(!busy||!pendingBlob||!$("consent").checked)return;
+  if(challengeTimer!==null){clearTimeout(challengeTimer);challengeTimer=null;}
+  const blob=pendingBlob;pendingBlob=null;token=value;
+  status("Preparing your personal print…");
+  try{
+    const response=await fetch(BASE,{method:"POST",headers:{"Content-Type":"image/png","X-Turnstile-Token":token},body:blob,cache:"no-store",credentials:"same-origin",referrerPolicy:"no-referrer"});
+    if(!response.ok)throw new Error("Could not prepare the print. Please try again.");
+    const result=await response.json();const target=new URL(result.checkoutUrl);
+    if(target.origin!=="https://www.zazzle.com"||target.pathname!=="/api/create/at-238446053942729400"||target.searchParams.get("pd")!=="256629092171840156")throw new Error("Unexpected checkout URL.");
+    if(!$("consent").checked||!busy){resetOrder("Transfer cancelled. Any already transferred print expires automatically.");return;}
+    location.assign(target.href);
+  }catch(e){resetOrder(e.message,true);}
+}
+$("form").addEventListener("submit",async e=>{
+  e.preventDefault();if(busy||!config||!$("consent").checked||!valid())return;
+  busy=true;updateButton();status("Preparing secure checkout…");
+  try{
+    render();pendingBlob=await imageBlob();
+    if(pendingBlob.size>16*1024*1024)throw new Error("Print file is too large; try a different portrait.");
+    await loadChallenge();
+    if(!busy||!$("consent").checked){resetOrder("Transfer cancelled.");return;}
+    widget=window.turnstile.render("#challenge",{sitekey:config.siteKey,action:"receipt_checkout",appearance:"interaction-only",callback:submitImage,"error-callback":()=>resetOrder("Verification failed. Please retry.",true),"expired-callback":()=>resetOrder("Verification expired. Please retry.",true)});
+    challengeTimer=setTimeout(()=>{if(busy&&pendingBlob)resetOrder("Verification timed out. Please retry.",true);},120000);
+  }catch(e){resetOrder(e.message,true);}
+});
+render();updateButton();
+fetch(BASE+"/config",{cache:"no-store",credentials:"same-origin",referrerPolicy:"no-referrer"})
+  .then(r=>r.ok?r.json():null).then(data=>{if(data?.enabled===true&&typeof data.siteKey==="string"){config=data;$("order-area").hidden=false;updateButton();}else status("Online ordering is not enabled yet. You can still download your print.");})
+  .catch(()=>status("Online ordering is not enabled yet. You can still download your print."));
+</script>
+</body></html>
