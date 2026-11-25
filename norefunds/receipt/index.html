@@ -26,6 +26,7 @@ canvas{width:100%;height:auto;display:block;box-shadow:0 10px 25px #0008;backgro
 <label for="design">Print edition</label><select id="design"><option value="portrait">ORIGINAL — personalized portrait</option><option value="standard">STANDARD — the lifetime receipt</option><option value="medical">BODY WARRANTY — parts &amp; maintenance</option><option value="goth">MEMENTO MORI — the dark ledger</option><option value="sunny">SUNSHINE — joy inventory</option></select>
 <div id="calculator-options" hidden><label for="plan">Warranty plan (illustration only)</label><select id="plan"><option value="81">STANDARD — 81 years</option><option value="92">EXTENDED — 92 years</option><option value="100">COLLECTOR’S — 100 years</option></select><label for="income">Annual income (optional)</label><input id="income" type="number" min="0" step="any"><label for="currency">Currency</label><select id="currency"></select><label for="visits">Parent visits per year (optional)</label><input id="visits" type="number" min="0" max="366"><label for="parent-age">Parents’ average age (optional)</label><input id="parent-age" type="number" min="18" max="119"><p class="note">Satirical estimates, not predictions or medical advice. Optional values appear as calculated totals in your print.</p></div>
 <label for="name">Name / Name</label><input id="name" maxlength="28" required placeholder="Anna">
+<label for="date-kind">Date shown on the print</label><select id="date-kind"><option value="printed">Printing date</option><option value="birthday">Birthday</option></select><label for="print-date">Choose date</label><input id="print-date" type="date" required><small>The date is printed as entered; it does not change your selected age.</small>
 <label for="age">Age / Alter</label><input id="age" type="number" min="1" max="120" step="1" required placeholder="34">
 <label for="photo">Portrait (optional)</label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp">
 <small>JPEG, PNG or WebP, up to 20 MB. The photo stays in your browser until you explicitly send the print to Zazzle.</small>
@@ -34,7 +35,7 @@ canvas{width:100%;height:auto;display:block;box-shadow:0 10px 25px #0008;backgro
 <p class="note">The receipt illustrates a chosen future period. It does not predict life expectancy.</p>
 <button type="button" class="secondary" id="download">Download print image (free)</button>
 <div id="order-area" hidden>
-<label class="consent"><input type="checkbox" id="consent"><span>I have permission to use the name and photograph. I agree to transfer the finished print image, including its selected name and calculated receipt contents, to Zazzle for product creation. Konsil temporarily hosts the image via an unlisted link accessible to anyone who has it, for up to 24 hours; the file is then scheduled for deletion. Zazzle processes and may retain the image under its own <a href="https://www.zazzle.com/terms/privacy_notice" target="_blank" rel="noopener noreferrer">privacy notice</a>. Checkout, shipping, payment and support are provided by Zazzle. This is a commission-bearing referral. Cloudflare Turnstile checks for abuse when I continue (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare privacy policy</a>). Do not enter clinical or other sensitive information.</span></label>
+<label class="consent"><input type="checkbox" id="consent"><span>I have permission to use the name and photograph. I agree to transfer the finished print image, including its selected name, date and calculated receipt contents, to Zazzle for product creation. Konsil temporarily hosts the image via an unlisted link accessible to anyone who has it, for up to 24 hours; the file is then scheduled for deletion. Zazzle processes and may retain the image under its own <a href="https://www.zazzle.com/terms/privacy_notice" target="_blank" rel="noopener noreferrer">privacy notice</a>. Checkout, shipping, payment and support are provided by Zazzle. This is a commission-bearing referral. Cloudflare Turnstile checks for abuse when I continue (<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare privacy policy</a>). Do not enter clinical or other sensitive information.</span></label>
 <div id="challenge"></div>
 <button type="submit" class="primary" id="order" disabled>Order a real receipt ↗</button>
 <small>See the actual price, shipping and delivery options on Zazzle before payment.</small>
@@ -51,6 +52,7 @@ import {CURRENCIES} from "../calculator-model.js";
 const $=id=>document.getElementById(id);
 const c=$("receipt"),ctx=c.getContext("2d",{alpha:false});
 const BASE="/norefunds/api/receipt";
+const today=new Date();$("print-date").value=[today.getFullYear(),String(today.getMonth()+1).padStart(2,"0"),String(today.getDate()).padStart(2,"0")].join("-");
 const palette={paper:"#f7f2e6",ink:"#232220",red:"#b62d20",muted:"#6b655b"};
 let portrait=null,loadingPhoto=false,photoVersion=0,busy=false,config=null,widget=null,pendingBlob=null,scriptPromise=null,challengeTimer=null,orderVersion=0,uploadController=null;
 function status(message,error=false){$("status").textContent=message;$("status").classList.toggle("error",error);}
@@ -83,7 +85,7 @@ function drawPortrait(x,y,w,h,caption){
 function render(){
   if($("design").value!=="portrait"){
     if($("age").value && (!Number.isFinite(Number($("age").value))||Number($("age").value)<1||Number($("age").value)>119))return;
-    window.receiptPrint=renderEdition(c,{edition:$("design").value,age:$("age").value||34,plan:$("plan").value,language:$("language").value,name:$("name").value,income:$("income").value,currency:$("currency").value,visits:$("visits").value,parentAge:$("parent-age").value});return;
+    window.receiptPrint=renderEdition(c,{edition:$("design").value,age:$("age").value||34,plan:$("plan").value,language:$("language").value,name:$("name").value,date:$("print-date").value,dateKind:$("date-kind").value,income:$("income").value,currency:$("currency").value,visits:$("visits").value,parentAge:$("parent-age").value});return;
   }
   const l=$("language").value==="de"?de:en;
   const name=$("name").value.trim()||"YOUR NAME";
@@ -96,6 +98,7 @@ function render(){
   dashed(61);
   text("NO REFUNDS.",225,82,52,{align:"center",max:388});
   text(l.sub,225,147,17,{align:"center",face:"mono"});
+  text(($("date-kind").value==="birthday"?"BIRTHDAY ":"PRINTED ")+$("print-date").value,225,168,9,{align:"center",face:"mono"});
   dashed(181);
   text(l.to,31,198,13,{face:"mono"});
   text(l.age,419,198,13,{face:"mono",align:"right"});
@@ -127,8 +130,8 @@ function render(){
 }
 function valid(){return $("form").reportValidity() && ($("design").value!=="portrait"||$("name").value.trim()!=="") && !loadingPhoto;}
 function imageBlob(){return new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(new Error("Could not render image")),"image/png"));}
-function updateButton(){$("order").disabled=busy||loadingPhoto||!config||!$("consent").checked;$("download").disabled=busy||loadingPhoto;["name","age","photo","years","language","design","plan","income","currency","visits","parent-age"].forEach(id=>{$(id).disabled=busy;});}
-["name","age","years","language","plan","income","currency","visits","parent-age"].forEach(id=>$(id).addEventListener("input",render));
+function updateButton(){$("order").disabled=busy||loadingPhoto||!config||!$("consent").checked;$("download").disabled=busy||loadingPhoto;["name","age","photo","years","language","design","plan","income","currency","visits","parent-age","date-kind","print-date"].forEach(id=>{$(id).disabled=busy;});}
+["name","age","years","language","plan","income","currency","visits","parent-age","date-kind","print-date"].forEach(id=>$(id).addEventListener("input",render));
 $("photo").addEventListener("change",async()=>{
   const version=++photoVersion, f=$("photo").files[0];portrait=null;loadingPhoto=!!f;updateButton();render();
   if(!f)return;

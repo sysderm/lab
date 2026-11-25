@@ -24,7 +24,7 @@ en:{locale:"en-US",
  makeCount:"make them count", assumeNote:"assuming ~20 more of their years",
  subtotal:"SUBTOTAL", everything:"EVERYTHING YOU'LL EVER HAVE", payMethod:"PAYMENT METHOD", timeW:"TIME", change:"CHANGE DUE",
  stampS:"NO EXCHANGES · SALE IS FINAL", wRemaining:"YOUR REMAINING WEEKS",
- thanks:"THANK YOU FOR LIVING<br>COME AGAIN · WHILE SUPPLIES LAST",
+ thanks:"THANKS FOR LIVING, COME AGAIN!",
  copyBtn:"Copy my receipt", copied:"Copied — go cause perspective", copyFail:"Screenshot the receipt instead",
  shareBtn:"Share it",
  nudge:"Screenshot it. Send it to someone you'd like more time with.",
@@ -198,8 +198,6 @@ export function buildReceipt(input) {
   L.push({t:"li",lab:TT.elapsed+"  "+elapsed+"%",val:blocks,cls:"barline"});
   rule();
   sect(TT.sTime);
-  line(TT.weeks,nf.format(weeks));
-  line(TT.mondays,nf.format(weeks));
   line(TT.weekends,nf.format(weeks));
   line(TT.summers,nf.format(summers));
   line(TT.moons,nf.format(moons));

@@ -29,3 +29,10 @@ test('all editions retain valid totals, language behavior and age-extension logi
  assert.throws(()=>buildReceipt({age:34,edition:'injected'}),RangeError);
  assert.throws(()=>buildReceipt({age:34,plan:999}),RangeError);
 });
+
+test('one weekly counter and the corrected cashier farewell',()=>{
+ const model=buildReceipt({age:50,plan:92,edition:'goth'});
+ assert.equal(model.lines.some(x=>x.lab==='WEEKS'||x.lab==='MONDAYS'),false);
+ assert.equal(model.lines.filter(x=>x.lab==='WEEKENDS').length,1);
+ assert.equal(I18N.en.thanks,'THANKS FOR LIVING, COME AGAIN!');
+});

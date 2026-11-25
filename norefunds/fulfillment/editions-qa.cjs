@@ -28,6 +28,12 @@ for(const [engine,mobile] of [[chromium,false],[webkit,false],[webkit,true]]){
    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);cases++;
   }
   await p.locator('#age').fill('50');await p.locator('#language').selectOption('en');
+  await p.locator('canvas').evaluate(canvas=>{const ctx=canvas.getContext('2d'),draw=ctx.fillText.bind(ctx);window.drawnPrintText=[];ctx.fillText=(...args)=>{window.drawnPrintText.push({value:String(args[0]),font:ctx.font});return draw(...args);};});
+  await p.locator('#name').fill('Alex');
+  await p.locator('#date-kind').selectOption('birthday');await p.locator('#print-date').fill('1976-06-15');
+  assert.equal(await p.evaluate(()=>window.drawnPrintText.some(x=>x.value==='ALEX'&&parseFloat(x.font.match(/[0-9.]+px/)[0])>=30)),true);
+  assert.equal(await p.evaluate(()=>window.drawnPrintText.some(x=>x.value==='BIRTHDAY 1976-06-15')),true);
+  assert.equal(await p.locator('#print-date').inputValue(),'1976-06-15');assert.equal(await p.evaluate(()=>window.receiptPrint.model.age),50);
   const png=await p.locator('canvas').evaluate(c=>c.toDataURL().split(',')[1]);const data=Buffer.from(png,'base64');
   assert.equal(data.readUInt32BE(16),1800);assert.equal(data.readUInt32BE(20),7200);
   if(engine===chromium)fs.writeFileSync(path.join(output,edition+'-edition.png'),data);
@@ -46,9 +52,10 @@ for(const [engine,mobile] of [[chromium,false],[webkit,false],[webkit,true]]){
  await popup.close();
  const baseline=await context.newPage();await baseline.goto('https://konsil.ch/baseline/?lang=de');await baseline.locator('#age').fill('50');await baseline.locator('[name=plan][value="92"]').check();await baseline.locator('#edition').selectOption('goth');await baseline.locator('#income').fill('450000');await baseline.locator('#visits').fill('2');await baseline.locator('#page').fill('87');await baseline.locator('#i-print').click();
  // Host/path in the footer intentionally differs for the baseline test URL.
+ await baseline.locator('#out').evaluate(out=>{for(const line of out.querySelectorAll('.li'))if(['WEEKS','MONDAYS'].includes(line.querySelector('.lab')?.textContent))line.remove();});
  const before=(await baseline.locator('#out').innerText()).replace('konsil.ch/baseline','konsil.ch/norefunds');
  assert.equal(screen,before);await baseline.close();assert.deepEqual(errors,[]);
- console.log(label+': '+cases+' edition/language/age layouts, exports, downloads, private handoff and baseline calculator equivalence PASS');
+ console.log(label+': '+cases+' edition/language/age layouts, exports, downloads, private handoff, big name/date rendering and baseline except removed counters PASS');
  }finally{await b.close();}
 }
 })().catch(e=>{console.error(e);process.exit(1)});
