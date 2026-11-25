@@ -36,3 +36,17 @@ Status: pending — new requirements received while the current editorial/resear
 Owner asks: “Bigger writing, version the designs please, of course, try to fill the receipt more with the writing and don't use small writing and make the writing more pixelated and not so pretty.”
 
 Intent: enlarge text throughout (not only the name), avoid tiny footnotes/labels, use more of the receipt area for meaningful writing with less empty space, adopt a deliberately coarse pixel/thermal-printer aesthetic rather than polished type, and give designs/exports explicit version identifiers while preserving earlier versions. This complements the pending pixel-art skull/motifs request. Retain high-quality output while making glyphs intentionally pixel-shaped; do not confuse this request with blurry preview scaling. No exact font, minimum size, version scheme or revised line selection has yet been approved. Keep existing no-purchase/no-live-release constraints.
+
+### 2026-11-25 — Explicit execution of next export version
+
+Owner clarified “No no no ... next version!” and requested cool thermal receipt designs/icons that fit. This explicitly authorizes the pending pixel typography/versioning and matching-icon requirements for the four personal PDF exports. Implemented as V2: original vector dot alphabet, 9.5 pt minimum visible glyph height, larger name, full-height layout and calculator/cross/skull/sun motifs. Preserve V1.1; deliver V2 separately to m4 Downloads. Website and Zazzle renderer rollout remain outside this export revision.
+
+## 2026-11-25 — Naming alternatives to NO REFUNDS
+
+Status: pending naming decision — received during V3 alignment/icon revision. Owner asks whether NO REFUNDS is too intellectual and wants funny, understandable alternatives. Do not rename designs or deploy a brand change without an explicit choice. Initial proposals: YOUR LIFE RECEIPT (clear main heading; retain NO REFUNDS as punchline), LIFE: FINAL SALE, SOLD AS HUMAN, THANKS FOR EXISTING, ONE LIFE. NO RETURNS. Answer the naming question now; retain current title in V3.
+
+### 2026-11-25 — V3 alignment and V4 gift content completed
+
+V3 export revision completed: numerical values share the first baseline with wrapped labels and a fixed right edge; relevant section icons added. Four PDFs copied and checksum-verified in m4 Downloads/NO-REFUNDS-v3.
+
+After approving LIFE RECEIPT, owner explicitly requested replacing MONEY, STILL INBOUND with creative gift-appropriate content (breaths, good nights' sleep, turning in sleep, daydreams). Implemented for V4 exports: LIFE RECEIPT heading, bottom NO REFUNDS stamp, no income/earnings/taxes in artwork, four edition-specific playful-estimate lines and moon motif. Inputs and prior versions preserved. These export revisions do not authorize a website/Zazzle live release or change checkout.
