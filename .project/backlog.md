@@ -22,3 +22,9 @@ Preserve this as the requested creative/context reference. Do not assume the sup
 Status: active review — user explicitly requested corrections to the current receipt artwork after inspecting the PDFs. Removed the duplicate WEEKS/MONDAYS counters, enlarged recipient name, added editable printing/birthday date controls without deriving age, and corrected the English farewell to “THANKS FOR LIVING, COME AGAIN!”. Four local personal PDFs revised and copied to m4 Downloads with backups; no personal files uploaded.
 
 User also requested a broad scan of Memento Mori jokes, gadgets, stories and web content for possible inclusions. The completed source-linked content-design resource at reports/Memento Mori receipt humour.md contains 42 primary-source URLs and 60 original receipt-line candidates, with original receipt-copy candidates distinguished from source facts and no claim to exhaust the internet. Candidates are not automatically all inserted into the receipts. New static UI remains unpublished; checkout and purchases remain gated.
+
+## 2026-11-25 — Pixel art motifs for receipt editions
+
+Status: pending — new suggestion received during the active editorial/research revision; not marked “dringend”. Do not implement or automatically start after the active task; wait for an explicit execution request.
+
+Owner suggestion: add a few pixel-art motifs, especially a Totenkopf/skull on the Memento Mori edition, and potentially matching motifs on the other editions. Keep the thermal-receipt identity and small 4×16-inch print readability. No decision yet on exact motifs, placement, quantity or size. Existing no-purchase/no-live-release-without-approval constraints remain in force.
