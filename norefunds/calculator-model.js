@@ -173,9 +173,21 @@ const CLASSIC = {
  zh:{title:"人生收银小票",scenario:"示例目标年龄",extended:"目标年龄（已延长）",hero:"购物篮里的周末",s1:"日常消耗品",s2:"隐藏费用",s3:"可选附加项",coffee:"咖啡（合法燃料）",meals:"餐食（洗碗另算）",hair:"理发（效果不保）",books:"可能读完的书",holiday:"度假夜数",phone:"换新手机",screen:"盯着屏幕的时间",work:"65岁前的工作小时",manual:"使用说明书",manualVal:"未附送",service:"客服热线",serviceVal:"从公元元年起占线",money:"65岁前税前收入",parents:"探望父母（示例）",unknown:"不作估算",stamp:"无成人监管",barcode:"扫码并不会发生任何事",end:"结账后请为你的人生打分。",disclaimer:"示例估算，并非预测。"}
 };
 const SPECIAL = {
- medical:{title:EDITIONS.medical,scenario:"ILLUSTRATIVE TARGET AGE",extended:"TARGET AGE (AUTO-EXTENDED)",hero:"HEARTBEATS · ENGINE RUNNING",money:"GROSS PAY TO 65",parents:"PARENT VISITS (SCENARIO)",unknown:"NOT ESTIMATED",stamp:"FACTORY SEAL BROKEN",barcode:"SCAN FOR SPARE PARTS (GOOD LUCK)",end:"Manual says rest. Owner insists on more tabs.",disclaimer:"Satire and illustrative rates, not medical forecasts."},
- goth:{title:EDITIONS.goth,scenario:"ILLUSTRATIVE TARGET AGE",extended:"TARGET AGE (AUTO-EXTENDED)",hero:"FULL MOONS BEFORE CURTAIN CALL",money:"GROSS PAY TO 65",parents:"PARENT VISITS (SCENARIO)",unknown:"NOT ESTIMATED",stamp:"STILL NOT A GHOST",barcode:"NOT A VALID PASS TO THE AFTERLIFE",end:"Please leave a message after the final beep.",disclaimer:"Fictional shopping basket, not a death forecast."},
+ medical:{title:EDITIONS.medical,scenario:"ILLUSTRATIVE TARGET AGE",extended:"TARGET AGE (AUTO-EXTENDED)",hero:"HEARTBEATS · ENGINE RUNNING",money:"GROSS PAY TO 65",parents:"PARENT VISITS (SCENARIO)",unknown:"NOT ESTIMATED",stamp:"FACTORY SEAL BROKEN",barcode:"SCAN FOR SPARE PARTS (GOOD LUCK)",end:"Manufacturer refuses to admit this is the beta version.",disclaimer:"Satire and illustrative rates, not medical forecasts."},
+ goth:{title:EDITIONS.goth,scenario:"ILLUSTRATIVE TARGET AGE",extended:"TARGET AGE (AUTO-EXTENDED)",hero:"FULL MOONS BEFORE CURTAIN CALL",money:"GROSS PAY TO 65",parents:"PARENT VISITS (SCENARIO)",unknown:"NOT ESTIMATED",stamp:"STILL NOT A GHOST",barcode:"PRINTED WITH 100% RECYCLED SHADOWS",end:"Please leave a message after the final beep.",disclaimer:"Fictional shopping basket, not a death forecast."},
  sunny:{title:EDITIONS.sunny,scenario:"ILLUSTRATIVE TARGET AGE",extended:"TARGET AGE (AUTO-EXTENDED)",hero:"SUNSETS TO SHOW UP FOR",money:"GROSS PAY TO 65",parents:"PARENT VISITS (SCENARIO)",unknown:"NOT ESTIMATED",stamp:"APPROVED FOR PLAY",barcode:"BEEP! YOU FOUND AN EASTER EGG.",end:"Wear the good outfit on a Tuesday.",disclaimer:"A playful wish list, not a promise."}
+};
+const STANDARD_FINE = {
+ en:"Scenario assumptions: 52.18 weekends/year; 1.5 coffees, 3 meals and 5 screen hours/day; 8.7 haircuts, 5 books and 12 nights away/year; phone upgrades every 3 years until 78; 1,800 work hours/year to 65. Optional gross pay assumes a flat wage; parent visits use a target age of 85 only when an eligible parent age is supplied. These are illustrative rates, not personalized forecasts. The free calculation stays in your browser.",
+ de:"Rechenannahmen: 52,18 Wochenenden/Jahr; 1,5 Kaffees, 3 Mahlzeiten und 5 Bildschirmstunden/Tag; 8,7 Haarschnitte, 5 Bücher und 12 Feriennächte/Jahr; Handy alle 3 Jahre bis 78; 1’800 Arbeitsstunden/Jahr bis 65. Optionaler Bruttolohn ohne Lohnänderung; Elternbesuche mit Zielalter 85 nur bei geeignetem angegebenem Alter. Rechenbeispiele, keine persönlichen Prognosen. Die Gratisberechnung bleibt im Browser.",
+ fr:"Hypothèses : 52,18 week-ends/an ; 1,5 café, 3 repas et 5 h d’écran/jour ; 8,7 coupes, 5 livres et 12 nuits de vacances/an ; téléphone tous les 3 ans jusqu’à 78 ans ; 1 800 h de travail/an jusqu’à 65 ans. Salaire constant ; visites aux parents avec un âge cible de 85 ans si l’âge fourni le permet. Exemples, pas de prévisions personnelles. Le calcul gratuit reste dans ton navigateur.",
+ es:"Supuestos: 52,18 fines de semana/año; 1,5 cafés, 3 comidas y 5 horas de pantalla/día; 8,7 cortes, 5 libros y 12 noches de vacaciones/año; móvil cada 3 años hasta los 78; 1.800 horas de trabajo/año hasta los 65. Salario constante; visitas a padres con edad objetivo de 85 si la edad indicada lo permite. Ejemplos, no predicciones personales. El cálculo gratuito queda en tu navegador.",
+ zh:"示例假设：每年52.18个周末，每天1.5杯咖啡、3餐及5小时屏幕时间；每年8.7次理发、5本书及12晚假期；78岁前每3年换手机，65岁前每年工作1,800小时。工资假设不变；仅在所填父母年龄适用时，以85岁为示例目标估算探望次数。并非个人预测。免费计算只在浏览器内完成。"
+};
+const SPECIAL_FINE={
+ medical:"Illustrative rates: 70 heartbeats/minute, 8 hours of sleep/day, 15 blinks/minute during 16 waking hours/day, and 2 example dental appointments/year. The service report is fictional and is not medical guidance or a prediction.",
+ goth:"The calendar uses 12.37 full moons/year. The entirely fictional shopping basket assumes 40 candles, 3 black outfits, 0.9 funerals and 52 midnight snacks/year for the chosen scenario. It does not forecast actual events or death.",
+ sunny:"Playful wish-list assumptions: 365 sunsets, 13 laughs/day, 4 hugs/day, 130 dog encounters, 8 outdoor swims, 1 birthday cake and 80 naps/year. These are imagined quantities, not guarantees."
 };
 export function buildReceipt(input) {
   const age=Number(input.age);
@@ -290,5 +302,6 @@ export function buildReceipt(input) {
   const shareRows=L.filter(l=>l.t==="li"&&!l.cls?.includes("small")).slice(0,2);
   const shareOv=C.title+" 🧾\n· "+highlight.lab+": "+highlight.val+
     shareRows.map(row=>"\n· "+row.lab+": "+row.val).join("")+"\n"+C.end;
-  return {lines:L,title:C.title,style:EDITION_STYLE[ED],disclaimer:C.disclaimer,edition:ED,age,exp,extended,language,contentLanguage,plan,currency:cur,income,weeks,coffees,screenYrs,Y,visits,pAge,shareOv,parents};
+  const finePrint=ED==="standard"?STANDARD_FINE[contentLanguage]:SPECIAL_FINE[ED]+" Optional gross pay assumes a flat wage to 65; parent visits use a target age of 85 only when an eligible age is provided. The free calculation stays in your browser.";
+  return {lines:L,title:C.title,finePrint,style:EDITION_STYLE[ED],disclaimer:C.disclaimer,edition:ED,age,exp,extended,language,contentLanguage,plan,currency:cur,income,weeks,coffees,screenYrs,Y,visits,pAge,shareOv,parents};
 }
