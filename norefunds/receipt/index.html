@@ -48,7 +48,7 @@ const $=id=>document.getElementById(id);
 const c=$("receipt"),ctx=c.getContext("2d",{alpha:false});
 const BASE="/norefunds/api/receipt";
 const palette={paper:"#f7f2e6",ink:"#232220",red:"#b62d20",muted:"#6b655b"};
-let portrait=null,loadingPhoto=false,photoVersion=0,busy=false,config=null,widget=null,token="",pendingBlob=null,scriptPromise=null,challengeTimer=null;
+let portrait=null,loadingPhoto=false,photoVersion=0,busy=false,config=null,widget=null,pendingBlob=null,scriptPromise=null,challengeTimer=null,orderVersion=0,uploadController=null;
 function status(message,error=false){$("status").textContent=message;$("status").classList.toggle("error",error);}
 const en={copy:"ORIGINAL COPY",sub:"THE LIFETIME RECEIPT",to:"ISSUED TO",age:"AGE",human:"1 OF 1 / ORIGINAL HUMAN",future:"OVER THE NEXT",years:"YEARS",weekends:"WEEKENDS",count:"MAKE THEM COUNT.",desc:"DESCRIPTION",value:"VALUE",items:[["COFFEE DATES","OPEN TAB"],["GOOD STORIES","PENDING"],["BAD IDEAS","CLASSIFIED"],["LAUGHTER","UNLIMITED"]],total:"TOTAL",priceless:"PRICELESS.",paid:"PAID IN TIME & LOVE",valid:"VALID FOR A LIFETIME",final:"ONE LIFE. ALL SALES FINAL.",disclaimer:"A playful illustration, not a life prediction.",photo:"YOUR PORTRAIT"};
 const de={copy:"ORIGINALBELEG",sub:"DER LEBENSKASSENZETTEL",to:"AUSGESTELLT FÜR",age:"ALTER",human:"1 VON 1 / UNIKAT",future:"IN DEN NÄCHSTEN",years:"JAHREN",weekends:"WOCHENENDEN",count:"MACH ETWAS DARAUS.",desc:"POSITION",value:"WERT",items:[["KAFFEE MIT FREUNDEN","OFFEN"],["GUTE GESCHICHTEN","FOLGEN"],["VERRÜCKTE IDEEN","GEHEIM"],["LACHEN","UNBEGRENZT"]],total:"TOTAL",priceless:"UNBEZAHLBAR.",paid:"MIT ZEIT & LIEBE BEZAHLT",valid:"EIN LEBEN LANG GÜLTIG",final:"EIN LEBEN. KEINE RÜCKGABE.",disclaimer:"Spielerische Illustration, keine Lebensprognose.",photo:"DEIN PORTRÄT"};
@@ -69,7 +69,7 @@ function barCode(x,y,w,h){
 }
 function drawPortrait(x,y,w,h,caption){
   rect(x,y,w,h,"#ded8ca");
-  if(!portrait){text(caption,x+w/2,y+h/2-10,22,{align:"center",face:"mono",color:palette.muted,max:w-12});return;}
+  if(!portrait){const initials=($("name").value.trim()||"YOUR NAME").split(/\s+/).slice(0,2).map(v=>Array.from(v)[0]||"").join("").toLocaleUpperCase();text("ONE OF ONE",x+w/2,y+60,20,{align:"center",face:"mono",color:palette.muted,max:w-24});text(initials,x+w/2,y+124,150,{align:"center",max:w-30});text("NO REFUNDS.",x+w/2,y+h-75,25,{align:"center",max:w-30});return;}
   const s=Math.max(w/portrait.naturalWidth,h/portrait.naturalHeight);
   const dw=portrait.naturalWidth*s,dh=portrait.naturalHeight*s;
   ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
@@ -119,7 +119,7 @@ function render(){
 }
 function valid(){return $("form").reportValidity() && $("name").value.trim()!=="" && !loadingPhoto;}
 function imageBlob(){return new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(new Error("Could not render image")),"image/png"));}
-function updateButton(){$("order").disabled=busy||loadingPhoto||!config||!$("consent").checked;$("download").disabled=busy||loadingPhoto;}
+function updateButton(){$("order").disabled=busy||loadingPhoto||!config||!$("consent").checked;$("download").disabled=busy||loadingPhoto;["name","age","photo","years","language"].forEach(id=>{$(id).disabled=busy;});}
 ["name","age","years","language"].forEach(id=>$(id).addEventListener("input",render));
 $("photo").addEventListener("change",async()=>{
   const version=++photoVersion, f=$("photo").files[0];portrait=null;loadingPhoto=!!f;updateButton();render();
@@ -141,11 +141,12 @@ $("download").addEventListener("click",async()=>{
   try{render();const blob=await imageBlob();const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="no-refunds-receipt-4x16.png";a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);}
   catch{status("Download failed. Please try again.",true);}
 });
-$("consent").addEventListener("change",()=>{if(!$("consent").checked && busy)resetOrder("Transfer cancelled.");updateButton();});
+$("consent").addEventListener("change",()=>{if(!$("consent").checked && busy)resetOrder("Transfer cancelled. Any already transferred print expires automatically.");updateButton();});
 function resetOrder(message,error=false){
+  orderVersion++;if(uploadController){uploadController.abort();uploadController=null;}
   if(challengeTimer!==null){clearTimeout(challengeTimer);challengeTimer=null;}
   if(widget!==null && window.turnstile){try{window.turnstile.remove(widget);}catch{}}
-  widget=null;token="";pendingBlob=null;busy=false;updateButton();status(message,error);
+  widget=null;pendingBlob=null;busy=false;updateButton();status(message,error);
 }
 function loadChallenge(){
   if(window.turnstile)return Promise.resolve();
@@ -154,31 +155,33 @@ function loadChallenge(){
   });
   return scriptPromise;
 }
-async function submitImage(value){
-  if(!busy||!pendingBlob||!$("consent").checked)return;
+async function submitImage(value,version){
+  if(version!==orderVersion||!busy||!pendingBlob||!$("consent").checked)return;
   if(challengeTimer!==null){clearTimeout(challengeTimer);challengeTimer=null;}
-  const blob=pendingBlob;pendingBlob=null;token=value;
+  const blob=pendingBlob;pendingBlob=null;const controller=new AbortController();uploadController=controller;
   status("Preparing your personal print…");
   try{
-    const response=await fetch(BASE,{method:"POST",headers:{"Content-Type":"image/png","X-Turnstile-Token":token},body:blob,cache:"no-store",credentials:"same-origin",referrerPolicy:"no-referrer"});
+    const response=await fetch(BASE,{method:"POST",headers:{"Content-Type":"image/png","X-Turnstile-Token":value},body:blob,signal:controller.signal,cache:"no-store",credentials:"same-origin",referrerPolicy:"no-referrer"});
     if(!response.ok)throw new Error("Could not prepare the print. Please try again.");
     const result=await response.json();const target=new URL(result.checkoutUrl);
     if(target.origin!=="https://www.zazzle.com"||target.pathname!=="/api/create/at-238446053942729400"||target.searchParams.get("pd")!=="256629092171840156")throw new Error("Unexpected checkout URL.");
+    if(version!==orderVersion)return;
     if(!$("consent").checked||!busy){resetOrder("Transfer cancelled. Any already transferred print expires automatically.");return;}
     location.assign(target.href);
-  }catch(e){resetOrder(e.message,true);}
+  }catch(e){if(version===orderVersion)resetOrder(e.message,true);}
 }
 $("form").addEventListener("submit",async e=>{
   e.preventDefault();if(busy||!config||!$("consent").checked||!valid())return;
-  busy=true;updateButton();status("Preparing secure checkout…");
+  const version=++orderVersion;busy=true;updateButton();status("Preparing secure checkout…");
   try{
-    render();pendingBlob=await imageBlob();
+    render();const blob=await imageBlob();if(version!==orderVersion)return;pendingBlob=blob;
     if(pendingBlob.size>16*1024*1024)throw new Error("Print file is too large; try a different portrait.");
     await loadChallenge();
+    if(version!==orderVersion)return;
     if(!busy||!$("consent").checked){resetOrder("Transfer cancelled.");return;}
-    widget=window.turnstile.render("#challenge",{sitekey:config.siteKey,action:"receipt_checkout",appearance:"interaction-only",callback:submitImage,"error-callback":()=>resetOrder("Verification failed. Please retry.",true),"expired-callback":()=>resetOrder("Verification expired. Please retry.",true)});
-    challengeTimer=setTimeout(()=>{if(busy&&pendingBlob)resetOrder("Verification timed out. Please retry.",true);},120000);
-  }catch(e){resetOrder(e.message,true);}
+    widget=window.turnstile.render("#challenge",{sitekey:config.siteKey,action:"receipt_checkout",appearance:"interaction-only",callback:v=>submitImage(v,version),"error-callback":()=>{if(version===orderVersion)resetOrder("Verification failed. Please retry.",true);},"expired-callback":()=>{if(version===orderVersion)resetOrder("Verification expired. Please retry.",true);}});
+    challengeTimer=setTimeout(()=>{if(version===orderVersion&&busy&&pendingBlob)resetOrder("Verification timed out. Please retry.",true);},120000);
+  }catch(e){if(version===orderVersion)resetOrder(e.message,true);}
 });
 render();updateButton();
 fetch(BASE+"/config",{cache:"no-store",credentials:"same-origin",referrerPolicy:"no-referrer"})
