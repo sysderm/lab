@@ -78,3 +78,11 @@ Status: pending owner decision — during launch planning the owner asks whether
 ## 2026-11-25 — Non-paper Zazzle receipt products
 
 Status: pending — new research task received during active launch-plan delivery, not marked dringend. Owner asks whether Zazzle can print the receipt on something other than paper. Later check current official product formats/materials and whether Create-a-Product/template personalization supports the same artwork. Assess long-receipt aspect ratio, actual readable print area, durable/display/gift appeal, base price/shipping/royalty economics and need for separate templates. Distinguish real available materials/products from speculative ideas; do not create listings, change current template, buy samples or subscribe while checking. Current verified product is a 4×16-inch satin photo print, not thermal till paper.
+
+## 2026-11-25 — Narrate both Life Receipt video drafts
+
+Pending. Add an English female Amazon Polly voiceover to the Standard and Sunshine clips, timed to the reveals and QR end cards. Received during the QR and visible-version edit.
+
+## 2026-11-26 — Life Receipt on mylifereceipt.com
+
+Pending. Owner purchased mylifereceipt.com at Spaceship and wants the website currently at konsil.ch/norefunds set up on that domain. Include the ordering flow and existing QR destinations in migration planning. Received during final verification of the Dreamina videos.
